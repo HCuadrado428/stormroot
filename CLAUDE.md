@@ -1,0 +1,51 @@
+# Stormroot · mod de Minecraft (multiloader / multiversión)
+
+Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. El diseño completo está en `README.md`.
+
+## Objetivo
+- Targets (todas versiones ofuscadas; NO hay versiones 26.x en este proyecto):
+  | Target | Jar válido en | Loaders | Java |
+  |----|----|---------|------|
+  | 1.20.1 | 1.20.1 | Forge, Fabric | 17 |
+  | 1.21.1 | 1.21 – 1.21.1 | NeoForge, Fabric | 21 |
+  | 1.21.11 | 1.21.11 | NeoForge, Fabric | 21 |
+- **Quilt** = el jar de Fabric probado en Quilt Loader (sin QSL).
+- Rangos de Minecraft de cada jar: `mc_range_fabric` / `mc_range_forge` en `versions/dependencies/<versión>.properties`, **siempre con límite superior**.
+
+## Estructura
+- Proyecto **Stonecraft + Stonecutter** con UN solo `src/main` para todos los targets.
+  - Versión: `//? if >=1.21 {` … `//?} else {` … `//?}`
+  - Loader: `/*? if fabric {*/` … `/*?}*/` (los bloques inactivos quedan comentados con `/* … */`, así que dentro de ellos NO puede haber comentarios de bloque).
+  - El código del repo está escrito para la versión activa `1.21.11-fabric` (`vcsVersion` en `settings.gradle.kts`).
+  - `ResourceLocation` → se escribe `Identifier` y `build.gradle.kts` lo traduce en versiones < 1.21.11.
+- Paquete base: `io.github.hcuadrado428.stormroot`
+  - `Stormroot.java`: SOLO pegamento de cada loader (registro y eventos).
+  - `weather/FrontType`, `WeatherFront`, `FrontSimulation`: **Java puro**, sin imports de Minecraft ni de loaders. Mantenerlo así.
+  - `weather/FrontTicker`: puente vanilla entre Minecraft y la simulación.
+  - `registry/`: creación de items/bloques (común); el registro lo hace cada loader en `Stormroot.java`.
+- Texturas: spec en `art/textures/<nombre>.json` → PNG en `src/main/resources/assets/stormroot/textures/...` con `texgen.py`.
+- Mappings: **Mojang (official)** en todos los loaders. No usar Yarn.
+
+## Comandos
+- Compilar todo: `./gradlew buildAndCollect` (Windows: `gradlew.bat buildAndCollect`) → jars en `build/libs/`
+- Cambiar target activo: `./gradlew "Set active project to 1.21.1-neoforge"` (o panel de Gradle → stonecutter)
+- Probar: `runClient`, `runServer`, `runGameTestServer` del target activo
+- Texturas: skill `minecraft-modding:pixel-art-16x16`
+
+## Reglas de oro
+1. **Nunca inventes una API.** Antes de usar una clase/método, compruébalo en las fuentes decompiladas de ESA versión (`./gradlew genSources` en Fabric; las fuentes de NeoForge/Forge se adjuntan en el IDE) o en la doc oficial.
+2. Consulta la skill `minecraft-modding:version-matrix` antes de escribir código que dependa de la versión, y la skill temática que toque (`worldgen`, `datagen`, `gui-screens`, `networking`, `geckolib`, `mod-config`, `gametests`, `publishing`).
+3. Un cambio no está terminado hasta que `./gradlew buildAndCollect` pasa en **los 6 targets**. Gradle se ejecuta con Java 25.
+4. Lógica nueva → en clases sin imports de loader. Si necesitas algo del loader, crea una interfaz común e impleméntala por loader con bloques Stonecutter.
+5. Texturas: 16×16 PNG RGBA, revisa siempre la preview ampliada antes de darla por buena.
+6. Delega en los subagentes del plugin: compilación rota → `minecraft-modding:build-fixer`; portar → `minecraft-modding:mod-porter`; mixins → `minecraft-modding:mixin-reviewer`; dudas de API → `minecraft-modding:api-researcher`; texturas → `minecraft-modding:texture-artist`; modelos 3D → `minecraft-modding:model-artist`.
+
+## Estado
+- Hecho: plantilla, item `lightning_crystal`, núcleo de frentes y tick del servidor en los 3 loaders.
+- **Aún no se ha compilado con Gradle**: el primer `buildAndCollect` puede necesitar ajustes (sobre todo los eventos de tick de Forge/NeoForge).
+- Siguientes pasos: ver "Siguientes pasos" en `README.md`.
+
+## Mod
+- modid: `stormroot`
+- paquete base: `io.github.hcuadrado428.stormroot`
+- nombre: `Stormroot`

@@ -1,0 +1,34 @@
+{
+  "size": [
+    16,
+    16
+  ],
+  "palette": {
+    ".": "transparent",
+    "K": "#0f3a66",
+    "D": "#157bdd",
+    "M": "#55bcfa",
+    "L": "#b0e8fd",
+    "W": "#ecfbfd",
+    "Y": "#ffe066",
+    "y": "#c6bf13"
+  },
+  "rows": [
+    "................",
+    "............KK..",
+    "...........KWLK.",
+    "..........KWLDK.",
+    ".........KWLMDK.",
+    "........KLWYMDK.",
+    ".......KLLYMDK..",
+    "......KLMYYYDK..",
+    ".....KLMMMMYDK..",
+    "....KLMMMYyDK...",
+    "...KLMMMYyDK....",
+    "..KLMMYyMDK.....",
+    "..KMMyyDDK......",
+    "..KDDDDDK.......",
+    "...KKKKK........",
+    "................"
+  ]
+}
