@@ -79,17 +79,31 @@ versions/dependencies/    → versiones de Minecraft, loaders y rangos de cada t
 - Item **Cristal de rayo** (`stormroot:lightning_crystal`) con textura, modelo y traducciones en/es.
 - **Núcleo de la simulación de frentes**: lluvia, tormenta eléctrica y niebla. Los frentes nacen a contraviento de los jugadores, se mueven con un viento dominante que cambia despacio, crecen y se debilitan al nacer y morir, y caducan.
 - Enganchado al **tick del servidor** en los tres loaders: cada 5 s se avanza la simulación y los frentes nuevos aparecen en el log (`[Stormroot] Nuevo frente: ...`).
+- **El clima sigue a los frentes**: si un jugador está dentro de una tormenta truena, si está en un frente de lluvia llueve y, si no, está despejado.
+- **Comandos de depuración** `/stormroot ...` y el cristal en la pestaña creativa.
 
 ## 🔜 Siguientes pasos (en orden)
 
-1. ~~Compilar los 6 targets~~ ✅ y **probar en el juego** (`runClient`) que los frentes salen en el log.
-2. **Pestaña creativa** para los items (ahora solo se consiguen con `/give @s stormroot:lightning_crystal`).
-3. **Comandos de depuración** `/stormroot front spawn|list|clear` (ojo: los permisos de comandos cambian en 1.21.11).
-4. **Guardar los frentes** con `SavedData` (la API cambia en 1.20.2 y en 1.21.5).
-5. **Aplicar el clima**: que llueva/truene/haya niebla donde hay un frente, en lugar del clima global.
-6. **Sincronizar con el cliente** (networking) para dibujar los frentes en el horizonte.
+1. ~~Compilar los 6 targets~~ ✅ · **probar en el juego** (`runClient`) en cada loader.
+2. ~~Pestaña creativa~~ ✅ (el Cristal de rayo está en *Ingredientes*).
+3. ~~Comandos de depuración~~ ✅ (ver abajo).
+4. **Guardar los frentes** con `SavedData` (la API cambia en 1.20.2 y en 1.21.5). Ahora se pierden al cerrar el mundo.
+5. ~~Aplicar el clima~~ ✅ *versión 1*: el clima vanilla (global) sigue al frente que toca a algún jugador. Falta la niebla y que cada jugador vea su clima.
+6. **Sincronizar con el cliente** (networking) para dibujar los frentes en el horizonte, la niebla y el clima por zonas.
 7. **Veleta y barómetro** (bloques con señal de redstone).
 8. **Filtración**: registro climático por chunk e inundación de cuevas.
+
+## 🧰 Comandos de depuración
+
+Requieren permisos de operador (nivel 2).
+
+| Comando | Qué hace |
+|---|---|
+| `/stormroot front list` | Lista los frentes activos |
+| `/stormroot front spawn rain\|thunderstorm\|fog` | Crea un frente centrado en ti |
+| `/stormroot front clear` | Borra todos los frentes |
+| `/stormroot here` | Qué frente hay donde estás, su intensidad y hacia dónde sopla el viento |
+| `/stormroot weather on\|off` | Stormroot controla el clima vanilla (`on`, por defecto) o lo deja en paz (`off`) |
 
 ---
 

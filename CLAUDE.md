@@ -41,7 +41,8 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
 6. Delega en los subagentes del plugin: compilación rota → `minecraft-modding:build-fixer`; portar → `minecraft-modding:mod-porter`; mixins → `minecraft-modding:mixin-reviewer`; dudas de API → `minecraft-modding:api-researcher`; texturas → `minecraft-modding:texture-artist`; modelos 3D → `minecraft-modding:model-artist`.
 
 ## Estado
-- Hecho: plantilla, item `lightning_crystal`, núcleo de frentes y tick del servidor en los 3 loaders.
+- Hecho: plantilla, item `lightning_crystal` (en pestaña Ingredientes), núcleo de frentes, tick del servidor, clima vanilla controlado por frentes (`FrontTicker.applyWeather`) y comandos `/stormroot` (`command/StormrootCommands`).
+- Permisos de comandos: en 1.21.11 `Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)`; antes `source.hasPermission(2)` (bloque Stonecutter).
 - Compila en los 6 targets (CI de GitHub en verde). Aún no se ha probado dentro del juego.
 - Siguientes pasos: ver "Siguientes pasos" en `README.md`.
 
