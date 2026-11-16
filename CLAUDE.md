@@ -42,7 +42,7 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
 
 ## Estado
 - Hecho: plantilla, item `lightning_crystal`, núcleo de frentes y tick del servidor en los 3 loaders.
-- **Aún no se ha compilado con Gradle**: el primer `buildAndCollect` puede necesitar ajustes (sobre todo los eventos de tick de Forge/NeoForge).
+- Compila en los 6 targets (CI de GitHub en verde). Aún no se ha probado dentro del juego.
 - Siguientes pasos: ver "Siguientes pasos" en `README.md`.
 
 ## Mod

@@ -82,7 +82,7 @@ versions/dependencies/    → versiones de Minecraft, loaders y rangos de cada t
 
 ## 🔜 Siguientes pasos (en orden)
 
-1. **Compilar los 6 targets** y arreglar lo que falle (subagente `build-fixer` del plugin).
+1. ~~Compilar los 6 targets~~ ✅ y **probar en el juego** (`runClient`) que los frentes salen en el log.
 2. **Pestaña creativa** para los items (ahora solo se consiguen con `/give @s stormroot:lightning_crystal`).
 3. **Comandos de depuración** `/stormroot front spawn|list|clear` (ojo: los permisos de comandos cambian en 1.21.11).
 4. **Guardar los frentes** con `SavedData` (la API cambia en 1.20.2 y en 1.21.5).
@@ -297,7 +297,7 @@ Incluye **logros (advancements)** para cada paso y otros ocultos para eventos ra
 - [ ] Cristal de rayo que se forma al caer un rayo, y raíces que crecen hacia abajo
 - [ ] 2 mobs: polilla de tormenta y medusa de cueva
 - [ ] Config básica y comandos de depuración
-- [ ] Compila y funciona en los 6 targets (1.20.1 Fabric/Forge, 1.21.1 y 1.21.11 Fabric/NeoForge)
+- [x] Compila en los 6 targets · [ ] probado en el juego en los 6 (1.20.1 Fabric/Forge, 1.21.1 y 1.21.11 Fabric/NeoForge)
 
 ## 🗺️ Roadmap
 
