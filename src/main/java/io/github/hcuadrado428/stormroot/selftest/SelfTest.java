@@ -371,13 +371,14 @@ public final class SelfTest {
             monsoonInHumid |= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.HUMID) == FrontType.MONSOON;
             blizzardOnlyCold &= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.HUMID) != FrontType.AURORA;
             FrontType dryType = sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.DRY);
-            dryOnlyStorms &= dryType == FrontType.THUNDERSTORM || dryType == FrontType.HEAT_WAVE;
+            dryOnlyStorms &= dryType == FrontType.THUNDERSTORM || dryType == FrontType.HEAT_WAVE
+                    || dryType == FrontType.MAGNETIC_STORM;
             temperateHasRain |= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE) == FrontType.RAIN;
         }
         check("fronts are born by biome",
                 here == io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE && dryOnlyStorms && temperateHasRain
                         && blizzardOnlyCold && coldHasBlizzard && monsoonInHumid,
-                "zona del mundo plano=" + here + ", en seco solo tormentas y calor=" + dryOnlyStorms + ", lluvia en templado="
+                "zona del mundo plano=" + here + ", en seco solo tormentas, calor y magnéticas=" + dryOnlyStorms + ", lluvia en templado="
                         + temperateHasRain + ", ventiscas y monzones solo donde tocan=" + blizzardOnlyCold + ", ventiscas en frío=" + coldHasBlizzard
                         + ", monzones en húmedos=" + monsoonInHumid);
     }
