@@ -40,6 +40,12 @@ stonecutter {
 }
 
 publishMods {
+    // NeoForge 1.20.1 es un fork de Forge 47.1: el jar de Forge 1.20.1 también funciona ahí.
+    // Stonecraft ya añade "forge"; aquí sumamos "neoforge" para que aparezca en ese filtro.
+    if (mod.isForge && stonecutter.current.version == "1.20.1") {
+        modLoaders.add("neoforge")
+    }
+
     modrinth {
         if (mod.isFabric) requires("fabric-api")
         environment.set(CLIENT_OR_SERVER_PREFERS_BOTH)

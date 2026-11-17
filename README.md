@@ -35,6 +35,8 @@ Las versiones intermedias (1.20.2–1.20.6, 1.21.2–1.21.10) **no tienen jar** 
 
 Quilt: el jar de Fabric funciona en Quilt Loader.
 
+NeoForge 1.20.1: usa el jar de **Forge 1.20.1** (NeoForge 1.20.1 es un fork de Forge 47.1). Al publicar, ese jar se marca también como NeoForge. Pendiente de probar en el juego.
+
 ---
 
 ## 🛠️ Cómo compilar

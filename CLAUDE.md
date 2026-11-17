@@ -10,6 +10,7 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   | 1.21.1 | 1.21 – 1.21.1 | NeoForge, Fabric | 21 |
   | 1.21.11 | 1.21.11 | NeoForge, Fabric | 21 |
 - **Quilt** = el jar de Fabric probado en Quilt Loader (sin QSL).
+- **NeoForge 1.20.1** = el jar de Forge 1.20.1 (fork de Forge 47.1). No uses APIs de Forge posteriores a 47.1 en el código de Forge. Se publica también con la etiqueta `neoforge` (`publishMods` en `build.gradle.kts`).
 - Rangos de Minecraft de cada jar: `mc_range_fabric` / `mc_range_forge` en `versions/dependencies/<versión>.properties`, **siempre con límite superior**.
 
 ## Estructura
