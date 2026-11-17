@@ -31,8 +31,11 @@ public final class StormrootConfig {
     public static volatile BooleanSupplier stormScreenEffects = () -> true;
     /** Temblor de cámara con los rayos cercanos (solo con Bloomberto). */
     public static volatile BooleanSupplier lightningCameraShake = () -> true;
-    /** Nubes de los frentes al estilo vanilla, visibles de lejos (solo con Bloomberto). */
-    public static volatile BooleanSupplier distantFronts = () -> true;
+    /**
+     * Nubes de Stormroot en vez de las vanilla. Desactívalo con un shader pack que dibuje sus propias nubes.
+     * Sin Bloomberto se lee de {@code config/stormroot-client.properties} ({@link ClientSettingsFile}).
+     */
+    public static volatile BooleanSupplier customClouds = ClientSettingsFile::customClouds;
     /** Indicador del clima en pantalla (solo con Bloomberto). */
     public static volatile BooleanSupplier weatherHud = () -> false;
 

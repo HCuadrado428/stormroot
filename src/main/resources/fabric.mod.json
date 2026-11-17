@@ -29,7 +29,8 @@
     ]
   },
   "mixins": [
-    "stormroot.mixins.json"
+    "stormroot.mixins.json",
+    "stormroot-sky.mixins.json"
   ],
   "depends": {
     "fabricloader": "*",

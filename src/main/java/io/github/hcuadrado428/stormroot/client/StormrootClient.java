@@ -34,8 +34,33 @@ public class StormrootClient /*? if fabric {*/ implements ClientModInitializer /
     public void onInitializeClient() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> ClientWeather.tick());
         registerReceiver();
+        registerWorldRender();
     }
     //?}
+
+    // Cielo de Stormroot (client/sky/SkyRenderer) desde el evento de render del mundo de cada loader.
+    // Mismos eventos y matrices que Bloomberto (WorldRenderBridge), probados en todas las versiones.
+    //? if fabric && >=1.21.11 {
+    private static void registerWorldRender() {
+        net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents.END_MAIN.register(context -> {
+            net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+            io.github.hcuadrado428.stormroot.client.render.WorldRenderHook.fire(context.matrices(),
+                    mc.gameRenderer.getMainCamera(), mc.getDeltaTracker().getGameTimeDeltaPartialTick(false), null);
+        });
+    }
+    //?} else if fabric && >=1.21 {
+    /*private static void registerWorldRender() {
+        net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.END.register(context ->
+                io.github.hcuadrado428.stormroot.client.render.WorldRenderHook.fire(new com.mojang.blaze3d.vertex.PoseStack(),
+                        context.camera(), context.tickCounter().getGameTimeDeltaPartialTick(false), context.positionMatrix()));
+    }
+    *///?} else if fabric {
+    /*private static void registerWorldRender() {
+        net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.END.register(context ->
+                io.github.hcuadrado428.stormroot.client.render.WorldRenderHook.fire(context.matrixStack(),
+                        context.camera(), context.tickDelta(), null));
+    }
+    *///?}
 
     //? if fabric && >=1.20.5 {
     private static void registerReceiver() {
@@ -57,6 +82,12 @@ public class StormrootClient /*? if fabric {*/ implements ClientModInitializer /
     /*public static void register() {
         MinecraftForge.EVENT_BUS.addListener(StormrootClient::onClientTick);
         MinecraftForge.EVENT_BUS.addListener(StormrootClient::onRenderFog);
+        MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.client.event.RenderLevelStageEvent e) -> {
+            if (e.getStage() == net.minecraftforge.client.event.RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
+                io.github.hcuadrado428.stormroot.client.render.WorldRenderHook.fire(e.getPoseStack(), e.getCamera(),
+                        e.getPartialTick(), null);
+            }
+        });
     }
 
     private static void onClientTick(TickEvent.ClientTickEvent event) {
@@ -80,6 +111,7 @@ public class StormrootClient /*? if fabric {*/ implements ClientModInitializer /
     /*public static void register() {
         NeoForge.EVENT_BUS.addListener(StormrootClient::onClientTick);
         registerFog();
+        registerWorldRender();
     }
 
     private static void onClientTick(ClientTickEvent.Post event) {
@@ -116,6 +148,26 @@ public class StormrootClient /*? if fabric {*/ implements ClientModInitializer /
             event.setFarPlaneDistance(far);
             ClientWeather.markFogApplied();
         }
+    }
+    *///?}
+
+    //? if neoforge && >=1.21.11 {
+    /*private static void registerWorldRender() {
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.RenderLevelStageEvent.AfterParticles e) -> {
+            net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+            io.github.hcuadrado428.stormroot.client.render.WorldRenderHook.fire(
+                    e.getPoseStack() != null ? e.getPoseStack() : new com.mojang.blaze3d.vertex.PoseStack(),
+                    mc.gameRenderer.getMainCamera(), mc.getDeltaTracker().getGameTimeDeltaPartialTick(false), null);
+        });
+    }
+    *///?} else if neoforge {
+    /*private static void registerWorldRender() {
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.RenderLevelStageEvent e) -> {
+            if (e.getStage() == net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
+                io.github.hcuadrado428.stormroot.client.render.WorldRenderHook.fire(new com.mojang.blaze3d.vertex.PoseStack(),
+                        e.getCamera(), e.getPartialTick().getGameTimeDeltaPartialTick(false), e.getModelViewMatrix());
+            }
+        });
     }
     *///?}
 }

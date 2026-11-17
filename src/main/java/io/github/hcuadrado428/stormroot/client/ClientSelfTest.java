@@ -1,6 +1,7 @@
 package io.github.hcuadrado428.stormroot.client;
 
 import io.github.hcuadrado428.stormroot.Stormroot;
+import io.github.hcuadrado428.stormroot.client.sky.SkyRenderer;
 import io.github.hcuadrado428.stormroot.compat.Compat;
 import io.github.hcuadrado428.stormroot.seep.SeepageSavedData;
 import io.github.hcuadrado428.stormroot.selftest.SelfTest;
@@ -9,6 +10,7 @@ import io.github.hcuadrado428.stormroot.weather.FrontTicker;
 import io.github.hcuadrado428.stormroot.weather.FrontType;
 import io.github.hcuadrado428.stormroot.weather.WeatherFront;
 import java.io.File;
+import net.minecraft.client.CloudStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.server.MinecraftServer;
@@ -17,7 +19,8 @@ import net.minecraft.server.MinecraftServer;
  * Self-test del CLIENTE (modo {@code client} o {@code all}), en un mundo de un jugador. Espera a que termine el del
  * servidor integrado ({@link SelfTest}) y entonces comprueba con el jugador real:
  * que llegan los frentes, que la tormenta se ve y se va, la niebla, la humedad de las cuevas y (con Bloomberto)
- * los efectos de pantalla y el archivo de config. Al terminar cierra el juego.
+ * los efectos de pantalla y el archivo de config, y el cielo de Stormroot (nubes vanilla ocultas, tormenta lejana,
+ * nubes de buen tiempo). Al terminar cierra el juego.
  */
 public final class ClientSelfTest {
     private static final int TIMEOUT = 600;
@@ -144,28 +147,45 @@ public final class ClientSelfTest {
                 boolean wet = ClientFronts.seep() > 0.9f;
                 if (wet || waited > TIMEOUT) {
                     SelfTest.report("cave humidity reaches the client", wet, "humedad=" + ClientFronts.seep());
-                    if (Compat.bloomberto()) {
-                        // Un frente grande a ~110 bloques de su borde: debe verse llegar.
-                        spawnAt(server, FrontType.THUNDERSTORM, x + 260, z, 150);
-                        next();
-                    } else {
-                        finish(mc);
-                    }
+                    // Una tormenta grande a ~110 bloques de su borde: el cielo de Stormroot debe dibujarla de lejos.
+                    spawnAt(server, FrontType.THUNDERSTORM, x + 260, z, 150);
+                    next();
                 }
             }
             case 6 -> {
-                long drawn = bloombertoLong("distantFrontsDrawn");
-                if (drawn > 0 || waited > TIMEOUT) {
-                    SelfTest.report("bloomberto distant fronts are drawn", drawn > 0, "no se dibujó ningún frente lejano");
+                boolean hidden = mc.options.getCloudsType() == CloudStatus.OFF;
+                boolean storm = SkyRenderer.stormCells() > 0 && SkyRenderer.cellsDrawn() > 0;
+                if ((hidden && storm) || waited > TIMEOUT) {
+                    SelfTest.report("vanilla clouds are hidden", hidden,
+                            "getCloudsType=" + mc.options.getCloudsType() + " con el cielo de Stormroot activo");
+                    SelfTest.report("stormroot sky draws a distant storm", storm, "celdas de tormenta="
+                            + SkyRenderer.stormCells() + ", celdas dibujadas=" + SkyRenderer.cellsDrawn()
+                            + ", fotogramas=" + SkyRenderer.framesDrawn());
                     stage = 60;
                     stageStart = ticks;
                     requestShot(mc, "tormenta_a_lo_lejos", -90f, -30f);
                 }
             }
             case 60 -> {
+                // Cielo despejado de frentes: solo las nubes de buen tiempo.
+                mc.options.hideGui = false;
                 clear(server);
-                finish(mc);
+                stage = 61;
+                stageStart = ticks;
             }
+            case 61 -> {
+                // El paquete sin frentes llega en unos segundos; la rejilla se recalcula cada medio segundo.
+                boolean fair = SkyRenderer.stormCells() == 0 && SkyRenderer.cellsDrawn() > 0;
+                if ((fair && waited > 40) || waited > TIMEOUT) {
+                    long before = SkyRenderer.cellsDrawn();
+                    SelfTest.report("fair-weather clouds without fronts", fair, "celdas de tormenta="
+                            + SkyRenderer.stormCells() + ", celdas dibujadas=" + before);
+                    stage = 62;
+                    stageStart = ticks;
+                    requestShot(mc, "cielo_de_buen_tiempo", 0f, -35f);
+                }
+            }
+            case 62 -> finish(mc);
             case 20 -> {
                 clear(server);
                 mc.options.hideGui = false;
@@ -239,15 +259,6 @@ public final class ClientSelfTest {
             SelfTest.report("bloomberto config screen", screen != null, "la pantalla de config no se pudo crear");
         } catch (ReflectiveOperationException e) {
             SelfTest.report("bloomberto storm screen effects", false, e.toString());
-        }
-    }
-
-    private static long bloombertoLong(String method) {
-        try {
-            return (Long) Class.forName("io.github.hcuadrado428.stormroot.compat.bloomberto.BloombertoClientCompat")
-                    .getMethod(method).invoke(null);
-        } catch (ReflectiveOperationException e) {
-            return -1;
         }
     }
 

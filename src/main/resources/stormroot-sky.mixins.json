@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "io.github.hcuadrado428.stormroot.client.mixin.clouds",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "OptionsCloudsMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

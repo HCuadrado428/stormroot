@@ -15,6 +15,9 @@ displayURL = "https://github.com/HCuadrado428/stormroot"
 logoFile = "assets/${id}/icon.png"
 logoBlur = false
 
+[[mixins]]
+config = "stormroot-sky.mixins.json"
+
 [[dependencies.${id}]]
 modId = "minecraft"
 type = "required"

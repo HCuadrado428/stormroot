@@ -82,6 +82,12 @@ if (bloombertoJar != null) {
     }
 }
 
+// Mixins comunes a los 3 loaders (stormroot-sky.mixins.json: ocultar las nubes vanilla).
+// Fabric: fabric.mod.json; NeoForge: [[mixins]] de neoforge.mods.toml; Forge 1.20.1: aquí (dev + manifiesto del jar).
+if (mod.isForge) {
+    extensions.getByType<net.fabricmc.loom.api.LoomGradleExtensionAPI>().forge.mixinConfig("stormroot-sky.mixins.json")
+}
+
 publishMods {
     // NeoForge 1.20.1 es un fork de Forge 47.1: el jar de Forge 1.20.1 también funciona ahí.
     // Stonecraft ya añade "forge"; aquí sumamos "neoforge" para que aparezca en ese filtro.

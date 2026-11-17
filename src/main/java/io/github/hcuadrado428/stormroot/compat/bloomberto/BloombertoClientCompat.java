@@ -29,7 +29,6 @@ import net.minecraft.world.entity.LightningBolt;
  *   según la tormenta/niebla donde está el jugador.</li>
  *   <li>{@code CameraShake}: temblor cuando cae un rayo cerca.</li>
  *   <li>{@code HudOverlays}: indicador de lluvia/tormenta/niebla (desactivado por defecto).</li>
- *   <li>Nubes de los frentes al estilo vanilla ({@link StormClouds}), para verlos llegar y verlos encima.</li>
  * </ul>
  */
 public final class BloombertoClientCompat {
@@ -47,7 +46,6 @@ public final class BloombertoClientCompat {
         vignette = PostEffects.register(Bloomberto.id(Stormroot.MOD_ID, "storm_vignette"), BuiltInEffects.Vignette::new);
         ClientEvents.CLIENT_TICK.register(BloombertoClientCompat::tick);
         ClientEvents.DISCONNECT.register(BloombertoClientCompat::reset);
-        ClientEvents.WORLD_RENDER.register(StormClouds::render);
         HudOverlays.register(Bloomberto.id(Stormroot.MOD_ID, "weather_hud"), (graphics, partialTick) -> {
             if (!StormrootConfig.weatherHud.getAsBoolean()) {
                 return;
@@ -65,11 +63,6 @@ public final class BloombertoClientCompat {
     /** Pantalla de config de Stormroot (la abre Mod Menu en Fabric; en Forge/NeoForge sale sola en la lista de mods). */
     public static Screen configScreen(Screen parent) {
         return BloombertoCompat.config() == null ? null : ConfigScreen.create(parent, BloombertoCompat.config());
-    }
-
-    /** Para el self-test: veces que se ha dibujado algún frente lejano. */
-    public static long distantFrontsDrawn() {
-        return StormClouds.drawnCount();
     }
 
     /** Para el self-test: {@code true} si algún efecto de pantalla de Stormroot está encendido. */

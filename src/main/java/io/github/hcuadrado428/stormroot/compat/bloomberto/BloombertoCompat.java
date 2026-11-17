@@ -66,8 +66,8 @@ public final class BloombertoCompat {
                 "Oscurece y desatura la pantalla dentro de tormentas y niebla");
         ConfigValue<Boolean> cameraShake = b.defineBoolean("lightning_camera_shake", true,
                 "La cámara tiembla cuando cae un rayo cerca");
-        ConfigValue<Boolean> distant = b.defineBoolean("distant_fronts", true,
-                "Dibuja las nubes de los frentes (estilo vanilla) para verlos llegar desde lejos");
+        ConfigValue<Boolean> clouds = b.defineBoolean("custom_clouds", true,
+                "Nubes de Stormroot en vez de las vanilla (desactívalo si tu shader pack dibuja sus propias nubes)");
         ConfigValue<Boolean> hud = b.defineBoolean("weather_hud", false,
                 "Muestra en pantalla la intensidad de lluvia, tormenta y niebla donde estás");
         b.pop();
@@ -85,7 +85,7 @@ public final class BloombertoCompat {
         StormrootConfig.stormScreenEffects = screenEffects::get;
         StormrootConfig.lightningCameraShake = cameraShake::get;
         StormrootConfig.weatherHud = hud::get;
-        StormrootConfig.distantFronts = distant::get;
+        StormrootConfig.customClouds = clouds::get;
 
         if (client) {
             BloombertoClientCompat.init();
