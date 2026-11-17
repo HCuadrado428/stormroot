@@ -54,6 +54,17 @@ Los `.jar` aparecen en `build/libs/`. El primer build tarda varios minutos (desc
 - **Probar en el juego**: tarea `runClient` del target activo.
 - La CI de GitHub (`.github/workflows/build.yml`) compila todo en cada push y publica en Modrinth/CurseForge al crear una Release.
 
+## 🌸 Bloomberto (opcional)
+
+[Bloomberto](https://github.com/HCuadrado428/Bloomberto) es una librería nuestra. Stormroot **funciona sin ella**; si está instalada (1.20.1 y 1.21.1; Bloomberto aún no tiene 1.21.11), añade:
+
+- **Config** en `config/stormroot.toml`, con botón *Config* en la lista de mods de Forge/NeoForge (en Fabric, edita el archivo o usa Mod Menu cuando lo integremos).
+- **Efectos de pantalla**: desaturación y viñeta dentro de tormentas y niebla.
+- **Temblor de cámara** cuando cae un rayo cerca.
+- **Indicador del clima** en pantalla (lluvia/tormenta/niebla en %), desactivado por defecto: `weather_hud = true`.
+
+Para compilar con la integración: `scripts/fetch-bloomberto.sh` (compila Bloomberto con JDK 21 en el commit de `bloomberto.ref` y deja los jars en `libs/bloomberto/`). Sin esos jars, el mod compila igual pero sin integración. Con ellos, `runClient` carga también Bloomberto. Para usar una versión más nueva de Bloomberto, cambia el commit de `bloomberto.ref`.
+
 ## 📁 Estructura del código
 
 Proyecto **Stonecraft + Stonecutter**: un único código fuente con comentarios `//? if ...` para cada versión y loader.
@@ -63,6 +74,11 @@ src/main/java/io/github/hcuadrado428/stormroot/
   Stormroot.java          → entrada del mod: registro y eventos de cada loader
   ModIds.java             → construye ids "stormroot:algo" (ResourceLocation / Identifier)
   registry/ModItems.java  → items
+  config/StormrootConfig.java   → ajustes (valores por defecto o los de Bloomberto)
+  compat/Compat.java            → carga las integraciones opcionales por reflexión
+  compat/bloomberto/            → integración con Bloomberto (solo se compila si están sus jars)
+  network/                → paquete servidor → cliente con los frentes cercanos
+  client/                 → clima por zonas, niebla y partículas (solo cliente)
   weather/
     FrontType.java        → tipos de frente (Java puro)
     WeatherFront.java     → un frente: posición, radio, movimiento, intensidad (Java puro)
@@ -94,7 +110,7 @@ versions/dependencies/    → versiones de Minecraft, loaders y rangos de cada t
 2. **Niebla en Fabric (todas) y NeoForge 1.21.11**: necesita un mixin o el nuevo sistema de niebla de 1.21.6+.
 3. **Lluvia "de juego" por zonas** en el servidor (mixin en `Level#isRainingAt`): ahora, si un jugador está en una tormenta, los rayos y la lluvia afectan también a los demás.
 4. **Frentes visibles de lejos**: las partículas solo se dibujan a menos de 32 bloques; para verlos llegar en el horizonte hace falta render propio (nubes/cortinas).
-5. **Config del mod** (probabilidades, distancias, partículas...).
+5. ~~Config del mod~~ ✅ con Bloomberto. Falta la pantalla de config en Fabric (Mod Menu).
 6. **Veleta y barómetro** (bloques con señal de redstone).
 7. **Filtración**: registro climático por chunk e inundación de cuevas.
 

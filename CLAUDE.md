@@ -51,6 +51,11 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
 - Permisos de comandos: en 1.21.11 `Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)`; antes `source.hasPermission(2)`.
 - Código de cliente: SOLO en `client/`. `ClientFronts` es Java puro (lo llaman los handlers de red en ambos lados).
 - Niebla: evento `ViewportEvent.RenderFog` en Forge 1.20.1 y NeoForge 1.21.1. TODO en Fabric y NeoForge 1.21.11.
+- **Bloomberto** (librería nuestra, opcional): integración en `compat/bloomberto/`, cargada por reflexión desde
+  `compat/Compat` solo si el mod está instalado. Solo se compila si existe `libs/bloomberto/bloomberto-*+<target>.jar`
+  (`scripts/fetch-bloomberto.sh`, commit en `bloomberto.ref`); 1.21.11 no tiene Bloomberto y la excluye.
+  NUNCA importes clases de Bloomberto fuera de `compat/bloomberto/`. Los ajustes se leen siempre de `config/StormrootConfig`.
+  API de Bloomberto: `docs/es/uso.md` de su repo; nivel de API probado: 2 (`BloombertoCompat.API_LEVEL`).
 - Compila en los 6 targets (CI en verde). **Aún no se ha probado dentro del juego.**
 - Siguientes pasos: ver "Siguientes pasos" en `README.md`.
 
