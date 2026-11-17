@@ -31,12 +31,20 @@ for t in "$@"; do
     JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:-} -Dstormroot.selfTest=server" \
       timeout 1200 ./gradlew ":$t:runServer" --args=nogui > /dev/null 2>&1
     mkdir -p "$run/saves" && cp -r "$run/selftest" "$run/saves/testworld"
+    # Dentro de la pantalla virtual: el cliente y, cuando el self-test lo pide, capturas (build/selftest-shots/).
     JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:-} -Dstormroot.selfTest=client" \
       LIBGL_ALWAYS_SOFTWARE=1 MESA_GL_VERSION_OVERRIDE=4.5 MESA_GLSL_VERSION_OVERRIDE=450 \
       timeout 1500 xvfb-run -a -s "-screen 0 1280x720x24" \
-      ./gradlew ":$t:runClient" --args="--quickPlaySingleplayer testworld" > "$log" 2>&1
+      scripts/selftest-client-xvfb.sh "$t" "$log"
+    # En la CI, además, cada captura reducida va al log en base64 (para verlas sin descargar artefactos).
+    if [ -n "${CI:-}" ] && command -v convert > /dev/null; then
+      for shot in build/selftest-shots/"$t"-*.png; do
+        [ -f "$shot" ] || continue
+        echo "SHOT-B64 $(basename "$shot" .png) $(convert "$shot" -resize 640x -quality 70 jpg:- | base64 -w0)"
+      done
+    fi
   fi
-  grep -E "\[selftest\] (PASS|FAIL|SKIP|.* done|cueva)" "$log" | sed -E "s/^.*\[selftest\]/$t: [selftest]/"
+  grep -E "\[selftest\] (PASS|FAIL|SKIP|SCREENSHOT|.* done|cueva)" "$log" | sed -E "s/^.*\[selftest\]/$t: [selftest]/"
   ok=1
   grep -q "\[selftest\] server done" "$log" || { ok=0; echo "$t: el self-test del servidor no terminó"; }
   if [ "$side" != server ] && ! grep -q "\[selftest\] client done" "$log"; then ok=0; echo "$t: el self-test del cliente no terminó"; fi

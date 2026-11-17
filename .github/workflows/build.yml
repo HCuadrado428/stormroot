@@ -129,7 +129,7 @@ jobs:
           scripts/fetch-bloomberto.sh
 
       - name: Pantalla virtual y OpenGL por software
-        run: sudo apt-get update && sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0 mesa-utils
+        run: sudo apt-get update && sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0 mesa-utils imagemagick
 
       - name: Self-test servidor (${{ matrix.target }})
         run: |
@@ -138,6 +138,14 @@ jobs:
 
       - name: Self-test cliente (${{ matrix.target }})
         run: scripts/selftest.sh client ${{ matrix.target }}
+
+      - name: Capturas del self-test
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selftest-capturas-${{ matrix.target }}
+          path: build/selftest-shots/
+          if-no-files-found: ignore
 
       - name: Logs del self-test
         if: failure()

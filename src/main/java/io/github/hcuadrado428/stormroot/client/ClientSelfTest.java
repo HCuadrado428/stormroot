@@ -26,6 +26,10 @@ public final class ClientSelfTest {
     private static int stageStart;
     private static boolean done;
     private static long nextFrontId = 10_000;
+    /** Captura pendiente: se coloca la cámara, se espera a que se dibuje y se avisa al script (que hace la captura). */
+    private static String pendingShot;
+    private static int shotAt;
+    private static int holdUntil;
 
     private ClientSelfTest() {
     }
@@ -40,6 +44,18 @@ public final class ClientSelfTest {
             return;
         }
         ticks++;
+        if (pendingShot != null) {
+            if (ticks >= shotAt) {
+                // scripts/selftest.sh ve esta línea y captura la pantalla virtual.
+                Stormroot.LOGGER.info("[selftest] SCREENSHOT {}", pendingShot);
+                pendingShot = null;
+                holdUntil = ticks + 80;
+            }
+            return;
+        }
+        if (ticks < holdUntil) {
+            return;
+        }
         MinecraftServer server = mc.getSingleplayerServer();
         if (server == null) {
             SelfTest.report("client is singleplayer", false, "no hay servidor integrado");
@@ -53,6 +69,7 @@ public final class ClientSelfTest {
             case 0 -> {
                 if (ticks > 100 && SelfTest.serverDone()) {
                     Stormroot.LOGGER.info("[selftest] cliente: empezando");
+                    server.execute(() -> server.overworld().setDayTime(6000)); // mediodía, para las capturas
                     spawnAt(server, FrontType.THUNDERSTORM, x, z);
                     next();
                 }
@@ -73,8 +90,9 @@ public final class ClientSelfTest {
                     SelfTest.report("storm is visible on the client", visible,
                             "trueno=" + ClientWeather.thunder() + ", lluvia=" + ClientWeather.rain());
                     checkBloomberto(mc);
-                    clear(server);
-                    next();
+                    stage = 20; // captura bajo la tormenta y luego sigue en el 3
+                    stageStart = ticks;
+                    requestShot(mc, "debajo_de_la_tormenta", -90f, -45f);
                 }
             }
             case 3 -> {
@@ -93,6 +111,13 @@ public final class ClientSelfTest {
                 if (foggy || waited > TIMEOUT) {
                     SelfTest.report("fog bank on the client", foggy, "niebla=" + ClientWeather.fog()
                             + ", veces que el enganche de niebla la aplicó=" + ClientWeather.fogAppliedCount());
+                    stage = 40; // captura en la niebla y luego sigue en el 41
+                    stageStart = ticks;
+                    requestShot(mc, "dentro_de_la_niebla", -90f, 0f);
+                }
+            }
+            case 41 -> {
+                {
                     clear(server);
                     int cx = (int) Math.floor(x) >> 4;
                     int cz = (int) Math.floor(z) >> 4;
@@ -102,7 +127,8 @@ public final class ClientSelfTest {
                         data.changed();
                         FrontTicker.save(server);
                     });
-                    next();
+                    stage = 5;
+                    stageStart = ticks;
                 }
             }
             case 5 -> {
@@ -110,8 +136,8 @@ public final class ClientSelfTest {
                 if (wet || waited > TIMEOUT) {
                     SelfTest.report("cave humidity reaches the client", wet, "humedad=" + ClientFronts.seep());
                     if (Compat.bloomberto()) {
-                        // Un frente a ~80 bloques de su borde: debe verse de lejos.
-                        spawnAt(server, FrontType.THUNDERSTORM, x + 200, z);
+                        // Un frente grande a ~110 bloques de su borde: debe verse llegar.
+                        spawnAt(server, FrontType.THUNDERSTORM, x + 260, z, 150);
                         next();
                     } else {
                         finish(mc);
@@ -122,13 +148,40 @@ public final class ClientSelfTest {
                 long drawn = bloombertoLong("distantFrontsDrawn");
                 if (drawn > 0 || waited > TIMEOUT) {
                     SelfTest.report("bloomberto distant fronts are drawn", drawn > 0, "no se dibujó ningún frente lejano");
-                    clear(server);
-                    finish(mc);
+                    stage = 60;
+                    stageStart = ticks;
+                    requestShot(mc, "tormenta_a_lo_lejos", -90f, -30f);
                 }
+            }
+            case 60 -> {
+                clear(server);
+                finish(mc);
+            }
+            case 20 -> {
+                clear(server);
+                mc.options.hideGui = false;
+                stage = 3;
+                stageStart = ticks;
+            }
+            case 40 -> {
+                mc.options.hideGui = false;
+                stage = 41;
+                stageStart = ticks;
             }
             default -> {
             }
         }
+    }
+
+    /** Coloca la cámara (yaw/pitch en grados), oculta la interfaz y pide una captura dentro de 40 ticks. */
+    private static void requestShot(Minecraft mc, String name, float yaw, float pitch) {
+        mc.player.setYRot(yaw);
+        mc.player.setXRot(pitch);
+        mc.player.yRotO = yaw;
+        mc.player.xRotO = pitch;
+        mc.options.hideGui = true;
+        pendingShot = name;
+        shotAt = ticks + 40;
     }
 
     private static void next() {
@@ -137,12 +190,16 @@ public final class ClientSelfTest {
     }
 
     private static void spawnAt(MinecraftServer server, FrontType type, double x, double z) {
+        spawnAt(server, type, x, z, 120);
+    }
+
+    private static void spawnAt(MinecraftServer server, FrontType type, double x, double z, double radius) {
         long id = nextFrontId++;
         server.execute(() -> {
             FrontSimulation sim = FrontTicker.simulation(server);
             sim.clear();
             // A media vida (intensidad plena) y quieto encima del jugador.
-            sim.add(new WeatherFront(id, type, x, z, 120, 0, 0, 1000, 2000));
+            sim.add(new WeatherFront(id, type, x, z, radius, 0, 0, 1000, 2000));
             FrontTicker.applyNow(server);
             FrontTicker.save(server);
         });

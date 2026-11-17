@@ -31,7 +31,7 @@ public final class StormrootConfig {
     public static volatile BooleanSupplier stormScreenEffects = () -> true;
     /** Temblor de cámara con los rayos cercanos (solo con Bloomberto). */
     public static volatile BooleanSupplier lightningCameraShake = () -> true;
-    /** Nubes y cortinas de lluvia en los frentes lejanos (solo con Bloomberto). */
+    /** Nubes de los frentes al estilo vanilla, visibles de lejos (solo con Bloomberto). */
     public static volatile BooleanSupplier distantFronts = () -> true;
     /** Indicador del clima en pantalla (solo con Bloomberto). */
     public static volatile BooleanSupplier weatherHud = () -> false;

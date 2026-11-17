@@ -67,7 +67,7 @@ public final class BloombertoCompat {
         ConfigValue<Boolean> cameraShake = b.defineBoolean("lightning_camera_shake", true,
                 "La cámara tiembla cuando cae un rayo cerca");
         ConfigValue<Boolean> distant = b.defineBoolean("distant_fronts", true,
-                "Dibuja nubes y cortinas de lluvia en los frentes lejanos para verlos llegar");
+                "Dibuja las nubes de los frentes (estilo vanilla) para verlos llegar desde lejos");
         ConfigValue<Boolean> hud = b.defineBoolean("weather_hud", false,
                 "Muestra en pantalla la intensidad de lluvia, tormenta y niebla donde estás");
         b.pop();
