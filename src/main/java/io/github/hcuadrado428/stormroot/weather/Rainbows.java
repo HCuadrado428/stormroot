@@ -67,9 +67,13 @@ public final class Rainbows {
     /** Pone un arcoíris con su extremo en (x, z) (en el suelo). */
     public static Rainbow spawn(ServerLevel level, double x, double z, double angle) {
         BlockPos ground = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, BlockPos.containing(x, 0, z));
+        return spawn(level, ground.getX() + 0.5, ground.getY(), ground.getZ() + 0.5, angle);
+    }
+
+    /** Pone un arcoíris con su extremo exactamente en (x, y, z). */
+    public static Rainbow spawn(ServerLevel level, double x, double y, double z, double angle) {
         long now = level.getGameTime();
-        Rainbow rainbow = new Rainbow(nextId++, ground.getX() + 0.5, ground.getY(), ground.getZ() + 0.5, angle, now,
-                now + Rainbow.DURATION_TICKS);
+        Rainbow rainbow = new Rainbow(nextId++, x, y, z, angle, now, now + Rainbow.DURATION_TICKS);
         ACTIVE.add(rainbow);
         FrontTicker.sync(level.getServer());
         return rainbow;
