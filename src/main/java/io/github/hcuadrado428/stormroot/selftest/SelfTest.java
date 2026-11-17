@@ -349,7 +349,7 @@ public final class SelfTest {
         return io.github.hcuadrado428.stormroot.weather.BiomeClimate.precipitationAt(level, pos);
     }
 
-    /** El mundo plano es de llanuras (templado); en zona seca solo nacen tormentas (secas); nunca niebla en el desierto. */
+    /** El mundo plano es de llanuras (templado); en zona seca solo nacen tormentas (secas) y olas de calor; nunca niebla en el desierto. */
     private static void checkFrontsByBiome(ServerLevel level) {
         io.github.hcuadrado428.stormroot.weather.ClimateZone here =
                 io.github.hcuadrado428.stormroot.weather.BiomeClimate.zoneAt(level, BX + 8, BZ + 8);
@@ -362,13 +362,14 @@ public final class SelfTest {
             blizzardOnlyCold &= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE) != FrontType.BLIZZARD
                     && sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.DRY) != FrontType.BLIZZARD;
             coldHasBlizzard |= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.COLD) == FrontType.BLIZZARD;
-            dryOnlyStorms &= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.DRY) == FrontType.THUNDERSTORM;
+            FrontType dryType = sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.DRY);
+            dryOnlyStorms &= dryType == FrontType.THUNDERSTORM || dryType == FrontType.HEAT_WAVE;
             temperateHasRain |= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE) == FrontType.RAIN;
         }
         check("fronts are born by biome",
                 here == io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE && dryOnlyStorms && temperateHasRain
                         && blizzardOnlyCold && coldHasBlizzard,
-                "zona del mundo plano=" + here + ", en seco solo tormentas=" + dryOnlyStorms + ", lluvia en templado="
+                "zona del mundo plano=" + here + ", en seco solo tormentas y calor=" + dryOnlyStorms + ", lluvia en templado="
                         + temperateHasRain + ", ventiscas solo en frío=" + blizzardOnlyCold + ", ventiscas en frío=" + coldHasBlizzard);
     }
 
