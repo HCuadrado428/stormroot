@@ -67,6 +67,7 @@ public final class StormrootCommands {
         WeatherFront front = FrontTicker.simulation(source.getServer()).create(type, pos.x, pos.z);
         FrontTicker.simulation(source.getServer()).add(front);
         FrontTicker.applyNow(source.getServer());
+        FrontTicker.save(source.getServer());
         reply(source, "Creado " + front);
         return 1;
     }
@@ -76,6 +77,7 @@ public final class StormrootCommands {
         int count = sim.fronts().size();
         sim.clear();
         FrontTicker.applyNow(source.getServer());
+        FrontTicker.save(source.getServer());
         reply(source, "Borrados " + count + " frente(s).");
         return count;
     }
@@ -98,7 +100,9 @@ public final class StormrootCommands {
     }
 
     private static int setWeatherControl(CommandSourceStack source, boolean enabled) {
+        FrontTicker.simulation(source.getServer()); // carga lo guardado antes de cambiar el flag
         FrontTicker.setControlsWeather(enabled);
+        FrontTicker.save(source.getServer());
         if (enabled) {
             FrontTicker.applyNow(source.getServer());
         }

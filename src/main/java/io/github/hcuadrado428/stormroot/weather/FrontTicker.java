@@ -11,8 +11,7 @@ import net.minecraft.server.level.ServerPlayer;
  * Puente entre Minecraft y {@link FrontSimulation}. Solo usa clases vanilla:
  * cada loader llama a {@link #onServerTick(MinecraftServer)} al final de cada tick del servidor.
  *
- * <p>MVP: solo el Overworld y los frentes viven en memoria (se pierden al cerrar el mundo).
- * Siguiente paso: guardarlos con SavedData (la API cambia en 1.20.2 y 1.21.5; ver skill version-matrix).
+ * <p>Solo el Overworld. El estado se guarda en el mundo con {@link FrontSavedData}.
  *
  * <p>Clima: el clima vanilla es global, así que de momento Stormroot lo pone según el frente más
  * fuerte que toque a algún jugador (tormenta &gt; lluvia &gt; nada). Cuando haya render en el cliente,
@@ -33,6 +32,7 @@ public final class FrontTicker {
     }
 
     public static void onServerTick(MinecraftServer server) {
+        LightningCrystals.tick();
         if (++tickCounter < STEP_TICKS && server == currentServer) {
             return;
         }
@@ -50,16 +50,30 @@ public final class FrontTicker {
             Stormroot.LOGGER.info("[Stormroot] Nuevo frente: {}", front);
         }
         applyWeather(overworld, sim);
+        save(server);
     }
 
     /** Simulación del Overworld de este servidor; la crea si hace falta (mundo nuevo o recién abierto). */
     public static FrontSimulation simulation(MinecraftServer server) {
         if (server != currentServer || simulation == null) {
             currentServer = server;
+            LightningCrystals.clear();
             simulation = new FrontSimulation(server.overworld().getSeed());
             tickCounter = 0;
+            FrontSavedData data = FrontSavedData.get(server);
+            if (data.restoreInto(simulation)) {
+                controlsWeather = data.controlsWeather();
+                Stormroot.LOGGER.info("[Stormroot] Cargados {} frente(s) guardados", simulation.fronts().size());
+            } else {
+                controlsWeather = true;
+            }
         }
         return simulation;
+    }
+
+    /** Copia el estado de la simulación al SavedData del mundo (se escribe a disco al guardar el mundo). */
+    public static void save(MinecraftServer server) {
+        FrontSavedData.get(server).capture(simulation(server), controlsWeather);
     }
 
     /** Recalcula el clima ya (p. ej. después de un comando), sin esperar al siguiente paso. */

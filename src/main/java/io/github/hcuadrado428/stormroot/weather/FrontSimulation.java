@@ -12,8 +12,8 @@ import java.util.Random;
  * <p>La capa de Minecraft ({@link FrontTicker}) la llama cada pocos segundos con la posición
  * de los jugadores, para que los frentes nazcan cerca de donde hay alguien.
  *
- * <p>Pendiente (ver README, "Siguientes pasos"): guardar en SavedData, sincronizar con el
- * cliente, viento dominante por bioma y choques de frentes.
+ * <p>Se guarda con {@code FrontSavedData} (exportando/restaurando su estado con {@link #restore}).
+ * Pendiente: viento dominante por bioma y choques de frentes.
  */
 public final class FrontSimulation {
     private final List<WeatherFront> fronts = new ArrayList<>();
@@ -114,6 +114,26 @@ public final class FrontSimulation {
 
     public double windAngle() {
         return windAngle;
+    }
+
+    /** Siguiente id que se asignará (para guardar el estado). */
+    public long nextId() {
+        return nextId;
+    }
+
+    /**
+     * Restaura el estado guardado (frentes, viento y contador de ids).
+     * El generador aleatorio no se guarda: tras cargar, los frentes nuevos serán distintos, y no pasa nada.
+     */
+    public void restore(double windAngle, long nextId, List<WeatherFront> saved) {
+        this.windAngle = windAngle;
+        this.fronts.clear();
+        this.fronts.addAll(saved);
+        long maxId = 0;
+        for (WeatherFront front : saved) {
+            maxId = Math.max(maxId, front.id());
+        }
+        this.nextId = Math.max(nextId, maxId + 1);
     }
 
     private FrontType randomType() {
