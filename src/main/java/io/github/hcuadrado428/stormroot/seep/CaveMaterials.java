@@ -35,9 +35,9 @@ public final class CaveMaterials {
     public static final Set<String> SOIL = Set.of("dirt", "coarse_dirt", "rooted_dirt");
     /** Se agrieta con la sequía. */
     public static final Set<String> CRACKABLE = Set.of("dirt", "rooted_dirt", "mud");
-    /** Puede tener charcos (además de la roca). */
+    /** Puede tener charcos: roca, grava y barro. La tierra primero se vuelve barro (y luego puede encharcarse). */
     public static final Set<String> PUDDLE_FLOOR = Set.of("stone", "deepslate", "tuff", "granite", "diorite", "andesite",
-            "calcite", "dirt", "coarse_dirt", "rooted_dirt", "mud", "gravel");
+            "calcite", "mud", "gravel");
 
     private CaveMaterials() {
     }

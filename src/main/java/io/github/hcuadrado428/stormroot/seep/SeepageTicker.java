@@ -55,6 +55,8 @@ public final class SeepageTicker {
     private static final int MIN_DEPTH = 10;
     /** Tamaño máximo de una poza (bloques de agua de una capa). */
     private static final int MAX_POOL = 24;
+    /** Los charcos pueden ocupar como mucho esta parte de los cambios del chunk (deja sitio a barro, musgo y pozas). */
+    private static final double MAX_PUDDLE_SHARE = 0.6;
 
     private SeepageTicker() {
     }
@@ -155,8 +157,10 @@ public final class SeepageTicker {
             return;
         }
 
+        boolean morePuddles = cell.count(SeepageCell.Kind.PUDDLE) < maxChanges * MAX_PUDDLE_SHARE;
+
         // Crecer: primero los charcos que ya hay.
-        if (deep >= PUDDLE_AT && cell.count(SeepageCell.Kind.PUDDLE) > 0 && random.nextBoolean()
+        if (deep >= PUDDLE_AT && morePuddles && cell.count(SeepageCell.Kind.PUDDLE) > 0 && random.nextBoolean()
                 && growPuddle(level, cell, random)) {
             return;
         }
@@ -174,17 +178,17 @@ public final class SeepageTicker {
             if (deep >= POOL_AT && random.nextInt(3) == 0 && fillPool(level, cell, air, maxChanges)) {
                 return;
             }
-            if (deep >= PUDDLE_AT && CaveMaterials.PUDDLE_FLOOR.contains(material)
-                    && canHoldWater(level, floor) && place(level, cell, floor, Blocks.WATER.defaultBlockState(),
-                    SeepageCell.Kind.PUDDLE, material)) {
-                return;
-            }
             if (deep >= MUD_AT && CaveMaterials.SOIL.contains(material)
                     && place(level, cell, floor, Blocks.MUD.defaultBlockState(), SeepageCell.Kind.MUD, material)) {
                 return;
             }
-            if (deep >= MOSS_AT && random.nextInt(8) == 0 && CaveMaterials.ROCK.contains(material)
+            if (deep >= MOSS_AT && random.nextInt(6) == 0 && CaveMaterials.ROCK.contains(material)
                     && place(level, cell, floor, Blocks.MOSS_BLOCK.defaultBlockState(), SeepageCell.Kind.MOSS, material)) {
+                return;
+            }
+            if (deep >= PUDDLE_AT && morePuddles && CaveMaterials.PUDDLE_FLOOR.contains(material)
+                    && canHoldWater(level, floor) && place(level, cell, floor, Blocks.WATER.defaultBlockState(),
+                    SeepageCell.Kind.PUDDLE, material)) {
                 return;
             }
             if (deep <= DROUGHT_AT && CaveMaterials.CRACKABLE.contains(material)

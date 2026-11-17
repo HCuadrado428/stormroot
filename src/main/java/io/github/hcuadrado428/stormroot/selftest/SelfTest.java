@@ -314,7 +314,8 @@ public final class SelfTest {
         int moss = cell.count(SeepageCell.Kind.MOSS);
         Stormroot.LOGGER.info("[selftest] cueva empapada: charcos {}, pozas {}, barro {}, musgo {}",
                 puddles, cell.count(SeepageCell.Kind.POOL), mud, moss);
-        check("seepage floods the cave", puddles > 0 && mud > 0, "charcos=" + puddles + ", barro=" + mud);
+        check("seepage floods the cave", puddles > 0 && mud > 0 && moss > 0 && puddles <= 256 * 0.6,
+                "charcos=" + puddles + ", barro=" + mud + ", musgo=" + moss);
         boolean consistent = true;
         for (SeepageCell.Change change : cell.changes()) {
             BlockState state = level.getBlockState(BlockPos.of(change.pos()));
