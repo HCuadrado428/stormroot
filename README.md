@@ -108,7 +108,14 @@ src/versioned/<versión>/  → recetas, loot tables y tags (su formato cambia en
 - **Cristales de rayo**: un rayo sobre arena o piedra deja un cristal el 25 % de las veces.
 - **Comandos de depuración** `/stormroot ...`.
 - **Veleta**: la flecha apunta hacia donde la colocas; da señal de redstone máxima cuando el viento sopla hacia ahí. Clic derecho: rumbo del viento.
-- **Filtración**: cada chunk guarda la humedad del suelo y del subsuelo. La lluvia empapa el suelo en minutos y el subsuelo la sigue unos 10 minutos después. Con el subsuelo empapado aparecen **charcos y barro en el suelo de las cuevas** y **gotea agua del techo**; al secarse, Stormroot deshace solo lo que él creó. En sequía flota **polvo** en las cuevas. Solo cambian los chunks cerca de los jugadores.
+- **Filtración**: cada chunk guarda la humedad del suelo y del subsuelo. La lluvia empapa el suelo en minutos y el subsuelo la sigue unos 10 minutos después. Según el subsuelo, las cuevas cercanas a los jugadores cambian:
+  - **Barro**: la tierra del suelo se vuelve barro.
+  - **Charcos**: bloques del suelo pasan a ser agua, siempre encerrados (nunca se derrama), y crecen con la humedad.
+  - **Pozas**: si está muy empapado, los hoyos cerrados del suelo se llenan de agua.
+  - **Musgo** en la roca tras mucho tiempo húmedo; **goteo** del techo en el cliente.
+  - **Secado lento**: el agua estancada retiene la humedad y el agua se retira bloque a bloque (pozas, charcos, barro).
+  - **Sequía**: la tierra se agrieta, el musgo se seca y flota polvo. Todo vuelve a su estado al cambiar el clima.
+  - Solo se tocan bloques naturales de cueva y cada cambio se deshace solo si el bloque sigue como lo dejó el mod.
 - **Raíces de rayo**: un rayo sobre piedra, tierra o arena puede hacer crecer hacia abajo una columna de cristal luminoso hasta llegar a una cueva. Al picarla puede soltar Cristales de rayo.
 - **Barómetro**: pronostica el próximo frente en los próximos 3 minutos; la señal de redstone sube cuanto más fuerte y cercano. Clic derecho: qué llega y en cuánto.
 
@@ -120,7 +127,7 @@ src/versioned/<versión>/  → recetas, loot tables y tags (su formato cambia en
 4. **Frentes visibles de lejos**: las partículas solo se dibujan a menos de 32 bloques; para verlos llegar en el horizonte hace falta render propio (nubes/cortinas).
 5. ~~Config del mod~~ ✅ con Bloomberto. Falta la pantalla de config en Fabric (Mod Menu).
 6. ~~Veleta y barómetro~~ ✅. Siguientes instrumentos: pluviómetro, campana de niebla, pararrayos tempestario.
-7. ~~Filtración~~ ✅ *versión 1* (charcos, barro, goteo, polvo, raíces de rayo). Siguiente: grietas y cuevas que se abren en sequías largas, corrientes de aire, bolsas de gas, red de micelio.
+7. ~~Filtración~~ ✅ *versión 2* (charcos que crecen, pozas, barro, musgo, grietas, goteo, polvo, raíces de rayo). Siguiente: grietas y cuevas que se abren en sequías largas, corrientes de aire, bolsas de gas, red de micelio.
 
 ## 🧰 Comandos de depuración
 

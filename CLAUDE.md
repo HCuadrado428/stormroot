@@ -63,7 +63,9 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   (`scripts/fetch-bloomberto.sh`, commit en `bloomberto.ref`); 1.21.11 no tiene Bloomberto y la excluye.
   NUNCA importes clases de Bloomberto fuera de `compat/bloomberto/`. Los ajustes se leen siempre de `config/StormrootConfig`.
   API de Bloomberto: `docs/es/uso.md` de su repo; nivel de API probado: 2 (`BloombertoCompat.API_LEVEL`).
-- Filtración v1 hecha: charcos/barro en cuevas, goteo y polvo en el cliente, raíces de rayo (`weather/LightningRoots`).
+- Filtración v2 hecha: charcos encerrados que crecen, pozas, barro, musgo, grietas (`seep/SeepageTicker`, umbrales
+  `MUD_AT`…`DROUGHT_AT`), materiales permitidos y su restauración en `seep/CaveMaterials`; goteo y polvo en el cliente;
+  raíces de rayo (`weather/LightningRoots`). El agua solo se coloca si queda encerrada por bloques completos (`isWall`).
   `getMinY()` desde 1.21.2 (`getMinBuildHeight()` antes).
 - Compila en los 6 targets (CI en verde). **Aún no se ha probado dentro del juego.**
 - Siguientes pasos: ver "Siguientes pasos" en `README.md`.
