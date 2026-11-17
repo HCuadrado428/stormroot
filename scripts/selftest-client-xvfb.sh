@@ -12,14 +12,13 @@ while kill -0 "$pid" 2>/dev/null; do
   for name in $(grep -oE "\[selftest\] SCREENSHOT [a-z_]+" "$log" 2>/dev/null | awk '{print $3}'); do
     case "$taken" in *" $name "*) continue ;; esac
     taken="$taken$name "
-    # La ventana del juego (si se encuentra) y, si no, toda la pantalla. Sin canal alfa: con alfa 0 sale negra.
-    win=$(xwininfo -root -tree 2>/dev/null | grep -i "minecraft" | head -n 1 | awk '{print $1}')
-    if [ -n "$win" ] && import -window "$win" -alpha off "$shots/$t-$name.png" 2>/dev/null; then
-      echo "captura (ventana $win): $shots/$t-$name.png brillo=$(convert "$shots/$t-$name.png" -format '%[fx:mean]' info: 2>/dev/null)"
-    elif import -window root -alpha off "$shots/$t-$name.png" 2>/dev/null; then
-      echo "captura (pantalla): $shots/$t-$name.png brillo=$(convert "$shots/$t-$name.png" -format '%[fx:mean]' info: 2>/dev/null)"
+    # Captura de toda la pantalla virtual y, aparte, sin canal alfa (con alfa 0 los visores la muestran negra).
+    raw="$shots/$t-$name-raw.png"
+    if import -window root "$raw"; then
+      convert "$raw" -alpha off "$shots/$t-$name.png" && rm -f "$raw"
+      echo "captura: $shots/$t-$name.png brillo=$(convert "$shots/$t-$name.png" -format '%[fx:mean]' info:)"
     else
-      echo "no se pudo capturar $name (¿falta ImageMagick?)"
+      echo "no se pudo capturar $name"
     fi
   done
   sleep 1
