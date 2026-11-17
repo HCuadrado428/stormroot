@@ -195,10 +195,11 @@ public final class ClientSelfTest {
                 requestShot(mc, "sombras_en_el_suelo", 0f, 80f);
             }
             case 63 -> {
-                // Un arcoíris con su extremo a 40 bloques al este y 40 por debajo del jugador (que vuela muy alto: con la
-                // distancia de dibujado corta de la CI, uno en el suelo quedaría más allá del plano lejano de la cámara).
+                // Un arcoíris de frente: a 80 bloques al este, de norte a sur (centrado delante del jugador) y algo por
+                // debajo de él (el jugador vuela muy alto sobre el mundo plano).
                 double y = mc.player.getY() - 40;
-                server.execute(() -> io.github.hcuadrado428.stormroot.weather.Rainbows.spawn(server.overworld(), x + 40, y, z, 0));
+                server.execute(() -> io.github.hcuadrado428.stormroot.weather.Rainbows.spawn(server.overworld(),
+                        x + 80, y, z - io.github.hcuadrado428.stormroot.sky.Rainbow.RADIUS, Math.PI / 2));
                 stage = 64;
                 stageStart = ticks;
             }
