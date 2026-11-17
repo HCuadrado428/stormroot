@@ -26,6 +26,8 @@ public final class ModBlocks {
     public static final String ICICLE_ID = "icicle";
     public static final String ICE_CRYSTAL_ID = "ice_crystal";
     public static final String MAGNETIC_ROCK_ID = "magnetic_rock";
+    public static final String MYCELIUM_VEIN_ID = "mycelium_vein";
+    public static final String MYCELIUM_NODE_ID = "mycelium_node";
 
     public static Block WEATHERVANE;
     public static Block BAROMETER;
@@ -42,6 +44,10 @@ public final class ModBlocks {
     public static Item ICE_CRYSTAL_ITEM;
     public static Block MAGNETIC_ROCK;
     public static Item MAGNETIC_ROCK_ITEM;
+    /** Red de micelio: hilos (sin objeto, como las venas de sculk sin toque de seda) y nodos. */
+    public static Block MYCELIUM_VEIN;
+    public static Block MYCELIUM_NODE;
+    public static Item MYCELIUM_NODE_ITEM;
 
     private ModBlocks() {
     }
@@ -96,6 +102,24 @@ public final class ModBlocks {
         BlockBehaviour.Properties properties = BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(3.0F)
                 .sound(SoundType.STONE).lightLevel(state -> 3);
         return create(MAGNETIC_ROCK_ID, io.github.hcuadrado428.stormroot.block.MagneticRockBlock::new, properties);
+    }
+
+    public static Block createMyceliumVein() {
+        BlockBehaviour.Properties properties = BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_LIGHT_GREEN).replaceable()
+                .strength(0.2F).sound(SoundType.SCULK_VEIN).randomTicks()
+                .pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY);
+        //? if >=1.21.11 {
+        properties = properties.noCollision();
+        //?} else {
+        /*properties = properties.noCollission();
+        *///?}
+        return create(MYCELIUM_VEIN_ID, io.github.hcuadrado428.stormroot.block.MyceliumVeinBlock::new, properties);
+    }
+
+    public static Block createMyceliumNode() {
+        BlockBehaviour.Properties properties = BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_LIGHT_GREEN).strength(0.8F)
+                .sound(SoundType.FUNGUS).lightLevel(state -> 6).randomTicks();
+        return create(MYCELIUM_NODE_ID, io.github.hcuadrado428.stormroot.block.MyceliumNodeBlock::new, properties);
     }
 
     public static Item createBlockItem(String name, Block block) {

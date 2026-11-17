@@ -56,6 +56,8 @@ public final class FrontTicker {
             Hail.tick(server.overworld());
             Monsoons.tick(server.overworld());
             RareSkies.tick(server.overworld());
+            io.github.hcuadrado428.stormroot.mycel.SporeMist.tick(server.overworld());
+            io.github.hcuadrado428.stormroot.mycel.Mycelium.tick(server.overworld());
             Rainbows.tick(server.overworld());
         }
         if (++tickCounter < STEP_TICKS && server == currentServer) {

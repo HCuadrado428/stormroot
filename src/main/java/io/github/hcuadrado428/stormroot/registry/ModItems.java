@@ -18,6 +18,8 @@ public final class ModItems {
     public static Item AURORA_DUST;
     /** Fragmento de arcoíris: el tesoro del final del arcoíris (ingrediente, más adelante). */
     public static Item RAINBOW_SHARD;
+    /** Esporas: las sueltan los nodos de la red de micelio (ingrediente, más adelante). */
+    public static Item SPORES;
 
     private ModItems() {
     }

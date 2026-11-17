@@ -232,6 +232,9 @@ public final class ClientWeather {
         }
     }
 
+    /** Partículas de bruma de esporas soltadas (para el self-test). */
+    public static int sporeParticles;
+
     private static void spawnFor(ClientLevel level, FrontType type, RandomSource random, double x, double playerY, double z) {
         ParticleOptions particle;
         double y;
@@ -265,7 +268,13 @@ public final class ClientWeather {
                 vy = -0.05;
                 break;
             case FOG:
-                particle = ParticleTypes.CLOUD;
+                // Sobre pantanos, manglares y campos de champiñones la niebla es bruma de esporas.
+                if (io.github.hcuadrado428.stormroot.mycel.HostBiomes.isHostColumn(level, (int) Math.floor(x), (int) Math.floor(z))) {
+                    particle = random.nextBoolean() ? ParticleTypes.SPORE_BLOSSOM_AIR : ParticleTypes.MYCELIUM;
+                    sporeParticles++;
+                } else {
+                    particle = ParticleTypes.CLOUD;
+                }
                 y = playerY + random.nextDouble() * 4;
                 vy = 0.005;
                 break;

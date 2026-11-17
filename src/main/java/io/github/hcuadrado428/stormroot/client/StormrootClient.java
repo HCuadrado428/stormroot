@@ -45,7 +45,8 @@ public class StormrootClient /*? if fabric {*/ implements ClientModInitializer /
         for (net.minecraft.world.level.block.Block block : new net.minecraft.world.level.block.Block[] {
                 io.github.hcuadrado428.stormroot.registry.ModBlocks.STORM_FIRE,
                 io.github.hcuadrado428.stormroot.registry.ModBlocks.ICICLE,
-                io.github.hcuadrado428.stormroot.registry.ModBlocks.ICE_CRYSTAL}) {
+                io.github.hcuadrado428.stormroot.registry.ModBlocks.ICE_CRYSTAL,
+                io.github.hcuadrado428.stormroot.registry.ModBlocks.MYCELIUM_VEIN}) {
             net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap.putBlock(block,
                     net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
         }
@@ -55,7 +56,8 @@ public class StormrootClient /*? if fabric {*/ implements ClientModInitializer /
         net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlocks(net.minecraft.client.renderer.RenderType.cutout(),
                 io.github.hcuadrado428.stormroot.registry.ModBlocks.STORM_FIRE,
                 io.github.hcuadrado428.stormroot.registry.ModBlocks.ICICLE,
-                io.github.hcuadrado428.stormroot.registry.ModBlocks.ICE_CRYSTAL);
+                io.github.hcuadrado428.stormroot.registry.ModBlocks.ICE_CRYSTAL,
+                io.github.hcuadrado428.stormroot.registry.ModBlocks.MYCELIUM_VEIN);
     }
     *///?}
 

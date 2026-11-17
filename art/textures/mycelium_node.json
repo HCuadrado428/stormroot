@@ -1,0 +1,22 @@
+{
+  "size": [16, 16],
+  "palette": {"d": "#3b2f3a", "e": "#4a3b47", "f": "#2e252d", "a": "#cfd8b0", "b": "#a9b98a", "g": "#e8f5c8", "w": "#f7ffe6", "c": "#7f9468"},
+  "rows": [
+    "dedfdbedeedfdeed",
+    "edbadedcdedeabde",
+    "dbgwbdeddedbgabd",
+    "eagwadedfdeawgae",
+    "dbaabcdeedecbaed",
+    "fdbcdedbdedfdcde",
+    "dedfdebgadedfdbd",
+    "edeedcawgbdeedad",
+    "deddfbgwgadedbge",
+    "fdedecbabcdfedad",
+    "dcbdedfcdeddedce",
+    "babadedededbcdfd",
+    "agwbdfdeedcagbde",
+    "dbgadedfdeawgade",
+    "edbcdedeedcbabed",
+    "deedfdedfdedcdde"
+  ]
+}

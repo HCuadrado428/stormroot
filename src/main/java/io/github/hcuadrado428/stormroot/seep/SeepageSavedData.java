@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import io.github.hcuadrado428.stormroot.mycel.MyceliumNetworks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.saveddata.SavedData;
 
@@ -43,8 +44,16 @@ public class SeepageSavedData extends SavedData {
             CHANGE_CODEC.listOf().fieldOf("changes").forGetter(CellEntry::changes)
     ).apply(i, CellEntry::new));
 
-    public static final Codec<SeepageSavedData> CODEC = CELL_CODEC.listOf().xmap(
-            SeepageSavedData::fromEntries, SeepageSavedData::toEntries).fieldOf("cells").codec();
+    private static final Codec<MyceliumNetworks.Entry> NETWORK_CODEC = RecordCodecBuilder.create(i -> i.group(
+            Codec.INT.fieldOf("id").forGetter(MyceliumNetworks.Entry::id),
+            Codec.LONG.listOf().fieldOf("chunks").forGetter(MyceliumNetworks.Entry::chunks)
+    ).apply(i, MyceliumNetworks.Entry::new));
+
+    /** Celdas de la filtración y, desde la red de micelio, qué chunks ocupa cada red ({@code mycelium}, opcional). */
+    public static final Codec<SeepageSavedData> CODEC = RecordCodecBuilder.create(i -> i.group(
+            CELL_CODEC.listOf().fieldOf("cells").forGetter(SeepageSavedData::toEntries),
+            NETWORK_CODEC.listOf().optionalFieldOf("mycelium", List.of()).forGetter(d -> d.mycelium.entries())
+    ).apply(i, SeepageSavedData::fromEntries));
 
     //? if >=1.21.5 {
     public static final SavedDataType<SeepageSavedData> TYPE =
@@ -55,6 +64,7 @@ public class SeepageSavedData extends SavedData {
     *///?}
 
     private final SeepageField field = new SeepageField();
+    private final MyceliumNetworks mycelium = new MyceliumNetworks();
 
     public SeepageSavedData() {
     }
@@ -73,13 +83,19 @@ public class SeepageSavedData extends SavedData {
         return field;
     }
 
+    /** Redes de micelio (se guardan con la filtración: son de la misma "vida" del subsuelo). */
+    public MyceliumNetworks mycelium() {
+        return mycelium;
+    }
+
     /** Marcar como modificado después de cambiar {@link #field()}. */
     public void changed() {
         setDirty();
     }
 
-    private static SeepageSavedData fromEntries(List<CellEntry> entries) {
+    private static SeepageSavedData fromEntries(List<CellEntry> entries, List<MyceliumNetworks.Entry> networks) {
         SeepageSavedData data = new SeepageSavedData();
+        data.mycelium.load(networks);
         for (CellEntry e : entries) {
             data.field.put(e.key(), new SeepageCell(e.surface(), e.deep(), e.frost(), e.changes()));
         }

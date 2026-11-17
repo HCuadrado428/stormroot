@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "stormroot:block/mycelium_node"
+    }
+  }
+}

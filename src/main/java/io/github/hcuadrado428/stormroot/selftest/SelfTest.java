@@ -62,6 +62,7 @@ public final class SelfTest {
     private static final int Y_TOP = -21;
     private static final int CAVE_FLOOR = -46;
 
+    private static final MyceliumSelfTest MYCELIUM = new MyceliumSelfTest(BX, BZ);
     private static final AtomicInteger PASSED = new AtomicInteger();
     private static final AtomicInteger FAILED = new AtomicInteger();
 
@@ -151,6 +152,7 @@ public final class SelfTest {
                 run("lightning root starts", () -> LightningRoots.start(level, new BlockPos(BX + 8, Y_TOP, BZ + 8)));
                 run("dry storm bolts start", () -> strikeFireTest(level));
                 run("storm fire starts", () -> startStormFire(level));
+                run("mycelium tunnel", () -> MYCELIUM.build(level));
                 stage = 1;
                 waitUntil = ticks + 160;
             }
@@ -169,6 +171,7 @@ public final class SelfTest {
                 run("magnetic storms magnetize iron and auroras leave dust", () -> checkRareSkies(level));
                 run("the end of the rainbow has a treasure", () -> checkRainbowTreasure(level));
                 run("hail hurts crops and glass and leaves hailstones", () -> checkHailGround(level));
+                run("mycelium network", () -> MYCELIUM.run(level));
                 finish(server);
             }
             default -> {
@@ -181,7 +184,8 @@ public final class SelfTest {
     private static void checkRegistries() {
         boolean ok = ModItems.LIGHTNING_CRYSTAL != null && ModBlocks.WEATHERVANE != null && ModBlocks.BAROMETER != null
                 && ModBlocks.LIGHTNING_ROOT != null && ModBlocks.WEATHERVANE_ITEM != null && ModBlocks.BAROMETER_ITEM != null
-                && ModBlocks.LIGHTNING_ROOT_ITEM != null;
+                && ModBlocks.LIGHTNING_ROOT_ITEM != null && ModBlocks.MYCELIUM_VEIN != null && ModBlocks.MYCELIUM_NODE != null
+                && ModBlocks.MYCELIUM_NODE_ITEM != null && ModItems.SPORES != null;
         check("registries", ok, "algún item o bloque es null");
     }
 
