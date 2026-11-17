@@ -403,8 +403,16 @@ public final class SelfTest {
             level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
             level.setBlock(pos.below(), Blocks.STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
         }
-        check("dry storm lightning does not burn", !dryFire && normalFire,
-                "fuego del rayo de tormenta seca=" + dryFire + ", fuego del rayo normal=" + normalFire);
+        // Desde 1.21.11 el fuego solo prende cerca de los jugadores (canSpreadFireAround): sin jugadores cerca, el rayo
+        // normal tampoco deja fuego y solo se puede comprobar que el de tormenta seca no lo deja.
+        //? if >=1.21.11 {
+        boolean fireAllowed = level.canSpreadFireAround(NORMAL_BOLT);
+        //?} else {
+        /*boolean fireAllowed = true;
+        *///?}
+        check("dry storm lightning does not burn", !dryFire && (normalFire || !fireAllowed),
+                "fuego del rayo de tormenta seca=" + dryFire + ", fuego del rayo normal=" + normalFire
+                        + ", el fuego puede prender aquí=" + fireAllowed);
     }
 
     private static void checkForecast() {
