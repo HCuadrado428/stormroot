@@ -14,7 +14,9 @@ public enum FrontType {
     /** Solo nace en biomas fríos y cumbres: nieve que se acumula, poca visibilidad y cuevas que se hielan. */
     BLIZZARD("blizzard", 96, 160, 0.8, 600, 1200),
     /** Ola de calor: enorme, larga y casi quieta. Despeja el cielo, seca el suelo y derrite las cuevas heladas. */
-    HEAT_WAVE("heat_wave", 192, 320, 0.15, 1200, 2400);
+    HEAT_WAVE("heat_wave", 192, 320, 0.15, 1200, 2400),
+    /** Monzón: lluvia torrencial enorme y larga en junglas, pantanos y costas cálidas; inunda cuevas y orillas. */
+    MONSOON("monsoon", 160, 256, 0.4, 1500, 2400);
 
     private final String id;
     private final int minRadius;
@@ -59,7 +61,7 @@ public enum FrontType {
 
     /** {@code true} si trae precipitación (lluvia o nieve según el bioma). */
     public boolean precipitates() {
-        return this == RAIN || this == THUNDERSTORM || this == BLIZZARD;
+        return this == RAIN || this == THUNDERSTORM || this == BLIZZARD || this == MONSOON;
     }
 
     public static FrontType byId(String id) {

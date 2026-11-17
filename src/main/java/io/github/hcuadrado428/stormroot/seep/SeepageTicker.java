@@ -90,6 +90,7 @@ public final class SeepageTicker {
                         double fog = fogAt(simulation, (cx << 4) + 8, (cz << 4) + 8);
                         SeepageCell cell = field.getOrCreate(cx, cz);
                         cell.update(rain, fog, seconds, rates);
+                        cell.setMonsoon(intensityAt(simulation, FrontType.MONSOON, (cx << 4) + 8, (cz << 4) + 8));
                         if (rain < 0.05) {
                             cell.applyHeat(intensityAt(simulation, FrontType.HEAT_WAVE, (cx << 4) + 8, (cz << 4) + 8), seconds, rates);
                         }
@@ -128,10 +129,16 @@ public final class SeepageTicker {
         for (WeatherFront front : simulation.fronts()) {
             if (front.type() == FrontType.RAIN || front.type() == FrontType.THUNDERSTORM) {
                 best = Math.max(best, front.intensityAt(x, z));
+            } else if (front.type() == FrontType.MONSOON) {
+                // Monzón: llena el subsuelo tres veces más rápido.
+                best = Math.max(best, front.intensityAt(x, z) * MONSOON_WETTING);
             }
         }
         return best;
     }
+
+    /** Cuánto más moja el monzón que la lluvia. */
+    public static final double MONSOON_WETTING = 3.0;
 
     /** Cuevas de hielo: a partir de esta helada, nieve y hielo en el suelo. */
     public static final double SNOW_AT = 0.2;
@@ -233,6 +240,23 @@ public final class SeepageTicker {
             return;
         }
 
+        // Monzón: cascadas del techo y orillas inundadas; al irse, se retiran.
+        double monsoon = cell.monsoon();
+        if ((monsoon < 0.1 || deep < CASCADE_AT - 0.2) && random.nextDouble() < RECEDE_CHANCE) {
+            undo(level, cell, cell.lastIndexOf(SeepageCell.Kind.CASCADE));
+        }
+        if (monsoon < 0.1 && random.nextDouble() < RECEDE_CHANCE) {
+            undo(level, cell, cell.lastIndexOf(SeepageCell.Kind.FLOOD));
+        }
+        if (monsoon >= 0.3 && cell.changes().size() < maxChanges) {
+            if (random.nextInt(3) == 0) {
+                floodBank(level, cx, cz, cell, random);
+            }
+            if (deep >= CASCADE_AT && cell.count(SeepageCell.Kind.CASCADE) < MAX_CASCADES && random.nextInt(4) == 0) {
+                cascade(level, cx, cz, cell, random);
+            }
+        }
+
         // Secado y sequía primero: deshacen cambios.
         if (deep <= RECEDE_AT && random.nextDouble() < RECEDE_CHANCE) {
             // Primero los charcos (vuelven a ser piedra: nunca abren hueco) y luego las pozas; si se vaciara antes una poza
@@ -332,6 +356,90 @@ public final class SeepageTicker {
             } else if (place(level, cell, floor, Blocks.PACKED_ICE.defaultBlockState(), SeepageCell.Kind.ICE_FLOOR, material)) {
                 return;
             }
+        }
+    }
+
+    /** Humedad del subsuelo a partir de la cual el monzón hace cascadas en las cuevas. */
+    public static final double CASCADE_AT = 0.9;
+    /** Cascadas por chunk como mucho. */
+    public static final int MAX_CASCADES = 2;
+    /** Hasta cuántos bloques del agua natural crece una orilla. */
+    public static final int MAX_FLOOD_REACH = 2;
+
+    /**
+     * Orilla inundada: un bloque de suelo natural (hierba, tierra, arena, grava, arcilla, barro) al nivel del agua, junto
+     * a agua quieta, a cielo abierto y sin nada encima, pasa a ser agua. Como mucho {@link #MAX_FLOOD_REACH} bloques desde
+     * el agua natural. Se restaura al irse el monzón.
+     */
+    private static void floodBank(ServerLevel level, int cx, int cz, SeepageCell cell, RandomSource random) {
+        int x = (cx << 4) + random.nextInt(16);
+        int z = (cz << 4) + random.nextInt(16);
+        BlockPos above = level.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, new BlockPos(x, 0, z));
+        BlockPos water = above.below();
+        if (!isStillWater(level, water)) {
+            return;
+        }
+        for (Direction side : Direction.Plane.HORIZONTAL) {
+            if (floodNext(level, cell, water.relative(side))) {
+                return;
+            }
+        }
+    }
+
+    /** Inunda {@code bank} si se puede (ver {@link #floodBank}). Público para el self-test. */
+    public static boolean floodNext(ServerLevel level, SeepageCell cell, BlockPos bank) {
+        BlockState state = level.getBlockState(bank);
+        String material = CaveMaterials.idOf(state);
+        if (material == null || !FLOOD_GROUND.contains(material) || !level.getBlockState(bank.above()).isAir()
+                || !level.canSeeSky(bank.above()) || floodDistance(level, cell, bank) > MAX_FLOOD_REACH) {
+            return false;
+        }
+        return place(level, cell, bank, Blocks.WATER.defaultBlockState(), SeepageCell.Kind.FLOOD, material);
+    }
+
+    private static final java.util.Set<String> FLOOD_GROUND =
+            java.util.Set.of("grass_block", "dirt", "coarse_dirt", "sand", "gravel", "clay", "mud");
+
+    /** Distancia (1, 2...) desde el agua natural a través de orillas ya inundadas; grande si no toca agua. */
+    private static int floodDistance(ServerLevel level, SeepageCell cell, BlockPos bank) {
+        int best = Integer.MAX_VALUE;
+        for (Direction side : Direction.Plane.HORIZONTAL) {
+            BlockPos next = bank.relative(side);
+            if (!isStillWater(level, next)) {
+                continue;
+            }
+            if (!hasChange(cell, next)) {
+                return 1;
+            }
+            for (Direction side2 : Direction.Plane.HORIZONTAL) {
+                BlockPos second = next.relative(side2);
+                if (!second.equals(bank) && isStillWater(level, second) && !hasChange(cell, second)) {
+                    best = Math.min(best, 2);
+                }
+            }
+        }
+        return best;
+    }
+
+    /** Cascada temporal: agua que cae del techo de roca de una cueva (al quitarla, el agua que corre se va sola). */
+    private static void cascade(ServerLevel level, int cx, int cz, SeepageCell cell, RandomSource random) {
+        for (int attempt = 0; attempt < ATTEMPTS_PER_CHUNK; attempt++) {
+            BlockPos air = randomCaveFloor(level, cx, cz, random);
+            if (air == null) {
+                continue;
+            }
+            BlockPos spout = ceilingAbove(level, air);
+            if (spout != null && spout.getY() >= air.getY() + 2
+                    && place(level, cell, spout, Blocks.WATER.defaultBlockState(), SeepageCell.Kind.CASCADE, "")) {
+                return;
+            }
+        }
+    }
+
+    /** Solo para el self-test: una cascada en el chunk. */
+    public static void cascadeForTest(ServerLevel level, int cx, int cz, SeepageCell cell) {
+        for (int i = 0; i < 20 && cell.count(SeepageCell.Kind.CASCADE) == 0; i++) {
+            cascade(level, cx, cz, cell, level.getRandom());
         }
     }
 
@@ -560,6 +668,7 @@ public final class SeepageTicker {
             case FROZEN -> state.is(Blocks.ICE);
             case ICICLE -> state.getBlock() instanceof io.github.hcuadrado428.stormroot.block.IcicleBlock;
             case ICE_CRYSTAL -> state.getBlock() instanceof io.github.hcuadrado428.stormroot.block.IceCrystalBlock;
+            case FLOOD, CASCADE -> state.is(Blocks.WATER);
         };
         if (unchanged) {
             level.setBlock(pos, CaveMaterials.restore(change.original()), Block.UPDATE_ALL);

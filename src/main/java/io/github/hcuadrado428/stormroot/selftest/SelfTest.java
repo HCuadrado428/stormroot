@@ -162,6 +162,7 @@ public final class SelfTest {
                 run("seepage codec round trip", () -> checkSeepageCodec(server));
                 run("seepage dries and restores every block", () -> dryCave(level));
                 run("ice cave freezes and thaws back", () -> iceCave(level));
+                run("monsoon floods banks and caves and recedes", () -> monsoonFlood(level));
                 run("massive thaw floods the cave", SelfTest::checkMassiveThaw);
                 run("heat waves dry the ground and clear the sky", SelfTest::checkHeatWave);
                 run("one in three storms brings hail", SelfTest::checkHailClouds);
@@ -360,19 +361,23 @@ public final class SelfTest {
         boolean temperateHasRain = false;
         boolean blizzardOnlyCold = true;
         boolean coldHasBlizzard = false;
+        boolean monsoonInHumid = false;
         for (int i = 0; i < 200; i++) {
             blizzardOnlyCold &= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE) != FrontType.BLIZZARD
                     && sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.DRY) != FrontType.BLIZZARD;
             coldHasBlizzard |= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.COLD) == FrontType.BLIZZARD;
+            blizzardOnlyCold &= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE) != FrontType.MONSOON;
+            monsoonInHumid |= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.HUMID) == FrontType.MONSOON;
             FrontType dryType = sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.DRY);
             dryOnlyStorms &= dryType == FrontType.THUNDERSTORM || dryType == FrontType.HEAT_WAVE;
             temperateHasRain |= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE) == FrontType.RAIN;
         }
         check("fronts are born by biome",
                 here == io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE && dryOnlyStorms && temperateHasRain
-                        && blizzardOnlyCold && coldHasBlizzard,
+                        && blizzardOnlyCold && coldHasBlizzard && monsoonInHumid,
                 "zona del mundo plano=" + here + ", en seco solo tormentas y calor=" + dryOnlyStorms + ", lluvia en templado="
-                        + temperateHasRain + ", ventiscas solo en frío=" + blizzardOnlyCold + ", ventiscas en frío=" + coldHasBlizzard);
+                        + temperateHasRain + ", ventiscas y monzones solo donde tocan=" + blizzardOnlyCold + ", ventiscas en frío=" + coldHasBlizzard
+                        + ", monzones en húmedos=" + monsoonInHumid);
     }
 
     /** La nieve de ventisca se apila hasta 4 capas y, sin ventisca, baja hasta 1 (la de vanilla). */
@@ -751,6 +756,50 @@ public final class SelfTest {
         check("hail hurts crops and glass and leaves hailstones",
                 age == wheat.getMaxAge() - 2 && glassBroken && count == 1,
                 "edad del trigo=" + age + " (máx " + wheat.getMaxAge() + "), cristal roto=" + glassBroken + ", granizo en el suelo=" + count);
+    }
+
+    /** Monzón: inunda la orilla de un agua natural (hasta 2 bloques), hace una cascada en la cueva y luego todo vuelve. */
+    private static void monsoonFlood(ServerLevel level) {
+        BlockPos above = level.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,
+                new BlockPos(BX + 8, 0, BZ + 12));
+        BlockPos lake = above.below();
+        BlockState ground = level.getBlockState(lake);
+        level.setBlock(lake, Blocks.WATER.defaultBlockState(), Block.UPDATE_CLIENTS);
+        cell.set(0.95);
+        int flooded = 0;
+        for (Direction side : Direction.Plane.HORIZONTAL) {
+            if (SeepageTicker.floodNext(level, cell, lake.relative(side))) {
+                flooded++;
+            }
+        }
+        // Segunda vuelta (2 bloques del agua) y tercera (3: no debe pasar).
+        boolean second = SeepageTicker.floodNext(level, cell, lake.east(2));
+        boolean third = SeepageTicker.floodNext(level, cell, lake.east(3));
+        SeepageTicker.cascadeForTest(level, CX, CZ, cell);
+        int cascades = cell.count(SeepageCell.Kind.CASCADE);
+        BlockPos spout = null;
+        for (SeepageCell.Change change : cell.changes()) {
+            if (change.kind() == SeepageCell.Kind.CASCADE) {
+                spout = BlockPos.of(change.pos());
+            }
+        }
+        cell.setMonsoon(0);
+        for (int i = 0; i < 2000 && (cell.count(SeepageCell.Kind.FLOOD) + cell.count(SeepageCell.Kind.CASCADE)) > 0; i++) {
+            cell.set(0.3);
+            SeepageTicker.applyEffectsForTest(level, CX, CZ, cell, 256);
+        }
+        boolean banksBack = true;
+        for (Direction side : Direction.Plane.HORIZONTAL) {
+            banksBack &= level.getBlockState(lake.relative(side)).equals(ground);
+        }
+        banksBack &= level.getBlockState(lake.east(2)).equals(ground);
+        boolean spoutGone = spout == null || level.getBlockState(spout).isAir();
+        level.setBlock(lake, ground, Block.UPDATE_CLIENTS);
+        check("monsoon floods banks and caves and recedes",
+                flooded == 4 && second && !third && cascades > 0 && banksBack && spoutGone,
+                "orillas inundadas=" + flooded + ", a 2 bloques=" + second + ", a 3 bloques=" + third + ", cascadas=" + cascades
+                        + ", orillas restauradas=" + banksBack + ", cascada quitada=" + spoutGone);
+        cell.set(0);
     }
 
     /** Deshielo masivo: la helada se va en un minuto y deja el subsuelo empapado (inundación). */

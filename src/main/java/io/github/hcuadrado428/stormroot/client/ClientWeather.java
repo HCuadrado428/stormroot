@@ -63,7 +63,8 @@ public final class ClientWeather {
         double z = player.getZ();
         double storm = ClientFronts.intensity(FrontType.THUNDERSTORM, x, z);
         double blizzard = ClientFronts.intensity(FrontType.BLIZZARD, x, z);
-        double wet = Math.max(Math.max(ClientFronts.intensity(FrontType.RAIN, x, z), storm), blizzard);
+        double monsoon = ClientFronts.intensity(FrontType.MONSOON, x, z);
+        double wet = Math.max(Math.max(Math.max(ClientFronts.intensity(FrontType.RAIN, x, z), storm), blizzard), monsoon);
         double mist = ClientFronts.intensity(FrontType.FOG, x, z);
         // La niebla se deshace sobre los biomas sin lluvia (desierto, badlands, sabana).
         if (!level.getBiome(player.blockPosition()).value().hasPrecipitation()) {
@@ -74,7 +75,8 @@ public final class ClientWeather {
         rain = approach(rain, (float) Math.min(1.0, wet * 2));
         thunder = approach(thunder, (float) Math.min(1.0, storm * 2));
         // Ventisca: casi tanta niebla como un banco de niebla (la nieve no deja ver).
-        fog = approach(fog, (float) Math.min(1.0, Math.max(mist, blizzard * 0.8) * 2));
+        // Monzón: la lluvia torrencial también quita visibilidad (algo menos que la ventisca).
+        fog = approach(fog, (float) Math.min(1.0, Math.max(Math.max(mist, blizzard * 0.8), monsoon * 0.45) * 2));
 
         level.setRainLevel(rain);
         level.setThunderLevel(thunder);

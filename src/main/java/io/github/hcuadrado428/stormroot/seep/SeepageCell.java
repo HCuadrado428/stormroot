@@ -71,6 +71,17 @@ public final class SeepageCell {
         return frost;
     }
 
+    /** Intensidad del monzón encima en la última actualización (no se guarda). */
+    private transient double monsoon;
+
+    public double monsoon() {
+        return monsoon;
+    }
+
+    public void setMonsoon(double value) {
+        monsoon = value;
+    }
+
     /** Deshielo masivo en curso (no se guarda). */
     private transient boolean thawing;
 
@@ -229,7 +240,11 @@ public final class SeepageCell {
         /** Carámbano colgando del techo (antes aire). */
         ICICLE("icicle", false),
         /** Cristal de hielo en el suelo (antes aire). */
-        ICE_CRYSTAL("ice_crystal", false);
+        ICE_CRYSTAL("ice_crystal", false),
+        /** Orilla inundada por el monzón: el suelo pasa a ser agua y vuelve a su material al bajar. */
+        FLOOD("flood", false),
+        /** Cascada temporal: agua que cae del techo de una cueva durante el monzón (antes aire). */
+        CASCADE("cascade", false);
 
         private final String id;
         private final boolean water;
