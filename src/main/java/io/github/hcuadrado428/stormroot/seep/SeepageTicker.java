@@ -313,10 +313,24 @@ public final class SeepageTicker {
         return true;
     }
 
+    /**
+     * Cambia el bloque y lo apunta. Si ese bloque ya tenía un cambio de Stormroot (p. ej. tierra → barro y ahora
+     * barro → charco), el nuevo sustituye al anterior y conserva el material de ANTES de Stormroot, para que al
+     * deshacerlo vuelva siempre al bloque original (lo encontró el self-test).
+     */
     private static boolean place(ServerLevel level, SeepageCell cell, BlockPos pos, BlockState newState,
                                  SeepageCell.Kind kind, String original) {
+        long key = pos.asLong();
+        for (int i = 0; i < cell.changes().size(); i++) {
+            SeepageCell.Change existing = cell.changes().get(i);
+            if (existing.pos() == key) {
+                original = existing.original();
+                cell.changes().remove(i);
+                break;
+            }
+        }
         level.setBlock(pos, newState, Block.UPDATE_ALL);
-        cell.changes().add(new SeepageCell.Change(pos.asLong(), kind, original));
+        cell.changes().add(new SeepageCell.Change(key, kind, original));
         return true;
     }
 
