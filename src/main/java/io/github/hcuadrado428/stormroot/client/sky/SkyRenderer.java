@@ -171,7 +171,7 @@ public final class SkyRenderer {
                     case STORM -> {
                         // Más gruesa y oscura cuanto más fuerte es la tormenta en ese punto.
                         bottom = FAIR_Y - 14;
-                        height = 5 + 9 * amount;
+                        height = heightOf(kind, amount);
                         r = (int) (118 - 30 * amount);
                         g = (int) (124 - 30 * amount);
                         b = (int) (140 - 26 * amount);
@@ -179,7 +179,7 @@ public final class SkyRenderer {
                     }
                     case RAIN -> {
                         bottom = FAIR_Y - 6;
-                        height = 4 + 3 * amount;
+                        height = heightOf(kind, amount);
                         r = (int) (180 - 20 * amount);
                         g = (int) (184 - 20 * amount);
                         b = (int) (196 - 18 * amount);
@@ -188,7 +188,7 @@ public final class SkyRenderer {
                     default -> {
                         // Aviso de tormenta: delante de un frente las nubes de buen tiempo se vuelven grises.
                         bottom = FAIR_Y;
-                        height = 4 + 2 * amount;
+                        height = heightOf(kind, amount);
                         r = (int) (255 - 90 * amount);
                         g = (int) (255 - 86 * amount);
                         b = (int) (255 - 72 * amount);
@@ -216,17 +216,17 @@ public final class SkyRenderer {
                 }
                 int sideX = shade(alpha, r, g, b, day * 0.9f, hr, hg, hb, haze);
                 int sideZ = shade(alpha, r, g, b, day * 0.82f, hr, hg, hb, haze);
-                // Lados solo en los bordes; entre celdas de distinto tipo (o grosor) también, para que no queden huecos.
-                if (GRID[i][j + 1] != k || SHADE[i][j + 1] < amount) {
+                // Lados solo en los bordes: junto a otro tipo de nube o junto a una celda bastante más fina (escalón).
+                if (edge(i, j + 1, k, height)) {
                     quad(vc, pose, x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0, sideX);
                 }
-                if (GRID[i + 2][j + 1] != k || SHADE[i + 2][j + 1] < amount) {
+                if (edge(i + 2, j + 1, k, height)) {
                     quad(vc, pose, x1, y0, z0, x1, y1, z0, x1, y1, z1, x1, y0, z1, sideX);
                 }
-                if (GRID[i + 1][j] != k || SHADE[i + 1][j] < amount) {
+                if (edge(i + 1, j, k, height)) {
                     quad(vc, pose, x0, y0, z0, x0, y1, z0, x1, y1, z0, x1, y0, z0, sideZ);
                 }
-                if (GRID[i + 1][j + 2] != k || SHADE[i + 1][j + 2] < amount) {
+                if (edge(i + 1, j + 2, k, height)) {
                     quad(vc, pose, x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1, sideZ);
                 }
                 drawn++;
@@ -238,6 +238,24 @@ public final class SkyRenderer {
         buffers.endBatch(renderType);
         cellsDrawn += drawn;
         frames++;
+    }
+
+    /** Grosor de una nube: las de buen tiempo, fijo; los nubarrones crecen con la intensidad del frente. */
+    private static double heightOf(CloudCover.Kind kind, float amount) {
+        return switch (kind) {
+            case STORM -> 5 + 9 * amount;
+            case RAIN -> 4 + 3 * amount;
+            default -> 4;
+        };
+    }
+
+    /** {@code true} si hay que dibujar el lado hacia la celda vecina (gi, gj) de la rejilla. */
+    private static boolean edge(int gi, int gj, byte kind, double height) {
+        byte other = GRID[gi][gj];
+        if (other != kind) {
+            return true;
+        }
+        return heightOf(CloudCover.Kind.values()[other], SHADE[gi][gj]) < height - 1;
     }
 
     /**
