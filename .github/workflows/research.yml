@@ -44,7 +44,8 @@ jobs:
           chmod +x ./gradlew
           for t in $TARGETS; do
             ./gradlew ":$t:genSources" -q > /dev/null 2>&1 || ./gradlew ":$t:genSources" --stacktrace | tail -40
-            jar=$(find ~/.gradle .gradle "versions/$t" -name "*sources.jar" -path "*minecraft*" 2>/dev/null | grep -v "/stormroot" | head -1)
+            v="${t%-*}"
+            jar=$(find ~/.gradle .gradle "versions/$t" -name "*sources.jar" -path "*minecraft*" 2>/dev/null | grep -- "-$v-loom" | head -1)
             echo "################ $t ($jar)"
             rm -rf /tmp/src && mkdir /tmp/src
             for c in $CLASSES; do
