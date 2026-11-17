@@ -18,8 +18,8 @@ import net.minecraft.world.entity.EntitySpawnReason;
  * Tormenta seca: en los biomas sin lluvia (desierto, badlands, sabana) vanilla no echa rayos (sus rayos naturales
  * piden que llueva en ese bloque). Aquí Stormroot los echa él mismo, solo bajo el nubarrón de tormenta.
  *
- * <p>Los rayos son "solo visuales" para vanilla: no prenden fuego (el fuego del clima, solo en hojas, llegará aparte)
- * ni hacen daño, pero sí dejan cristales de rayo y raíces de rayo ({@link LightningCrystals}).
+ * <p>Los rayos hacen daño como los de vanilla y dejan cristales y raíces de rayo ({@link LightningCrystals}), pero NO
+ * prenden fuego: {@code mixin/LightningBoltFireMixin} cancela su fuego (el fuego del clima, solo en hojas, va aparte).
  */
 public final class DryStorms {
     /** Cada cuántos ticks se prueba (por jugador). */
@@ -29,10 +29,23 @@ public final class DryStorms {
     /** Radio alrededor del jugador donde puede caer. */
     private static final int RANGE = 96;
 
+    /** Rayos de tormenta seca vivos: hacen daño pero no prenden fuego ({@code mixin/LightningBoltFireMixin}). */
+    private static final java.util.Map<LightningBolt, Boolean> OURS = new java.util.WeakHashMap<>();
+
     private static int ticks;
     private static long bolts;
 
     private DryStorms() {
+    }
+
+    /** Solo para el self-test: marca un rayo como de tormenta seca. */
+    public static void markForTest(LightningBolt bolt) {
+        OURS.put(bolt, Boolean.TRUE);
+    }
+
+    /** {@code true} si el rayo es de una tormenta seca (no debe prender fuego). */
+    public static boolean isDryStormBolt(LightningBolt bolt) {
+        return OURS.containsKey(bolt);
     }
 
     /** Rayos de tormenta seca lanzados desde que arrancó el juego (para el self-test). */
@@ -87,7 +100,7 @@ public final class DryStorms {
             return false;
         }
         bolt.setPos(top.getX() + 0.5, top.getY(), top.getZ() + 0.5);
-        bolt.setVisualOnly(true);
+        OURS.put(bolt, Boolean.TRUE);
         level.addFreshEntity(bolt);
         bolts++;
         return true;

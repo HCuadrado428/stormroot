@@ -70,7 +70,7 @@ Para compilar con la integración: `scripts/fetch-bloomberto.sh` (compila Bloomb
 
 La CI arranca **Minecraft de verdad** en los 6 targets en cada push (`scripts/selftest.sh`, job `selftest`):
 
-- **Servidor dedicado** (21 comprobaciones): construye una cueva de pruebas y comprueba registros, guardado de frentes y de filtración, el paquete de red, los comandos, los ajustes del mundo, que `/weather` se respeta, que se quitan los rayos fuera de las tormentas, el pronóstico, la veleta y el barómetro (señal de redstone), que las pozas solo llenan hoyos cerrados, que la cueva empapada da charcos, barro y musgo, que **el agua nunca se derrama**, que la raíz de rayo baja hasta la cueva y que **al secarse cada bloque vuelve a ser exactamente el original**; además, que solo llueve bajo los nubarrones, que los frentes nacen según el bioma y que la niebla humedece sin hacer charcos.
+- **Servidor dedicado** (22 comprobaciones): construye una cueva de pruebas y comprueba registros, guardado de frentes y de filtración, el paquete de red, los comandos, los ajustes del mundo, que `/weather` se respeta, que se quitan los rayos fuera de las tormentas, el pronóstico, la veleta y el barómetro (señal de redstone), que las pozas solo llenan hoyos cerrados, que la cueva empapada da charcos, barro y musgo, que **el agua nunca se derrama**, que la raíz de rayo baja hasta la cueva y que **al secarse cada bloque vuelve a ser exactamente el original**; además, que solo llueve bajo los nubarrones, que los frentes nacen según el bioma, que la niebla humedece sin hacer charcos y que los rayos de tormenta seca no prenden fuego.
 - **Un jugador** en una pantalla virtual (12 más): llegan los frentes al cliente, la tormenta se ve y se va, la niebla (y que el enganche de cada loader la aplica de verdad al dibujar), la humedad de las cuevas, el cielo de Stormroot (nubes vanilla ocultas, una tormenta lejana dibujada, nubes de buen tiempo sin frentes y sus sombras en el suelo) y la integración con Bloomberto (archivo y pantalla de config, efectos de pantalla). Saca capturas (artefacto `selftest-shots` de la CI).
 
 En local: `scripts/selftest.sh server 1.21.1-fabric` o `scripts/selftest.sh client 1.21.1-fabric` (cliente: necesita `xvfb-run` en Linux). En cualquier lanzador: `-Dstormroot.selfTest=server|client|all` (el juego se cierra al terminar; `-Dstormroot.selfTest.exit=false` lo deja abierto). Sin esa propiedad el self-test no hace nada.
@@ -126,9 +126,9 @@ src/versioned/<versión>/  → recetas, loot tables y tags (su formato cambia en
   - **Solo llueve bajo los nubarrones**, también en el juego (fuera no se apagan fuegos ni se llenan calderos).
   - **Aviso de tormenta**: delante de un frente salen más nubes y se van poniendo grises; los nubarrones son más gruesos y oscuros cuanto más fuerte es el frente.
   - **Sombra de las nubes** en el suelo (opción `cloud_shadows`) y una **capa alta** de velos finos.
-- **Tormenta seca**: en desiertos, badlands y sabanas las tormentas echan rayos sin lluvia (sin fuego, de momento) y dan el doble de cristales de rayo.
+- **Tormenta seca**: en desiertos, badlands y sabanas las tormentas echan rayos sin lluvia, que hacen daño pero no prenden fuego, y dan el doble de cristales de rayo.
 - **Frentes según el bioma**: en el desierto solo nacen tormentas (secas); en pantanos, junglas y océanos, más lluvia y niebla.
-- **Niebla que rueda** pegada al suelo con el viento; los bancos de niebla humedecen un poco el subsuelo (barro y musgo, nunca charcos).
+- **Niebla que rueda** pegada al suelo con el viento; se deshace al entrar en biomas sin lluvia (desierto, badlands, sabana); los bancos de niebla humedecen un poco el subsuelo (barro y musgo, nunca charcos).
 - **Partículas en el borde** de los frentes cercanos (gotas, humo de tormenta, nubes bajas).
 - **Cristales de rayo**: un rayo sobre arena o piedra deja un cristal el 25 % de las veces. Se usan en la receta del barómetro.
 - **Comandos de depuración** `/stormroot ...`.

@@ -148,11 +148,13 @@ public final class SelfTest {
                 run("pool fills a closed hole only", () -> checkPool(level));
                 run("seepage floods the cave", () -> floodCave(level));
                 run("lightning root starts", () -> LightningRoots.start(level, new BlockPos(BX + 8, Y_TOP, BZ + 8)));
+                run("dry storm bolts start", () -> strikeFireTest(level));
                 stage = 1;
                 waitUntil = ticks + 160;
             }
             case 1 -> {
                 run("water stays contained", () -> checkContained(level));
+                run("dry storm lightning does not burn", () -> checkFireTest(level));
                 run("lightning root grows to the cave", () -> checkRoot(level));
                 run("seepage codec round trip", () -> checkSeepageCodec(server));
                 run("seepage dries and restores every block", () -> dryCave(level));
@@ -371,6 +373,38 @@ public final class SelfTest {
         boolean ok = cell.foggy() && cell.surface() <= SeepageCell.FOG_CAP + 1e-9
                 && cell.deep() >= SeepageTicker.FOG_MOSS_AT && cell.deep() < SeepageTicker.PUDDLE_AT;
         check("fog dampens without puddles", ok, "superficie=" + cell.surface() + ", subsuelo=" + cell.deep());
+    }
+
+    private static final BlockPos DRY_BOLT = new BlockPos(BX + 14, Y_TOP + 1, BZ + 14);
+    private static final BlockPos NORMAL_BOLT = new BlockPos(BX + 14, Y_TOP + 1, BZ + 10);
+
+    /** Dos rayos sobre netherrack (donde el fuego no se apaga): uno de tormenta seca y uno normal. */
+    private static void strikeFireTest(ServerLevel level) {
+        for (BlockPos pos : new BlockPos[] {DRY_BOLT, NORMAL_BOLT}) {
+            level.setBlock(pos.below(), Blocks.NETHERRACK.defaultBlockState(), Block.UPDATE_CLIENTS);
+            //? if >=1.21.2 {
+            LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.TRIGGERED);
+            //?} else {
+            /*LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level);
+            *///?}
+            bolt.setPos(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+            if (pos.equals(DRY_BOLT)) {
+                io.github.hcuadrado428.stormroot.weather.DryStorms.markForTest(bolt);
+            }
+            level.addFreshEntity(bolt);
+        }
+    }
+
+    /** El rayo normal deja fuego; el de tormenta seca, no. Luego se limpia. */
+    private static void checkFireTest(ServerLevel level) {
+        boolean dryFire = level.getBlockState(DRY_BOLT).is(Blocks.FIRE);
+        boolean normalFire = level.getBlockState(NORMAL_BOLT).is(Blocks.FIRE);
+        for (BlockPos pos : new BlockPos[] {DRY_BOLT, NORMAL_BOLT}) {
+            level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+            level.setBlock(pos.below(), Blocks.STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        check("dry storm lightning does not burn", !dryFire && normalFire,
+                "fuego del rayo de tormenta seca=" + dryFire + ", fuego del rayo normal=" + normalFire);
     }
 
     private static void checkForecast() {

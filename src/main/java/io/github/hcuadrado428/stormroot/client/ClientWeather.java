@@ -64,6 +64,10 @@ public final class ClientWeather {
         double storm = ClientFronts.intensity(FrontType.THUNDERSTORM, x, z);
         double wet = Math.max(ClientFronts.intensity(FrontType.RAIN, x, z), storm);
         double mist = ClientFronts.intensity(FrontType.FOG, x, z);
+        // La niebla se deshace sobre los biomas sin lluvia (desierto, badlands, sabana).
+        if (!level.getBiome(player.blockPosition()).value().hasPrecipitation()) {
+            mist = 0;
+        }
 
         // La mayor parte del frente debe verse "a tope": intensidad 0.5 ya es lluvia completa.
         rain = approach(rain, (float) Math.min(1.0, wet * 2));
@@ -216,6 +220,9 @@ public final class ClientWeather {
                 particle = ParticleTypes.FALLING_WATER;
                 y = playerY + 6 + random.nextDouble() * 10;
                 break;
+        }
+        if (type == FrontType.FOG && !level.getBiome(net.minecraft.core.BlockPos.containing(x, playerY, z)).value().hasPrecipitation()) {
+            return;
         }
         level.addParticle(particle, x, y, z, 0, vy, 0);
     }
