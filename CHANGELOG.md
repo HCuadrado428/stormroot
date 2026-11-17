@@ -11,7 +11,7 @@ Primera versión jugable. Minecraft 1.20.1 (Fabric, Forge; también NeoForge 1.2
 - **Frentes climáticos** de lluvia, tormenta y niebla que nacen a contraviento de los jugadores, se mueven con un
   viento dominante, crecen, se debilitan y desaparecen. Se guardan con el mundo.
 - **Clima por zonas**: cada jugador ve la lluvia y los truenos de su zona, con transición suave.
-- La lluvia "de juego" (rayos, fuego...) solo ocurre dentro de los frentes.
+- Los rayos naturales solo caen dentro de los frentes de tormenta (no junto a jugadores que están fuera).
 - **Niebla** dentro de los bancos de niebla.
 - Partículas en el borde de los frentes cercanos; con Bloomberto, los frentes se ven también de lejos.
 - `/weather` se respeta: si alguien lo usa, Stormroot espera a que ese clima termine.
