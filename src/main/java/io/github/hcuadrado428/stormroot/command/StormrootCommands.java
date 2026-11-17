@@ -66,6 +66,7 @@ public final class StormrootCommands {
         Vec3 pos = source.getPosition();
         WeatherFront front = FrontTicker.simulation(source.getServer()).create(type, pos.x, pos.z);
         FrontTicker.simulation(source.getServer()).add(front);
+        FrontTicker.markDirty(source.getServer());
         FrontTicker.applyNow(source.getServer());
         reply(source, "Creado " + front);
         return 1;
@@ -75,6 +76,7 @@ public final class StormrootCommands {
         FrontSimulation sim = FrontTicker.simulation(source.getServer());
         int count = sim.fronts().size();
         sim.clear();
+        FrontTicker.markDirty(source.getServer());
         FrontTicker.applyNow(source.getServer());
         reply(source, "Borrados " + count + " frente(s).");
         return count;
@@ -98,7 +100,7 @@ public final class StormrootCommands {
     }
 
     private static int setWeatherControl(CommandSourceStack source, boolean enabled) {
-        FrontTicker.setControlsWeather(enabled);
+        FrontTicker.setControlsWeather(source.getServer(), enabled);
         if (enabled) {
             FrontTicker.applyNow(source.getServer());
         }

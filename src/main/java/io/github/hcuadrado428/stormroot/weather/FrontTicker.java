@@ -11,8 +11,8 @@ import net.minecraft.server.level.ServerPlayer;
  * Puente entre Minecraft y {@link FrontSimulation}. Solo usa clases vanilla:
  * cada loader llama a {@link #onServerTick(MinecraftServer)} al final de cada tick del servidor.
  *
- * <p>MVP: solo el Overworld y los frentes viven en memoria (se pierden al cerrar el mundo).
- * Siguiente paso: guardarlos con SavedData (la API cambia en 1.20.2 y 1.21.5; ver skill version-matrix).
+ * <p>MVP: solo el Overworld. Los frentes se guardan en su {@link FrontSavedData}, que se marca como
+ * modificado en cada paso y en cada comando que cambie algo ({@link #markDirty}).
  *
  * <p>Clima: el clima vanilla es global, así que de momento Stormroot lo pone según el frente más
  * fuerte que toque a algún jugador (tormenta &gt; lluvia &gt; nada). Cuando haya render en el cliente,
@@ -25,9 +25,8 @@ public final class FrontTicker {
     public static final double WEATHER_THRESHOLD = 0.15;
 
     private static MinecraftServer currentServer;
-    private static FrontSimulation simulation;
+    private static FrontSavedData data;
     private static int tickCounter;
-    private static boolean controlsWeather = true;
 
     private FrontTicker() {
     }
@@ -49,17 +48,36 @@ public final class FrontTicker {
         for (WeatherFront front : sim.step(STEP_TICKS / 20.0, anchors)) {
             Stormroot.LOGGER.info("[Stormroot] Nuevo frente: {}", front);
         }
+        data.setDirty();
         applyWeather(overworld, sim);
     }
 
-    /** Simulación del Overworld de este servidor; la crea si hace falta (mundo nuevo o recién abierto). */
+    /**
+     * Simulación del Overworld de este servidor. Al abrir un mundo la carga de su {@link FrontSavedData}
+     * (o la crea vacía si es un mundo nuevo).
+     */
     public static FrontSimulation simulation(MinecraftServer server) {
-        if (server != currentServer || simulation == null) {
+        return data(server).simulation();
+    }
+
+    /** Marca los datos como modificados para que se guarden con el mundo (llamar tras cambiar algo). */
+    public static void markDirty(MinecraftServer server) {
+        data(server).setDirty();
+    }
+
+    private static FrontSavedData data(MinecraftServer server) {
+        if (server != currentServer || data == null) {
+            ServerLevel overworld = server.overworld();
+            FrontSavedData loaded = FrontSavedData.get(overworld);
+            if (loaded.simulation() == null) {
+                loaded.attach(new FrontSimulation(overworld.getSeed()));
+                Stormroot.LOGGER.info("[Stormroot] Frentes cargados: {}", loaded.simulation().fronts().size());
+            }
             currentServer = server;
-            simulation = new FrontSimulation(server.overworld().getSeed());
+            data = loaded;
             tickCounter = 0;
         }
-        return simulation;
+        return data;
     }
 
     /** Recalcula el clima ya (p. ej. después de un comando), sin esperar al siguiente paso. */
@@ -67,16 +85,17 @@ public final class FrontTicker {
         applyWeather(server.overworld(), simulation(server));
     }
 
-    public static void setControlsWeather(boolean enabled) {
-        controlsWeather = enabled;
+    /** Activa o desactiva el control del clima vanilla; se guarda con el mundo. */
+    public static void setControlsWeather(MinecraftServer server, boolean enabled) {
+        data(server).setControlsWeather(enabled);
     }
 
-    public static boolean controlsWeather() {
-        return controlsWeather;
+    public static boolean controlsWeather(MinecraftServer server) {
+        return data(server).controlsWeather();
     }
 
     private static void applyWeather(ServerLevel level, FrontSimulation sim) {
-        if (!controlsWeather) {
+        if (!data.controlsWeather()) {
             return;
         }
         FrontType strongest = null;
