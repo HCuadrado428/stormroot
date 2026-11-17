@@ -1,0 +1,167 @@
+{
+ "meta": {
+  "format_version": "4.10",
+  "model_format": "java_block",
+  "box_uv": false
+ },
+ "name": "barometer",
+ "parent": "",
+ "ambientocclusion": true,
+ "front_gui_light": false,
+ "visible_box": [
+  1,
+  1,
+  0
+ ],
+ "variable_placeholders": "",
+ "variable_placeholder_buttons": [],
+ "timeline_setups": [],
+ "unhandled_root_fields": {},
+ "resolution": {
+  "width": 16,
+  "height": 16
+ },
+ "elements": [
+  {
+   "name": "pieza_1",
+   "box_uv": false,
+   "rescale": false,
+   "locked": false,
+   "render_order": "default",
+   "allow_mirror_modeling": true,
+   "from": [
+    3,
+    0,
+    5
+   ],
+   "to": [
+    13,
+    14,
+    11
+   ],
+   "autouv": 0,
+   "color": 0,
+   "origin": [
+    8,
+    8,
+    8
+   ],
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      3,
+      2,
+      13,
+      16
+     ],
+     "texture": 0
+    },
+    "south": {
+     "uv": [
+      3,
+      2,
+      13,
+      16
+     ],
+     "texture": 1
+    },
+    "east": {
+     "uv": [
+      5,
+      2,
+      11,
+      16
+     ],
+     "texture": 1
+    },
+    "west": {
+     "uv": [
+      5,
+      2,
+      11,
+      16
+     ],
+     "texture": 1
+    },
+    "up": {
+     "uv": [
+      3,
+      5,
+      13,
+      11
+     ],
+     "texture": 1
+    },
+    "down": {
+     "uv": [
+      3,
+      5,
+      13,
+      11
+     ],
+     "texture": 1
+    }
+   },
+   "type": "cube",
+   "uuid": "c9bcbb02-995a-46b1-a264-f653056fdb0e"
+  }
+ ],
+ "outliner": [
+  "c9bcbb02-995a-46b1-a264-f653056fdb0e"
+ ],
+ "textures": [
+  {
+   "path": "",
+   "name": "barometer_front.png",
+   "folder": "block",
+   "namespace": "stormroot",
+   "id": "0",
+   "width": 16,
+   "height": 16,
+   "uv_width": 16,
+   "uv_height": 16,
+   "particle": false,
+   "render_mode": "default",
+   "render_sides": "auto",
+   "frame_time": 1,
+   "frame_order_type": "loop",
+   "frame_order": "",
+   "frame_interpolate": false,
+   "visible": true,
+   "internal": true,
+   "saved": true,
+   "uuid": "e69838a2-a404-453a-82ea-30a163c3eeb1",
+   "relative_path": "",
+   "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA10lEQVR4XmP00hX/z0ABYAHpjXPXINmIwxeeM9x/+RFiAAyABOPiGPEatmjRfwZbA0m4GrgBMM2aXpvwGhDH4MewaNFzuBombKotCs5jCB+0csWmFLsBJyYYYii2P7YbLAZyIbI3sboAGzAw8yTeBeheAGm+cGo72AB0r2B1AbIXkDWDAMwrMEDQCzCbcQGsBly/dgmremziWA3Q1NLDagBI/Po2UDpApH54QgKlLlACASUUfACWEkEJDwRQkjLIkPvYXQ8HtgaoxoMNgJlGDgAbAMpV5AIAduFGZY8l80kAAAAASUVORK5CYII="
+  },
+  {
+   "path": "",
+   "name": "barometer_side.png",
+   "folder": "block",
+   "namespace": "stormroot",
+   "id": "1",
+   "width": 16,
+   "height": 16,
+   "uv_width": 16,
+   "uv_height": 16,
+   "particle": false,
+   "render_mode": "default",
+   "render_sides": "auto",
+   "frame_time": 1,
+   "frame_order_type": "loop",
+   "frame_order": "",
+   "frame_interpolate": false,
+   "visible": true,
+   "internal": true,
+   "saved": true,
+   "uuid": "78f66abe-f154-422a-b403-bdfd5ac76585",
+   "relative_path": "",
+   "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAfElEQVR4XmP00hX/z0ABYAHpjXPXINmIwxeeM9x/+RFiAAg8evaZZENAgAmbroevvhBtGFYD5MV4MAzAZShWA7ABbIZi9QIpzsdqACnOxxmI6ACX8+kbCzCAHkZExwIMoHsHrwHExAheA/AFHgyA8wIoY5ALwAaAchW5AAAVMSSjHdQmGwAAAABJRU5ErkJggg=="
+  }
+ ]
+}

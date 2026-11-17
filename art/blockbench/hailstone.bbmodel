@@ -1,0 +1,107 @@
+{
+ "meta": {
+  "format_version": "4.10",
+  "model_format": "java_block",
+  "box_uv": false
+ },
+ "name": "hailstone",
+ "parent": "",
+ "ambientocclusion": true,
+ "front_gui_light": false,
+ "visible_box": [
+  1,
+  1,
+  0
+ ],
+ "variable_placeholders": "",
+ "variable_placeholder_buttons": [],
+ "timeline_setups": [],
+ "unhandled_root_fields": {},
+ "resolution": {
+  "width": 16,
+  "height": 16
+ },
+ "elements": [
+  {
+   "name": "pieza_1",
+   "box_uv": false,
+   "rescale": false,
+   "locked": false,
+   "render_order": "default",
+   "allow_mirror_modeling": true,
+   "from": [
+    0,
+    0,
+    8
+   ],
+   "to": [
+    16,
+    16,
+    8
+   ],
+   "autouv": 0,
+   "color": 0,
+   "origin": [
+    8,
+    8,
+    8
+   ],
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    }
+   },
+   "type": "cube",
+   "uuid": "74ac021e-49fe-424b-b952-bd409e607e69"
+  }
+ ],
+ "outliner": [
+  "74ac021e-49fe-424b-b952-bd409e607e69"
+ ],
+ "textures": [
+  {
+   "path": "",
+   "name": "hailstone.png",
+   "folder": "item",
+   "namespace": "stormroot",
+   "id": "0",
+   "width": 16,
+   "height": 16,
+   "uv_width": 16,
+   "uv_height": 16,
+   "particle": false,
+   "render_mode": "default",
+   "render_sides": "auto",
+   "frame_time": 1,
+   "frame_order_type": "loop",
+   "frame_order": "",
+   "frame_interpolate": false,
+   "visible": true,
+   "internal": true,
+   "saved": true,
+   "uuid": "37e8a397-1f4a-4c91-ab5d-24445fa8f248",
+   "relative_path": "",
+   "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAv0lEQVR4XmNgGDLAO6vtPwiT5WCQxiO3X/1/9ukXhiEsyCYi27B1WhUjstzpq/cYGBiUcDsA2RZsNhH0AkhB/4YTYKeCADZDsAEUL8DA88+/sSrG50UwgLkC5BL0EEf2IgjA5FFcAAk4SFQhByJIsYubE1YXMqG7FaYRV6Dde/kBRQtGGIA0VhamMCiJCzBI8rIy+DAw/Ed2GQi09++DW4Q1EBFxLgC3DZf3sBoAAtgSDnriAgGU1AYDBKOLmgAAC+OPLGpSBgUAAAAASUVORK5CYII="
+  }
+ ]
+}

@@ -1,0 +1,107 @@
+{
+ "meta": {
+  "format_version": "4.10",
+  "model_format": "java_block",
+  "box_uv": false
+ },
+ "name": "lightning_crystal",
+ "parent": "",
+ "ambientocclusion": true,
+ "front_gui_light": false,
+ "visible_box": [
+  1,
+  1,
+  0
+ ],
+ "variable_placeholders": "",
+ "variable_placeholder_buttons": [],
+ "timeline_setups": [],
+ "unhandled_root_fields": {},
+ "resolution": {
+  "width": 16,
+  "height": 16
+ },
+ "elements": [
+  {
+   "name": "pieza_1",
+   "box_uv": false,
+   "rescale": false,
+   "locked": false,
+   "render_order": "default",
+   "allow_mirror_modeling": true,
+   "from": [
+    0,
+    0,
+    8
+   ],
+   "to": [
+    16,
+    16,
+    8
+   ],
+   "autouv": 0,
+   "color": 0,
+   "origin": [
+    8,
+    8,
+    8
+   ],
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    }
+   },
+   "type": "cube",
+   "uuid": "21616665-7902-4cc5-8bc8-c58c84742343"
+  }
+ ],
+ "outliner": [
+  "21616665-7902-4cc5-8bc8-c58c84742343"
+ ],
+ "textures": [
+  {
+   "path": "",
+   "name": "lightning_crystal.png",
+   "folder": "item",
+   "namespace": "stormroot",
+   "id": "0",
+   "width": 16,
+   "height": 16,
+   "uv_width": 16,
+   "uv_height": 16,
+   "particle": false,
+   "render_mode": "default",
+   "render_sides": "auto",
+   "frame_time": 1,
+   "frame_order_type": "loop",
+   "frame_order": "",
+   "frame_interpolate": false,
+   "visible": true,
+   "internal": true,
+   "saved": true,
+   "uuid": "d00c64ba-70e6-426a-b3ae-709b0a2d948a",
+   "relative_path": "",
+   "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAzElEQVR4XmNgoDfgt0r7D8Jk2QvS+Ob33/8bXvwl3RBkzaLVd+EGMBHjFJDmuwenMxx5y8Cw9MpfFC0EDQBpXrhuOliT/49MYuxDAJBmkH9B+P+DtP+he36hOB8EcLoAZjPIyTCbV6nkYLgAqwHImkEg7M4UMCYKwJwNci4Mg5x/bL8whvMxAFU1w2zFFnDIgAWZA4vjQmZJhuP3GRj895xiYGB4zPBrfyfDx2OzGLGFAYoBB/Y/Bqs5wADSCAH4NIMAiqnYMgkum6kGAGWHsAp8j0VEAAAAAElFTkSuQmCC"
+  }
+ ]
+}

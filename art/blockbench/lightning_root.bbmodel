@@ -1,0 +1,143 @@
+{
+ "meta": {
+  "format_version": "4.10",
+  "model_format": "java_block",
+  "box_uv": false
+ },
+ "name": "lightning_root",
+ "parent": "",
+ "ambientocclusion": true,
+ "front_gui_light": false,
+ "visible_box": [
+  1,
+  1,
+  0
+ ],
+ "variable_placeholders": "",
+ "variable_placeholder_buttons": [],
+ "timeline_setups": [],
+ "unhandled_root_fields": {},
+ "resolution": {
+  "width": 16,
+  "height": 16
+ },
+ "elements": [
+  {
+   "name": "pieza_1",
+   "box_uv": false,
+   "rescale": false,
+   "locked": false,
+   "render_order": "default",
+   "allow_mirror_modeling": true,
+   "from": [
+    0,
+    0,
+    0
+   ],
+   "to": [
+    16,
+    16,
+    16
+   ],
+   "autouv": 0,
+   "color": 0,
+   "origin": [
+    8,
+    8,
+    8
+   ],
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    }
+   },
+   "type": "cube",
+   "uuid": "69606fa8-0fc2-4a8c-a3b1-bb92a95e1d70"
+  }
+ ],
+ "outliner": [
+  "69606fa8-0fc2-4a8c-a3b1-bb92a95e1d70"
+ ],
+ "textures": [
+  {
+   "path": "",
+   "name": "lightning_root.png",
+   "folder": "block",
+   "namespace": "stormroot",
+   "id": "0",
+   "width": 16,
+   "height": 16,
+   "uv_width": 16,
+   "uv_height": 16,
+   "particle": false,
+   "render_mode": "default",
+   "render_sides": "auto",
+   "frame_time": 1,
+   "frame_order_type": "loop",
+   "frame_order": "",
+   "frame_interpolate": false,
+   "visible": true,
+   "internal": true,
+   "saved": true,
+   "uuid": "7ec2c32d-50cd-45ac-93c6-3c13b8fdf4a3",
+   "relative_path": "",
+   "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABaUlEQVR4Xm1TsUrDUBQ9DZkc7Bfo4BzIZDp1LEiho0jNJ+giZHTI0PGBi78gRRwcBBEcMyVboLODg846uFbOy7uv9zU50OX23vPuOfdkdHR6sT2cLJFOMxBt1eC3XkPXFukYq/v3Xr0yN4ilkU0dMrSAJWTt7OQAV8/f9p9pcef7Xtof+0isG98+/hzJDkM1kspjsbSykawigVtwGy1L1wQxB/YbP5/GyOss8IPrC1lldh7FNKxjhjcJeMXDpESOMvBDeyRz3kTL7sxLDLApOpKkmvt1tXbp9SZ6dnfGxCwtCX/H52vASdCwZ5TCELtsQk8S0/eKZxxdPn5tJQNyhf0MUAqRmHkvTBFX5qA+oT6tDBKUo4PHhyPrZtUEJyNIyPhSJ5HX3RYk0bIjYby9nvlbc6jLRwhKICiJDzB8QZT1nf3Hpb6LRTrzAdsUpd1qMMqBiS7OhL4ULwQ0w1GWzIuxspk2mtLp3z/C4/ptKBLk+QAAAABJRU5ErkJggg=="
+  }
+ ]
+}

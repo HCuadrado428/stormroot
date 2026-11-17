@@ -1,0 +1,499 @@
+{
+ "meta": {
+  "format_version": "4.10",
+  "model_format": "java_block",
+  "box_uv": false
+ },
+ "name": "weathervane",
+ "parent": "",
+ "ambientocclusion": true,
+ "front_gui_light": false,
+ "visible_box": [
+  1,
+  1,
+  0
+ ],
+ "variable_placeholders": "",
+ "variable_placeholder_buttons": [],
+ "timeline_setups": [],
+ "unhandled_root_fields": {},
+ "resolution": {
+  "width": 16,
+  "height": 16
+ },
+ "elements": [
+  {
+   "name": "pieza_1",
+   "box_uv": false,
+   "rescale": false,
+   "locked": false,
+   "render_order": "default",
+   "allow_mirror_modeling": true,
+   "from": [
+    5,
+    0,
+    5
+   ],
+   "to": [
+    11,
+    2,
+    11
+   ],
+   "autouv": 0,
+   "color": 0,
+   "origin": [
+    8,
+    8,
+    8
+   ],
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      5,
+      14,
+      11,
+      16
+     ],
+     "texture": 0
+    },
+    "south": {
+     "uv": [
+      5,
+      14,
+      11,
+      16
+     ],
+     "texture": 0
+    },
+    "east": {
+     "uv": [
+      5,
+      14,
+      11,
+      16
+     ],
+     "texture": 0
+    },
+    "west": {
+     "uv": [
+      5,
+      14,
+      11,
+      16
+     ],
+     "texture": 0
+    },
+    "up": {
+     "uv": [
+      5,
+      5,
+      11,
+      11
+     ],
+     "texture": 0
+    },
+    "down": {
+     "uv": [
+      5,
+      5,
+      11,
+      11
+     ],
+     "texture": 0
+    }
+   },
+   "type": "cube",
+   "uuid": "12316ed9-021d-49c8-bfd7-ff6c890992ea"
+  },
+  {
+   "name": "pieza_2",
+   "box_uv": false,
+   "rescale": false,
+   "locked": false,
+   "render_order": "default",
+   "allow_mirror_modeling": true,
+   "from": [
+    7.5,
+    2,
+    7.5
+   ],
+   "to": [
+    8.5,
+    15,
+    8.5
+   ],
+   "autouv": 0,
+   "color": 1,
+   "origin": [
+    8,
+    8,
+    8
+   ],
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      7.5,
+      1,
+      8.5,
+      14
+     ],
+     "texture": 0
+    },
+    "south": {
+     "uv": [
+      7.5,
+      1,
+      8.5,
+      14
+     ],
+     "texture": 0
+    },
+    "east": {
+     "uv": [
+      7.5,
+      1,
+      8.5,
+      14
+     ],
+     "texture": 0
+    },
+    "west": {
+     "uv": [
+      7.5,
+      1,
+      8.5,
+      14
+     ],
+     "texture": 0
+    },
+    "up": {
+     "uv": [
+      7.5,
+      7.5,
+      8.5,
+      8.5
+     ],
+     "texture": 0
+    },
+    "down": {
+     "uv": [
+      7.5,
+      7.5,
+      8.5,
+      8.5
+     ],
+     "texture": 0
+    }
+   },
+   "type": "cube",
+   "uuid": "74f136b3-516a-42a5-b9b8-e29d2a825bfa"
+  },
+  {
+   "name": "pieza_3",
+   "box_uv": false,
+   "rescale": false,
+   "locked": false,
+   "render_order": "default",
+   "allow_mirror_modeling": true,
+   "from": [
+    7.5,
+    12,
+    2
+   ],
+   "to": [
+    8.5,
+    13,
+    14
+   ],
+   "autouv": 0,
+   "color": 2,
+   "origin": [
+    8,
+    8,
+    8
+   ],
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      7.5,
+      3,
+      8.5,
+      4
+     ],
+     "texture": 0
+    },
+    "south": {
+     "uv": [
+      7.5,
+      3,
+      8.5,
+      4
+     ],
+     "texture": 0
+    },
+    "east": {
+     "uv": [
+      2,
+      3,
+      14,
+      4
+     ],
+     "texture": 0
+    },
+    "west": {
+     "uv": [
+      2,
+      3,
+      14,
+      4
+     ],
+     "texture": 0
+    },
+    "up": {
+     "uv": [
+      7.5,
+      2,
+      8.5,
+      14
+     ],
+     "texture": 0
+    },
+    "down": {
+     "uv": [
+      7.5,
+      2,
+      8.5,
+      14
+     ],
+     "texture": 0
+    }
+   },
+   "type": "cube",
+   "uuid": "b6e0227e-ec22-498a-9bfd-f4e4f7a17629"
+  },
+  {
+   "name": "pieza_4",
+   "box_uv": false,
+   "rescale": false,
+   "locked": false,
+   "render_order": "default",
+   "allow_mirror_modeling": true,
+   "from": [
+    6.5,
+    11.5,
+    1
+   ],
+   "to": [
+    9.5,
+    13.5,
+    3
+   ],
+   "autouv": 0,
+   "color": 3,
+   "origin": [
+    8,
+    8,
+    8
+   ],
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      6.5,
+      2.5,
+      9.5,
+      4.5
+     ],
+     "texture": 0
+    },
+    "south": {
+     "uv": [
+      6.5,
+      2.5,
+      9.5,
+      4.5
+     ],
+     "texture": 0
+    },
+    "east": {
+     "uv": [
+      13,
+      2.5,
+      15,
+      4.5
+     ],
+     "texture": 0
+    },
+    "west": {
+     "uv": [
+      1,
+      2.5,
+      3,
+      4.5
+     ],
+     "texture": 0
+    },
+    "up": {
+     "uv": [
+      6.5,
+      1,
+      9.5,
+      3
+     ],
+     "texture": 0
+    },
+    "down": {
+     "uv": [
+      6.5,
+      13,
+      9.5,
+      15
+     ],
+     "texture": 0
+    }
+   },
+   "type": "cube",
+   "uuid": "5bc8db22-b303-4743-abfb-4512bf55c6ab"
+  },
+  {
+   "name": "pieza_5",
+   "box_uv": false,
+   "rescale": false,
+   "locked": false,
+   "render_order": "default",
+   "allow_mirror_modeling": true,
+   "from": [
+    7.75,
+    10.5,
+    12
+   ],
+   "to": [
+    8.25,
+    14.5,
+    15
+   ],
+   "autouv": 0,
+   "color": 4,
+   "origin": [
+    8,
+    8,
+    8
+   ],
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      7.75,
+      1.5,
+      8.25,
+      5.5
+     ],
+     "texture": 0
+    },
+    "south": {
+     "uv": [
+      7.75,
+      1.5,
+      8.25,
+      5.5
+     ],
+     "texture": 0
+    },
+    "east": {
+     "uv": [
+      1,
+      1.5,
+      4,
+      5.5
+     ],
+     "texture": 0
+    },
+    "west": {
+     "uv": [
+      12,
+      1.5,
+      15,
+      5.5
+     ],
+     "texture": 0
+    },
+    "up": {
+     "uv": [
+      7.75,
+      12,
+      8.25,
+      15
+     ],
+     "texture": 0
+    },
+    "down": {
+     "uv": [
+      7.75,
+      1,
+      8.25,
+      4
+     ],
+     "texture": 0
+    }
+   },
+   "type": "cube",
+   "uuid": "bb2a6e7a-7753-4df3-a97b-7001ddf28587"
+  }
+ ],
+ "outliner": [
+  "12316ed9-021d-49c8-bfd7-ff6c890992ea",
+  "74f136b3-516a-42a5-b9b8-e29d2a825bfa",
+  "b6e0227e-ec22-498a-9bfd-f4e4f7a17629",
+  "5bc8db22-b303-4743-abfb-4512bf55c6ab",
+  "bb2a6e7a-7753-4df3-a97b-7001ddf28587"
+ ],
+ "textures": [
+  {
+   "path": "",
+   "name": "weathervane.png",
+   "folder": "block",
+   "namespace": "stormroot",
+   "id": "0",
+   "width": 16,
+   "height": 16,
+   "uv_width": 16,
+   "uv_height": 16,
+   "particle": false,
+   "render_mode": "default",
+   "render_sides": "auto",
+   "frame_time": 1,
+   "frame_order_type": "loop",
+   "frame_order": "",
+   "frame_interpolate": false,
+   "visible": true,
+   "internal": true,
+   "saved": true,
+   "uuid": "bc461fdd-d095-4133-82ad-82a243b008eb",
+   "relative_path": "",
+   "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAvUlEQVR4XmN8UO3/n4FMsOfULQYWkN6H95+TaQQDAxNMp7yiJIYh8zxDsBqMrBZuADZXPLj1AKsByGrhBoAAuiua7p4h6CoUA2Am3379GavNIJC0fQ2KHIoBMKAqykvQ7zAANwBXgCG7Bls4wQ1AdxosTNBdU6dsgt8LyAqw2YgesBhhgC3kQQDZi1jTAbZoRAbIXsSZDtCdjB6d2FIr3lhAD0CYBcjhxAjKjdgCixgAciELKEuSCy6++swAABOVTPrE/p6BAAAAAElFTkSuQmCC"
+  }
+ ]
+}

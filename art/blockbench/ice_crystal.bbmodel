@@ -1,0 +1,160 @@
+{
+ "meta": {
+  "format_version": "4.10",
+  "model_format": "java_block",
+  "box_uv": false
+ },
+ "name": "ice_crystal",
+ "parent": "",
+ "ambientocclusion": true,
+ "front_gui_light": false,
+ "visible_box": [
+  1,
+  1,
+  0
+ ],
+ "variable_placeholders": "",
+ "variable_placeholder_buttons": [],
+ "timeline_setups": [],
+ "unhandled_root_fields": {},
+ "resolution": {
+  "width": 16,
+  "height": 16
+ },
+ "elements": [
+  {
+   "name": "pieza_1",
+   "box_uv": false,
+   "rescale": true,
+   "locked": false,
+   "render_order": "default",
+   "allow_mirror_modeling": true,
+   "from": [
+    0.8,
+    0,
+    8
+   ],
+   "to": [
+    15.2,
+    16,
+    8
+   ],
+   "autouv": 0,
+   "color": 0,
+   "origin": [
+    8,
+    8,
+    8
+   ],
+   "rotation": [
+    0,
+    45,
+    0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    }
+   },
+   "type": "cube",
+   "uuid": "1f91e7fa-e59e-49c9-a78e-e5bd3c5928be"
+  },
+  {
+   "name": "pieza_2",
+   "box_uv": false,
+   "rescale": true,
+   "locked": false,
+   "render_order": "default",
+   "allow_mirror_modeling": true,
+   "from": [
+    8,
+    0,
+    0.8
+   ],
+   "to": [
+    8,
+    16,
+    15.2
+   ],
+   "autouv": 0,
+   "color": 1,
+   "origin": [
+    8,
+    8,
+    8
+   ],
+   "rotation": [
+    0,
+    45,
+    0
+   ],
+   "faces": {
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    }
+   },
+   "type": "cube",
+   "uuid": "98c37b84-bb4a-4173-a788-2b958d155226"
+  }
+ ],
+ "outliner": [
+  "1f91e7fa-e59e-49c9-a78e-e5bd3c5928be",
+  "98c37b84-bb4a-4173-a788-2b958d155226"
+ ],
+ "textures": [
+  {
+   "path": "",
+   "name": "ice_crystal.png",
+   "folder": "block",
+   "namespace": "stormroot",
+   "id": "0",
+   "width": 16,
+   "height": 16,
+   "uv_width": 16,
+   "uv_height": 16,
+   "particle": false,
+   "render_mode": "default",
+   "render_sides": "auto",
+   "frame_time": 1,
+   "frame_order_type": "loop",
+   "frame_order": "",
+   "frame_interpolate": false,
+   "visible": true,
+   "internal": true,
+   "saved": true,
+   "uuid": "b2768a66-fd3c-47ca-96a8-3204ea66f566",
+   "relative_path": "",
+   "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA9UlEQVR4Xt2QoQ7CMBiENxQOgcERBKrBgELheQIQGILCoHkL8AsGwxPMowgCEKQKQXAzCBISSBAl9yfXtLDU4Dizdd19d/8fRf+v+8uY0JSF0CXMp+szuCUP8JkG8+588wCdycJr5AFgCFXG3Wza94AeAGms7CaNk62k5jX60iF7GBrwjtRkkwkAZ75TuUtsqqpNpdhouUrlE0cVgFsXY7RqJYFwgTgPel0xqoaSJ0cVABZD4l5fLIQ/1stF2wRgN1AAXB5m10dtf0ayK7ZDC7YTwKhdifEBdFzCiDOTWZftIO4idpcEMyAUQRQAEFqu50Pr/Ulv5vyjLWhAt1MAAAAASUVORK5CYII="
+  }
+ ]
+}

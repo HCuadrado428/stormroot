@@ -1,0 +1,143 @@
+{
+ "meta": {
+  "format_version": "4.10",
+  "model_format": "java_block",
+  "box_uv": false
+ },
+ "name": "magnetic_rock",
+ "parent": "",
+ "ambientocclusion": true,
+ "front_gui_light": false,
+ "visible_box": [
+  1,
+  1,
+  0
+ ],
+ "variable_placeholders": "",
+ "variable_placeholder_buttons": [],
+ "timeline_setups": [],
+ "unhandled_root_fields": {},
+ "resolution": {
+  "width": 16,
+  "height": 16
+ },
+ "elements": [
+  {
+   "name": "pieza_1",
+   "box_uv": false,
+   "rescale": false,
+   "locked": false,
+   "render_order": "default",
+   "allow_mirror_modeling": true,
+   "from": [
+    0,
+    0,
+    0
+   ],
+   "to": [
+    16,
+    16,
+    16
+   ],
+   "autouv": 0,
+   "color": 0,
+   "origin": [
+    8,
+    8,
+    8
+   ],
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    }
+   },
+   "type": "cube",
+   "uuid": "e0da748e-3d5f-4b97-93d4-1b255a6ad4fc"
+  }
+ ],
+ "outliner": [
+  "e0da748e-3d5f-4b97-93d4-1b255a6ad4fc"
+ ],
+ "textures": [
+  {
+   "path": "",
+   "name": "magnetic_rock.png",
+   "folder": "block",
+   "namespace": "stormroot",
+   "id": "0",
+   "width": 16,
+   "height": 16,
+   "uv_width": 16,
+   "uv_height": 16,
+   "particle": false,
+   "render_mode": "default",
+   "render_sides": "auto",
+   "frame_time": 1,
+   "frame_order_type": "loop",
+   "frame_order": "",
+   "frame_interpolate": false,
+   "visible": true,
+   "internal": true,
+   "saved": true,
+   "uuid": "50f67bf8-e855-4acf-8f15-e2f4e44270a7",
+   "relative_path": "",
+   "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABlklEQVR4Xm2TvUoDURCFb5JWiWathcXkCUQWFGsRfAAb7aySFxDcFKLYGQsbsTOvIIi11WJttSsBG4v8QB4gRr4J57q7ZuDmbu7OuXPOnNlKHMfzyWTims2mY2cRjUbDVpIkrtVq+fN8Hu+rAHjYXR+6o61ZAZxlmQePx2PLI4SxC/gRcDD4cofhvSUBFguqigWFFFxkDJ4/awYOw023d7ygr0CCpOl8f2PqmVS5nXgb1d1wdO1uH7qF6kEQeMowpRAR1S9tNwbSlNbu7Bm9BHRPd+qezdP71B2c9e1/Mu2atEq73Z4DkEbpBqxqK6t99zLoFJoojDUxiqICTRpIX6gGmGpEmqa2UxlphDEoO/HxExaskiNyCyliagzQDV0WFTlTH/Jg5Vyd/1ltF7AAQhm6GiDZBnUk4RR5r48nnqGX4J1IU2voMrpi828S1RzzN4q8bVDW0OSlYK3stzmgIodUJZFgqJBEQ/OTqT4w8jbK5SbSIBjRi4ubzmJoksSz+l7b9r0yG3u9nn3O5c84/zHp/bKB+wXwykPLxSbqbAAAAABJRU5ErkJggg=="
+  }
+ ]
+}
