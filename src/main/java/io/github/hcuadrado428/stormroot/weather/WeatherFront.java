@@ -29,6 +29,11 @@ public final class WeatherFront {
         this.maxAgeSeconds = maxAgeSeconds;
     }
 
+    /** Copia independiente (para guardar o restaurar el estado sin compartir objetos). */
+    public WeatherFront copy() {
+        return new WeatherFront(id, type, x, z, radius, vx, vz, ageSeconds, maxAgeSeconds);
+    }
+
     /** Avanza el frente {@code seconds} segundos. */
     public void advance(double seconds) {
         x += vx * seconds;

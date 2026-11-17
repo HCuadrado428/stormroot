@@ -12,8 +12,11 @@ import java.util.Random;
  * <p>La capa de Minecraft ({@link FrontTicker}) la llama cada pocos segundos con la posición
  * de los jugadores, para que los frentes nazcan cerca de donde hay alguien.
  *
- * <p>Pendiente (ver README, "Siguientes pasos"): guardar en SavedData, sincronizar con el
- * cliente, viento dominante por bioma y choques de frentes.
+ * <p>El estado se guarda en el mundo con {@link #exportState()} / {@link #restoreState}; la conversión
+ * a NBT/Codec vive en {@code FrontSavedData} (capa de Minecraft), no aquí.
+ *
+ * <p>Pendiente (ver README, "Siguientes pasos"): sincronizar con el cliente, viento dominante por
+ * bioma y choques de frentes.
  */
 public final class FrontSimulation {
     private final List<WeatherFront> fronts = new ArrayList<>();
@@ -114,6 +117,32 @@ public final class FrontSimulation {
 
     public double windAngle() {
         return windAngle;
+    }
+
+    /** Estado guardable de la simulación, solo con tipos simples (el {@link Random} no se guarda). */
+    public record State(double windAngle, long nextId, List<WeatherFront> fronts) {
+        public State {
+            fronts = List.copyOf(fronts);
+        }
+    }
+
+    /** Copia del estado actual, para guardarlo. Los frentes devueltos son copias independientes. */
+    public State exportState() {
+        List<WeatherFront> copies = new ArrayList<>(fronts.size());
+        for (WeatherFront front : fronts) {
+            copies.add(front.copy());
+        }
+        return new State(windAngle, nextId, copies);
+    }
+
+    /** Sustituye el estado actual por uno guardado. */
+    public void restoreState(State state) {
+        fronts.clear();
+        windAngle = state.windAngle();
+        nextId = state.nextId();
+        for (WeatherFront front : state.fronts()) {
+            add(front.copy());
+        }
     }
 
     private FrontType randomType() {
