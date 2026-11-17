@@ -71,7 +71,14 @@ public final class ClientSelfTest {
             case 0 -> {
                 if (ticks > 100 && SelfTest.serverDone()) {
                     Stormroot.LOGGER.info("[selftest] cliente: empezando");
-                    server.execute(() -> server.overworld().setDayTime(6000)); // mediodía, para las capturas
+                    server.execute(() -> {
+                        // Para las capturas: mediodía, y el jugador flotando a la altura de un mundo normal (y=70; el
+                        // mundo plano de pruebas está en y=-60, demasiado lejos de las nubes).
+                        server.overworld().setDayTime(6000);
+                        net.minecraft.commands.CommandSourceStack src = server.createCommandSourceStack().withSuppressedOutput();
+                        server.getCommands().performPrefixedCommand(src, "gamemode spectator @a");
+                        server.getCommands().performPrefixedCommand(src, "execute as @a at @s run tp @s ~ 70 ~");
+                    });
                     spawnAt(server, FrontType.THUNDERSTORM, x, z);
                     next();
                 }

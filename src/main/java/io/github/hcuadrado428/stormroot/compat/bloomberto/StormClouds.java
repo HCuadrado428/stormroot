@@ -29,8 +29,9 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 /**
  * Nubes de los frentes al estilo de las nubes vanilla: bloques planos de {@link #CELL}×altura×{@link #CELL} siguiendo
  * el patrón de {@code minecraft:textures/environment/clouds.png}, pegados al frente (avanzan con él en tiempo real),
- * densos en el centro y deshilachados en el borde. Tormenta: capa gruesa y oscura justo bajo las nubes vanilla;
- * lluvia: capa gris; niebla: banco bajo y blanco.
+ * densos en el centro y deshilachados en el borde. Tormenta: capa gruesa gris azulada justo bajo las nubes vanilla;
+ * lluvia: capa gris. La niebla no se dibuja: ella misma es el efecto. Con la distancia se funden con el horizonte
+ * (como el resto del paisaje), porque el tipo de render no lleva niebla propia.
  *
  * <p>Usa el contexto de render de Bloomberto ({@code WorldRenderContext}) pero dibuja TODAS las caras de un frente en un
  * solo lote (Bloomberto hace un envío por cara, demasiado para miles de caras). Solo dibuja caras visibles: la de abajo o
@@ -68,7 +69,7 @@ public final class StormClouds {
             double dx = cam.x - front.x();
             double dz = cam.z - front.z();
             double edge = Math.sqrt(dx * dx + dz * dz) - front.radius();
-            if (edge > MAX_DISTANCE || front.lifeFactor() < 0.05) {
+            if (front.type() == FrontType.FOG || edge > MAX_DISTANCE || front.lifeFactor() < 0.05) {
                 continue;
             }
             drawFront(ctx, level, cam, front, daylight);
@@ -87,13 +88,10 @@ public final class StormClouds {
         float alpha;
         switch (type) {
             case THUNDERSTORM -> {
-                height = 7; bottom = VANILLA_CLOUD_Y - 10; fill = 0.45; r = 62; g = 66; b = 80; alpha = 0.95f;
-            }
-            case FOG -> {
-                height = 4; bottom = level.getSeaLevel() + 4; fill = 0.5; r = 232; g = 234; b = 238; alpha = 0.6f;
+                height = 6; bottom = VANILLA_CLOUD_Y - 9; fill = 0.22; r = 104; g = 110; b = 128; alpha = 0.97f;
             }
             default -> {
-                height = 4; bottom = VANILLA_CLOUD_Y - 6; fill = 0.65; r = 148; g = 152; b = 162; alpha = 0.88f;
+                height = 4; bottom = VANILLA_CLOUD_Y - 5; fill = 0.35; r = 176; g = 181; b = 192; alpha = 0.92f;
             }
         }
         double life = front.lifeFactor();
@@ -116,16 +114,16 @@ public final class StormClouds {
                 double intensity = (1 - d) * life;
                 boolean cloud = cloudAt(i + seedX, j + seedZ);
                 // Centro macizo, borde solo donde el patrón vanilla tiene nube (deshilachado).
-                on[i + 1][j + 1] = intensity > 0.06 && (cloud || (intensity > fill && d < 0.8));
+                on[i + 1][j + 1] = intensity > 0.04 && (cloud || (intensity > fill && d < 0.85));
             }
         }
 
         float shadeDay = Math.max(0.18f, daylight);
         int a = (int) (alpha * 255 * Math.min(1.0, life * 1.5));
-        int bottomColor = argb(a, r, g, b, shadeDay * 0.72f);
-        int topColor = argb(a, r, g, b, shadeDay);
-        int sideX = argb(a, r, g, b, shadeDay * 0.86f);
-        int sideZ = argb(a, r, g, b, shadeDay * 0.8f);
+        // Color del horizonte hacia el que se funden las nubes lejanas (cielo de mediodía, oscurecido de noche).
+        int hr = (int) (182 * shadeDay);
+        int hg = (int) (198 * shadeDay);
+        int hb = (int) (222 * shadeDay);
 
         double y0 = bottom - cam.y;
         double y1 = bottom + height - cam.y;
@@ -150,6 +148,14 @@ public final class StormClouds {
                 float z1 = z0 + CELL;
                 float fy0 = (float) y0;
                 float fy1 = (float) y1;
+                // Neblina de la distancia: de 120 a 700 bloques se van fundiendo con el horizonte.
+                double hx = x0 + CELL / 2.0;
+                double hz = z0 + CELL / 2.0;
+                float haze = (float) Math.max(0, Math.min(0.75, (Math.sqrt(hx * hx + hz * hz) - 120) / 580));
+                int bottomColor = hazed(a, r, g, b, shadeDay * 0.78f, hr, hg, hb, haze);
+                int topColor = hazed(a, r, g, b, shadeDay, hr, hg, hb, haze);
+                int sideX = hazed(a, r, g, b, shadeDay * 0.9f, hr, hg, hb, haze);
+                int sideZ = hazed(a, r, g, b, shadeDay * 0.84f, hr, hg, hb, haze);
                 if (below) {
                     quad(vc, pose, x0, fy0, z0, x1, fy0, z0, x1, fy0, z1, x0, fy0, z1, bottomColor);
                 }
@@ -189,6 +195,13 @@ public final class StormClouds {
         //?} else {
         /*vc.vertex(pose.pose(), x, y, z).color((argb >> 16) & 0xFF, (argb >> 8) & 0xFF, argb & 0xFF, (argb >>> 24) & 0xFF).endVertex();
         *///?}
+    }
+
+    private static int hazed(int a, int r, int g, int b, float shade, int hr, int hg, int hb, float haze) {
+        int rr = (int) (r * shade * (1 - haze) + hr * haze);
+        int gg = (int) (g * shade * (1 - haze) + hg * haze);
+        int bb = (int) (b * shade * (1 - haze) + hb * haze);
+        return argb(a, rr, gg, bb, 1f);
     }
 
     private static int argb(int a, int r, int g, int b, float shade) {

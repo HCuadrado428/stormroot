@@ -25,7 +25,7 @@ public final class ClientWeather {
     /** Cuánto cambia la lluvia/trueno/niebla por tick (0.01 → unos 5 s de transición completa). */
     private static final float STEP = 0.01f;
     /** Distancia de niebla en el centro de un frente de niebla. */
-    private static final float FOG_MIN_DISTANCE = 20f;
+    private static final float FOG_MIN_DISTANCE = 12f;
     /** Distancia máxima al borde para las partículas (más allá, Minecraft no las dibuja). Cantidad: config. */
     private static final double EDGE_MAX_DISTANCE = 32;
 
@@ -129,7 +129,9 @@ public final class ClientWeather {
         if (fog <= 0.01f || vanillaFar <= FOG_MIN_DISTANCE) {
             return vanillaFar;
         }
-        return vanillaFar + (FOG_MIN_DISTANCE - vanillaFar) * fog;
+        // Curva que cierra antes: con la mitad de niebla ya se ve poco más allá de la mitad de la distancia.
+        float t = (float) Math.sqrt(fog);
+        return vanillaFar + (FOG_MIN_DISTANCE - vanillaFar) * t;
     }
 
     /** Lo llaman los enganches de niebla de cada loader cuando aplican {@link #fogFarPlane}. */
