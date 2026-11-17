@@ -15,6 +15,9 @@
   "entrypoints": {
     "main": [
       "${group}.${id}.Stormroot"
+    ],
+    "client": [
+      "${group}.${id}.client.StormrootClient"
     ]
   },
   "depends": {

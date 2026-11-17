@@ -1,6 +1,8 @@
 package io.github.hcuadrado428.stormroot.weather;
 
 import io.github.hcuadrado428.stormroot.Stormroot;
+import io.github.hcuadrado428.stormroot.network.FrontsSyncPayload;
+import io.github.hcuadrado428.stormroot.network.StormrootNetwork;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
@@ -20,6 +22,8 @@ import net.minecraft.server.level.ServerPlayer;
 public final class FrontTicker {
     /** Cada cuántos ticks se avanza la simulación (100 ticks = 5 s). */
     public static final int STEP_TICKS = 100;
+    /** Distancia (más allá del radio) hasta la que se mandan frentes a cada jugador. */
+    public static final double SYNC_DISTANCE = 1024;
     /** Intensidad mínima de un frente para que cuente en el clima (los bordes no cuentan). */
     public static final double WEATHER_THRESHOLD = 0.15;
 
@@ -53,6 +57,23 @@ public final class FrontTicker {
         save(server);
     }
 
+    /** Manda a cada jugador del Overworld los frentes que tiene cerca (para el clima por zonas en el cliente). */
+    public static void sync(MinecraftServer server) {
+        FrontSimulation sim = simulation(server);
+        for (ServerPlayer player : server.overworld().players()) {
+            List<WeatherFront> near = new ArrayList<>();
+            for (WeatherFront front : sim.fronts()) {
+                double dx = front.x() - player.getX();
+                double dz = front.z() - player.getZ();
+                double max = front.radius() + SYNC_DISTANCE;
+                if (dx * dx + dz * dz <= max * max) {
+                    near.add(front);
+                }
+            }
+            StormrootNetwork.sendFronts(player, new FrontsSyncPayload(controlsWeather, sim.windAngle(), near));
+        }
+    }
+
     /** Simulación del Overworld de este servidor; la crea si hace falta (mundo nuevo o recién abierto). */
     public static FrontSimulation simulation(MinecraftServer server) {
         if (server != currentServer || simulation == null) {
@@ -71,9 +92,13 @@ public final class FrontTicker {
         return simulation;
     }
 
-    /** Copia el estado de la simulación al SavedData del mundo (se escribe a disco al guardar el mundo). */
+    /**
+     * Copia el estado de la simulación al SavedData del mundo (se escribe a disco al guardar el mundo)
+     * y lo manda a los clientes.
+     */
     public static void save(MinecraftServer server) {
         FrontSavedData.get(server).capture(simulation(server), controlsWeather);
+        sync(server);
     }
 
     /** Recalcula el clima ya (p. ej. después de un comando), sin esperar al siguiente paso. */

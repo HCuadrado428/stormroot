@@ -1,6 +1,8 @@
 package io.github.hcuadrado428.stormroot;
 
+import io.github.hcuadrado428.stormroot.client.StormrootClient;
 import io.github.hcuadrado428.stormroot.command.StormrootCommands;
+import io.github.hcuadrado428.stormroot.network.StormrootNetwork;
 import io.github.hcuadrado428.stormroot.registry.ModItems;
 import io.github.hcuadrado428.stormroot.weather.FrontTicker;
 import io.github.hcuadrado428.stormroot.weather.LightningCrystals;
@@ -21,6 +23,7 @@ import net.minecraft.world.item.CreativeModeTabs;
 /*? if forge {*/
 /*import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -29,12 +32,14 @@ import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.RegisterEvent;
 *//*?}*/
 
 /*? if neoforge {*/
 /*import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
@@ -68,6 +73,10 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
         MinecraftForge.EVENT_BUS.addListener(Stormroot::onServerTick);
         MinecraftForge.EVENT_BUS.addListener(Stormroot::onRegisterCommands);
         MinecraftForge.EVENT_BUS.addListener(Stormroot::onEntityJoin);
+        StormrootNetwork.init();
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            StormrootClient.register();
+        }
         LOGGER.info("Stormroot cargado en Forge");
     }
 
@@ -98,12 +107,16 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
     *//*?}*/
 
     /*? if neoforge {*/
-    /*public Stormroot(IEventBus modBus) {
+    /*public Stormroot(IEventBus modBus, Dist dist) {
         modBus.addListener(Stormroot::onRegister);
+        modBus.addListener(StormrootNetwork::onRegisterPayloads);
         modBus.addListener(Stormroot::onCreativeTabs);
         NeoForge.EVENT_BUS.addListener(Stormroot::onServerTick);
         NeoForge.EVENT_BUS.addListener(Stormroot::onRegisterCommands);
         NeoForge.EVENT_BUS.addListener(Stormroot::onEntityJoin);
+        if (dist.isClient()) {
+            StormrootClient.register();
+        }
         LOGGER.info("Stormroot cargado en NeoForge");
     }
 
@@ -140,6 +153,7 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 .register(entries -> entries.accept(ModItems.LIGHTNING_CRYSTAL));
         ServerTickEvents.END_SERVER_TICK.register(FrontTicker::onServerTick);
         ServerEntityEvents.ENTITY_LOAD.register(LightningCrystals::onEntityAdded);
+        StormrootNetwork.init();
         CommandRegistrationCallback.EVENT.register(
                 (dispatcher, registryAccess, environment) -> StormrootCommands.register(dispatcher));
         LOGGER.info("Stormroot cargado en Fabric");
