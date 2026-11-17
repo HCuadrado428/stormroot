@@ -12,7 +12,9 @@ public enum FrontType {
     THUNDERSTORM("thunderstorm", 64, 128, 1.0, 300, 900),
     FOG("fog", 80, 160, 0.3, 450, 1200),
     /** Solo nace en biomas fríos y cumbres: nieve que se acumula, poca visibilidad y cuevas que se hielan. */
-    BLIZZARD("blizzard", 96, 160, 0.8, 600, 1200);
+    BLIZZARD("blizzard", 96, 160, 0.8, 600, 1200),
+    /** Ola de calor: enorme, larga y casi quieta. Despeja el cielo, seca el suelo y derrite las cuevas heladas. */
+    HEAT_WAVE("heat_wave", 192, 320, 0.15, 1200, 2400);
 
     private final String id;
     private final int minRadius;

@@ -163,6 +163,7 @@ public final class SelfTest {
                 run("seepage dries and restores every block", () -> dryCave(level));
                 run("ice cave freezes and thaws back", () -> iceCave(level));
                 run("massive thaw floods the cave", SelfTest::checkMassiveThaw);
+                run("heat waves dry the ground and clear the sky", SelfTest::checkHeatWave);
                 finish(server);
             }
             default -> {
@@ -661,6 +662,40 @@ public final class SelfTest {
                 "suelo helado=" + floor + ", carámbanos=" + icicles + " (el más largo " + longest + "), cristales=" + crystals
                         + ", sin charcos=" + dry + ", cambios pendientes=" + cell.changes().size() + ", distintos=" + different);
         cell.set(0);
+    }
+
+    /** La ola de calor seca el suelo mucho más rápido que el buen tiempo y casi no deja nubes de buen tiempo. */
+    private static void checkHeatWave() {
+        io.github.hcuadrado428.stormroot.seep.SeepageRates rates = io.github.hcuadrado428.stormroot.seep.SeepageRates.DEFAULT;
+        SeepageCell normal = new SeepageCell(0.8, 0.8, List.of());
+        SeepageCell hot = new SeepageCell(0.8, 0.8, List.of());
+        for (int i = 0; i < 20; i++) {
+            normal.update(0, 30, rates);
+            hot.update(0, 30, rates);
+            hot.applyHeat(1.0, 30, rates);
+        }
+        boolean drier = hot.surface() < normal.surface() - 0.2;
+        List<WeatherFront> heat = List.of(new WeatherFront(903, FrontType.HEAT_WAVE, 0, 0, 300, 0, 0, 1000, 2000));
+        int clear = 0;
+        int calm = 0;
+        long seed = io.github.hcuadrado428.stormroot.sky.CloudCover.SKY_SEED;
+        for (int i = -10; i <= 10; i++) {
+            for (int j = -10; j <= 10; j++) {
+                double x = i * 12;
+                double z = j * 12;
+                if (io.github.hcuadrado428.stormroot.sky.CloudCover.at(seed, x, z, 0, 100, List.of())
+                        == io.github.hcuadrado428.stormroot.sky.CloudCover.Kind.FAIR) {
+                    calm++;
+                }
+                if (io.github.hcuadrado428.stormroot.sky.CloudCover.at(seed, x, z, 0, 100, heat)
+                        == io.github.hcuadrado428.stormroot.sky.CloudCover.Kind.FAIR) {
+                    clear++;
+                }
+            }
+        }
+        check("heat waves dry the ground and clear the sky", drier && clear <= calm / 3,
+                "humedad tras 10 min: normal=" + normal.surface() + ", con calor=" + hot.surface()
+                        + "; nubes de buen tiempo sin/con calor=" + calm + "/" + clear);
     }
 
     /** Deshielo masivo: la helada se va en un minuto y deja el subsuelo empapado (inundación). */

@@ -22,6 +22,8 @@ Primera versión jugable. Minecraft 1.20.1 (Fabric, Forge; también NeoForge 1.2
   que solo quema hojas de árbol y nunca casas.
 - **Ventisca** en biomas fríos: nieve que se apila y **cuevas de hielo** (nieve y hielo, carámbanos que caen con luz,
   cristales de hielo, congelación, strays) que se deshielan poco a poco o de golpe con una tormenta fuerte.
+- **Ola de calor**: cielo despejado, más hambre al sol, fuego del clima en las hojas a mediodía, suelo que se
+  seca mucho antes y deshielo masivo de las cuevas heladas.
 - Partículas en el borde de los frentes cercanos.
 - `/weather` se respeta: si alguien lo usa, Stormroot espera a que ese clima termine.
 

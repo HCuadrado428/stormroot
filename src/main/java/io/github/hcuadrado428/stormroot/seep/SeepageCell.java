@@ -112,6 +112,25 @@ public final class SeepageCell {
         deep = clamp(deep + (surface - deep) * follow);
     }
 
+    /**
+     * Ola de calor de intensidad {@code heat} (0–1) encima, sin lluvia: el suelo se seca tres veces más rápido y la
+     * sequía avanza cuatro veces más rápido (grietas antes). Se llama después de {@link #update}.
+     */
+    public void applyHeat(double heat, double seconds, SeepageRates rates) {
+        if (heat <= 0.05) {
+            return;
+        }
+        double retention = hasStandingWater() ? STANDING_WATER_RETENTION : 1.0;
+        if (surface > 0) {
+            surface -= heat * 2 * rates.dryPerSecond() * retention * seconds;
+        } else {
+            surface -= heat * 3 * rates.droughtPerSecond() * retention * seconds;
+        }
+        surface = clamp(surface);
+        double follow = Math.min(1.0, seconds / rates.deepLagSeconds());
+        deep = clamp(deep + (surface - deep) * follow * heat);
+    }
+
     /** Humedad máxima que da la niebla sola (por debajo de los charcos, {@code SeepageTicker.PUDDLE_AT} = 0,55). */
     public static final double FOG_CAP = 0.5;
 

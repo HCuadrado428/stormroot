@@ -90,6 +90,9 @@ public final class SeepageTicker {
                         double fog = fogAt(simulation, (cx << 4) + 8, (cz << 4) + 8);
                         SeepageCell cell = field.getOrCreate(cx, cz);
                         cell.update(rain, fog, seconds, rates);
+                        if (rain < 0.05) {
+                            cell.applyHeat(intensityAt(simulation, FrontType.HEAT_WAVE, (cx << 4) + 8, (cz << 4) + 8), seconds, rates);
+                        }
                         updateFrost(level, simulation, cell, cx, cz, seconds);
                     }
                     if (Math.abs(dx) <= EFFECT_RADIUS && Math.abs(dz) <= EFFECT_RADIUS) {
@@ -142,7 +145,7 @@ public final class SeepageTicker {
     public static final double ICICLE_GROW_AT = 0.65;
     /** Helada mínima para que una tormenta encima la derrita de golpe (deshielo masivo). */
     public static final double MASSIVE_THAW_FROST = 0.6;
-    /** Intensidad de tormenta que desata el deshielo masivo. */
+    /** Intensidad de tormenta (u ola de calor) que desata el deshielo masivo. */
     public static final double MASSIVE_THAW_STORM = 0.5;
 
     /**
@@ -162,8 +165,10 @@ public final class SeepageTicker {
                 blizzard = 0;
             }
         }
-        double storm = intensityAt(simulation, FrontType.THUNDERSTORM, x, z);
-        boolean thaw = storm >= MASSIVE_THAW_STORM && (cell.frost() >= MASSIVE_THAW_FROST || cell.thawing());
+        // Deshielo masivo: una tormenta fuerte o una ola de calor sobre una cueva muy helada.
+        double warm = Math.max(intensityAt(simulation, FrontType.THUNDERSTORM, x, z),
+                intensityAt(simulation, FrontType.HEAT_WAVE, x, z));
+        boolean thaw = warm >= MASSIVE_THAW_STORM && (cell.frost() >= MASSIVE_THAW_FROST || cell.thawing());
         cell.updateFrost(blizzard, thaw, seconds);
     }
 

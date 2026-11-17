@@ -52,6 +52,7 @@ public final class FrontTicker {
             DryStorms.tick(server.overworld());
             BlizzardSnow.tick(server.overworld());
             io.github.hcuadrado428.stormroot.seep.ColdCaves.tick(server);
+            HeatWaves.tick(server.overworld());
         }
         if (++tickCounter < STEP_TICKS && server == currentServer) {
             return;
@@ -100,6 +101,11 @@ public final class FrontTicker {
     }
 
     /** Simulación del Overworld de este servidor; la crea si hace falta (mundo nuevo o recién abierto). */
+    /** La simulación ya creada de este servidor, o {@code null} (no la crea). */
+    public static FrontSimulation simulationIfRunning() {
+        return simulation;
+    }
+
     public static FrontSimulation simulation(MinecraftServer server) {
         if (server != currentServer || simulation == null) {
             currentServer = server;

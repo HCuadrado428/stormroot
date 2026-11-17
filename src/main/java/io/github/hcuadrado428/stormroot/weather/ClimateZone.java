@@ -5,24 +5,27 @@ package io.github.hcuadrado428.stormroot.weather;
  * fenómenos). Java puro: {@code FrontTicker} clasifica el bioma y {@link FrontSimulation} elige el tipo.
  */
 public enum ClimateZone {
-    COLD(1.0, 0.5, 0.7, 1.6),
-    TEMPERATE(1.0, 1.0, 0.7, 0.0),
-    HUMID(2.0, 2.0, 2.0, 0.0),
-    /** Sin lluvia en vanilla (desierto, badlands, sabana): solo tormentas, que ahí son tormentas secas. */
-    DRY(0.0, 0.6, 0.0, 0.0),
-    OCEAN(2.0, 1.0, 2.0, 0.0),
-    MOUNTAIN(1.0, 1.0, 0.7, 0.6);
+    //        lluvia tormenta niebla ventisca ola de calor
+    COLD(1.0, 0.5, 0.7, 1.6, 0.0),
+    TEMPERATE(1.0, 1.0, 0.7, 0.0, 0.4),
+    HUMID(2.0, 2.0, 2.0, 0.0, 0.3),
+    /** Sin lluvia en vanilla (desierto, badlands, sabana): tormentas (secas) y olas de calor. */
+    DRY(0.0, 0.6, 0.0, 0.0, 0.8),
+    OCEAN(2.0, 1.0, 2.0, 0.0, 0.0),
+    MOUNTAIN(1.0, 1.0, 0.7, 0.6, 0.0);
 
     private final double rain;
     private final double thunderstorm;
     private final double fog;
     private final double blizzard;
+    private final double heatWave;
 
-    ClimateZone(double rain, double thunderstorm, double fog, double blizzard) {
+    ClimateZone(double rain, double thunderstorm, double fog, double blizzard, double heatWave) {
         this.rain = rain;
         this.thunderstorm = thunderstorm;
         this.fog = fog;
         this.blizzard = blizzard;
+        this.heatWave = heatWave;
     }
 
     /** Peso de un tipo de frente en esta zona (0 = nunca nace aquí). */
@@ -32,6 +35,7 @@ public enum ClimateZone {
             case THUNDERSTORM -> thunderstorm;
             case FOG -> fog;
             case BLIZZARD -> blizzard;
+            case HEAT_WAVE -> heatWave;
         };
     }
 

@@ -349,10 +349,10 @@ public final class SkyRenderer {
                 if (kind != CloudCover.Kind.NONE) {
                     SHADE[i][j] = (float) CloudCover.frontIntensity(x, z, fronts);
                 } else {
-                    double approach = CloudCover.approach(x, z, fronts);
-                    if (CloudCover.fairCloud(seed, u, v, seconds, approach)) {
+                    double bias = CloudCover.fairBias(x, z, fronts);
+                    if (CloudCover.fairCloud(seed, u, v, seconds, bias)) {
                         kind = CloudCover.Kind.FAIR;
-                        SHADE[i][j] = (float) approach;
+                        SHADE[i][j] = (float) Math.max(0, bias);
                     }
                 }
                 GRID[i][j] = (byte) kind.ordinal();

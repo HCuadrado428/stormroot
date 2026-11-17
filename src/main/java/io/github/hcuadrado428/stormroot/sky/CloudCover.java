@@ -84,7 +84,7 @@ public final class CloudCover {
     public static Kind frontCloud(long seed, double x, double z, double u, double v, double seconds, List<WeatherFront> fronts) {
         Kind best = Kind.NONE;
         for (WeatherFront front : fronts) {
-            if (front.type() == FrontType.FOG) {
+            if (!front.type().precipitates()) {
                 continue;
             }
             double intensity = front.intensityAt(x, z);
@@ -119,7 +119,7 @@ public final class CloudCover {
     public static double approach(double x, double z, List<WeatherFront> fronts) {
         double best = 0;
         for (WeatherFront front : fronts) {
-            if (front.type() == FrontType.FOG) {
+            if (!front.type().precipitates()) {
                 continue;
             }
             double dx = x - front.x();
@@ -142,11 +142,27 @@ public final class CloudCover {
     public static double frontIntensity(double x, double z, List<WeatherFront> fronts) {
         double best = 0;
         for (WeatherFront front : fronts) {
-            if (front.type() != FrontType.FOG) {
+            if (front.type().precipitates()) {
                 best = Math.max(best, front.intensityAt(x, z));
             }
         }
         return best;
+    }
+
+    /** Ola de calor (0–1) en un punto: despeja el cielo (casi no hay nubes de buen tiempo). */
+    public static double heat(double x, double z, List<WeatherFront> fronts) {
+        double best = 0;
+        for (WeatherFront front : fronts) {
+            if (front.type() == FrontType.HEAT_WAVE) {
+                best = Math.max(best, front.intensityAt(x, z));
+            }
+        }
+        return best;
+    }
+
+    /** Lo que se pasa a {@link #fairCloud(long, double, double, double, double)}: aviso de tormenta menos calor. */
+    public static double fairBias(double x, double z, List<WeatherFront> fronts) {
+        return Math.max(-1, approach(x, z, fronts) - heat(x, z, fronts) * 1.6);
     }
 
     /** Nubes altas y finas (una capa más arriba, solo decorativa): {@code true} si hay en ese punto del cielo. */
@@ -163,6 +179,6 @@ public final class CloudCover {
         if (front != Kind.NONE) {
             return front;
         }
-        return fairCloud(seed, u, v, seconds, approach(x, z, fronts)) ? Kind.FAIR : Kind.NONE;
+        return fairCloud(seed, u, v, seconds, fairBias(x, z, fronts)) ? Kind.FAIR : Kind.NONE;
     }
 }

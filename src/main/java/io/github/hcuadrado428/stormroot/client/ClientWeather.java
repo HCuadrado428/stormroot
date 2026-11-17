@@ -212,6 +212,12 @@ public final class ClientWeather {
                 particle = random.nextInt(3) == 0 ? ParticleTypes.LARGE_SMOKE : ParticleTypes.FALLING_WATER;
                 y = playerY + 6 + random.nextDouble() * 10;
                 break;
+            case HEAT_WAVE:
+                // Aire caliente: polvillo blanco que flota.
+                particle = ParticleTypes.WHITE_ASH;
+                y = playerY + random.nextDouble() * 6;
+                vy = 0.01;
+                break;
             case BLIZZARD:
                 particle = ParticleTypes.SNOWFLAKE;
                 y = playerY + 2 + random.nextDouble() * 10;

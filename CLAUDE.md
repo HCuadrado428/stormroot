@@ -98,9 +98,12 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   `SeepageCell.frost` (guardado; `updateFrost`, deshielo lento/masivo) y efectos en `SeepageTicker.freeze` (tipos
   `SNOW_FLOOR`, `ICE_FLOOR`, `FROZEN`, `ICICLE`, `ICE_CRYSTAL`, reversibles), bloques `block/IcicleBlock` (cae con luz
   de bloque ≥ 7) e `IceCrystalBlock`, peligros en `seep/ColdCaves` (congelación vanilla `setTicksFrozen`, strays).
+- **Ola de calor**: `FrontType.HEAT_WAVE` (no precipita; `CloudCover.heat`/`fairBias` despejan el cielo),
+  `SeepageCell.applyHeat` (seca más rápido), deshielo masivo también con calor, `weather/HeatWaves` (hambre al sol de
+  día con `causeFoodExhaustion`, fuego del clima a mediodía).
 - Fuentes decompiladas desde la CI: `gh api -X POST repos/HCuadrado428/stormroot/actions/workflows/research.yml/dispatches`
   con `inputs[classes]` y `inputs[pattern]` (workflow `research`).
-- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 27 comprobaciones; cliente con
+- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 28 comprobaciones; cliente con
   un jugador en pantalla virtual: 12 más, incluidas las de Bloomberto y las del cielo).
 - En el self-test, el clima se lee de `server.getWorldData().overworldData()`: `level.isRaining()/isThundering()` son la
   intensidad visual, que sube tick a tick. Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.
