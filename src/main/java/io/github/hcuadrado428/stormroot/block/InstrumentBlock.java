@@ -86,7 +86,13 @@ public abstract class InstrumentBlock extends Block {
     public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         int power = 0;
         if (level.dimension() == Level.OVERWORLD) {
-            power = Math.max(0, Math.min(15, computePower(state, level, pos, FrontTicker.simulation(level.getServer()))));
+            FrontSimulation simulation = FrontTicker.simulation(level.getServer());
+            power = Math.max(0, Math.min(15, computePower(state, level, pos, simulation)));
+            // Tormenta magnética: lecturas locas.
+            if (io.github.hcuadrado428.stormroot.seep.SeepageTicker.intensityAt(simulation,
+                    io.github.hcuadrado428.stormroot.weather.FrontType.MAGNETIC_STORM, pos.getX() + 0.5, pos.getZ() + 0.5) > 0.2) {
+                power = random.nextInt(16);
+            }
         }
         if (power != state.getValue(POWER)) {
             level.setBlock(pos, state.setValue(POWER, power), Block.UPDATE_ALL);

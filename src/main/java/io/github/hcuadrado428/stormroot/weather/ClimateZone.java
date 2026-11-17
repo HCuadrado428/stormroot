@@ -5,14 +5,14 @@ package io.github.hcuadrado428.stormroot.weather;
  * fenómenos). Java puro: {@code FrontTicker} clasifica el bioma y {@link FrontSimulation} elige el tipo.
  */
 public enum ClimateZone {
-    //        lluvia tormenta niebla ventisca calor monzón
-    COLD(1.0, 0.5, 0.7, 1.6, 0.0, 0.0),
-    TEMPERATE(1.0, 1.0, 0.7, 0.0, 0.4, 0.0),
-    HUMID(2.0, 2.0, 2.0, 0.0, 0.3, 1.2),
-    /** Sin lluvia en vanilla (desierto, badlands, sabana): tormentas (secas) y olas de calor. */
-    DRY(0.0, 0.6, 0.0, 0.0, 0.8, 0.0),
-    OCEAN(2.0, 1.0, 2.0, 0.0, 0.0, 0.6),
-    MOUNTAIN(1.0, 1.0, 0.7, 0.6, 0.0, 0.0);
+    //        lluvia tormenta niebla ventisca calor monzón aurora magnética
+    COLD(1.0, 0.5, 0.7, 1.6, 0.0, 0.0, 0.15, 0.06),
+    TEMPERATE(1.0, 1.0, 0.7, 0.0, 0.4, 0.0, 0.0, 0.06),
+    HUMID(2.0, 2.0, 2.0, 0.0, 0.3, 1.2, 0.0, 0.06),
+    /** Sin lluvia en vanilla (desierto, badlands, sabana): tormentas (secas), olas de calor y, rara, la magnética. */
+    DRY(0.0, 0.6, 0.0, 0.0, 0.8, 0.0, 0.0, 0.06),
+    OCEAN(2.0, 1.0, 2.0, 0.0, 0.0, 0.6, 0.0, 0.06),
+    MOUNTAIN(1.0, 1.0, 0.7, 0.6, 0.0, 0.0, 0.15, 0.06);
 
     private final double rain;
     private final double thunderstorm;
@@ -20,14 +20,19 @@ public enum ClimateZone {
     private final double blizzard;
     private final double heatWave;
     private final double monsoon;
+    private final double aurora;
+    private final double magnetic;
 
-    ClimateZone(double rain, double thunderstorm, double fog, double blizzard, double heatWave, double monsoon) {
+    ClimateZone(double rain, double thunderstorm, double fog, double blizzard, double heatWave, double monsoon,
+                double aurora, double magnetic) {
         this.rain = rain;
         this.thunderstorm = thunderstorm;
         this.fog = fog;
         this.blizzard = blizzard;
         this.heatWave = heatWave;
         this.monsoon = monsoon;
+        this.aurora = aurora;
+        this.magnetic = magnetic;
     }
 
     /** Peso de un tipo de frente en esta zona (0 = nunca nace aquí). */
@@ -39,6 +44,8 @@ public enum ClimateZone {
             case BLIZZARD -> blizzard;
             case HEAT_WAVE -> heatWave;
             case MONSOON -> monsoon;
+            case AURORA -> aurora;
+            case MAGNETIC_STORM -> magnetic;
         };
     }
 

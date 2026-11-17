@@ -26,6 +26,7 @@ Primera versión jugable. Minecraft 1.20.1 (Fabric, Forge; también NeoForge 1.2
   seca mucho antes y deshielo masivo de las cuevas heladas.
 - **Monzón**: lluvia torrencial que inunda orillas y cuevas (con cascadas del techo) y hace crecer los cultivos; todo
   vuelve a su sitio al irse.
+- **Aurora** de noche en biomas fríos (polvo de aurora) y **tormenta magnética** (instrumentos locos, roca magnetizada).
 - **Granizo** en el núcleo de algunas tormentas: daña cultivos maduros, cristal a la intemperie y a quien no lleve
   casco; deja granizo (4 = un bloque de hielo).
 - Partículas en el borde de los frentes cercanos.

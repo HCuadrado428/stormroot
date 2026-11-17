@@ -14,6 +14,8 @@ public final class ModItems {
     public static Item LIGHTNING_CRYSTAL;
     /** Granizo: lo deja una granizada en el suelo; 4 hacen un bloque de hielo (refrigerante). */
     public static Item HAILSTONE;
+    /** Polvo de aurora: cae del cielo durante una aurora, de noche (ingrediente de final de juego, más adelante). */
+    public static Item AURORA_DUST;
 
     private ModItems() {
     }

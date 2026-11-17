@@ -241,6 +241,18 @@ public final class ClientWeather {
                 particle = random.nextInt(3) == 0 ? ParticleTypes.LARGE_SMOKE : ParticleTypes.FALLING_WATER;
                 y = playerY + 6 + random.nextDouble() * 10;
                 break;
+            case MAGNETIC_STORM:
+                // Chispas en el aire.
+                particle = ParticleTypes.ELECTRIC_SPARK;
+                y = playerY + 1 + random.nextDouble() * 6;
+                vy = 0;
+                break;
+            case AURORA:
+                // Destellos muy altos (solo se notan de noche).
+                particle = ParticleTypes.END_ROD;
+                y = playerY + 8 + random.nextDouble() * 12;
+                vy = 0;
+                break;
             case HEAT_WAVE:
                 // Aire caliente: polvillo blanco que flota.
                 particle = ParticleTypes.WHITE_ASH;

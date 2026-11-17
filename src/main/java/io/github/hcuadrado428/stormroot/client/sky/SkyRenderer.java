@@ -250,12 +250,60 @@ public final class SkyRenderer {
                 drawn++;
             }
         }
+        drawAurora(vc, pose, level, cam, seconds, day);
         if (StormrootConfig.cloudShadows.getAsBoolean()) {
             drawShadows(vc, pose, level, cam, camCellX, camCellZ, driftX, driftZ, day);
         }
         buffers.endBatch(renderType);
         cellsDrawn += drawn;
         frames++;
+    }
+
+    /**
+     * Aurora: dos cortinas de luz verde y morada muy altas, hacia el norte, que ondulan. Solo de noche y dentro de un frente
+     * de aurora (más intensa cuanto más dentro).
+     */
+    private static void drawAurora(VertexConsumer vc, PoseStack.Pose pose, ClientLevel level, Vec3 cam, double seconds, float day) {
+        double intensity = ClientFronts.intensity(io.github.hcuadrado428.stormroot.weather.FrontType.AURORA, cam.x, cam.z);
+        float night = Math.max(0, 1 - day * 1.6f);
+        float strength = (float) (intensity * night);
+        if (strength < 0.02f) {
+            return;
+        }
+        int segments = 48;
+        for (int curtain = 0; curtain < 2; curtain++) {
+            double distance = 170 + curtain * 60;
+            float bottom = (float) (250 + curtain * 20 - cam.y);
+            float top = bottom + 60;
+            for (int k = 0; k < segments; k++) {
+                double a0 = (k - segments / 2.0) * 14;
+                double a1 = a0 + 14;
+                double w0 = Math.sin(a0 * 0.025 + seconds * 0.15 + curtain) * 35;
+                double w1 = Math.sin(a1 * 0.025 + seconds * 0.15 + curtain) * 35;
+                float x0 = (float) a0;
+                float x1 = (float) a1;
+                float z0 = (float) (-distance + w0);
+                float z1 = (float) (-distance + w1);
+                double fade = 1 - Math.abs(k - segments / 2.0) / (segments / 2.0);
+                double shimmer = 0.7 + 0.3 * Math.sin(k * 0.7 + seconds * 0.9 + curtain * 2);
+                int alphaBottom = (int) (150 * strength * fade * shimmer);
+                int alphaTop = (int) (40 * strength * fade * shimmer);
+                int green = (alphaBottom << 24) | 0x52F2A0;
+                int violet = (alphaTop << 24) | 0xA67CFF;
+                vertex(vc, pose, x0, bottom, z0, green);
+                vertex(vc, pose, x1, bottom, z1, green);
+                vertex(vc, pose, x1, top, z1, violet);
+                vertex(vc, pose, x0, top, z0, violet);
+            }
+        }
+        auroraFrames++;
+    }
+
+    private static long auroraFrames;
+
+    /** Para el self-test: fotogramas con aurora dibujada. */
+    public static long auroraFrames() {
+        return auroraFrames;
     }
 
     /** Grosor de una nube: las de buen tiempo, fijo; los nubarrones crecen con la intensidad del frente. */

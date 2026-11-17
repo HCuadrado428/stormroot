@@ -166,6 +166,7 @@ public final class SelfTest {
                 run("massive thaw floods the cave", SelfTest::checkMassiveThaw);
                 run("heat waves dry the ground and clear the sky", SelfTest::checkHeatWave);
                 run("one in three storms brings hail", SelfTest::checkHailClouds);
+                run("magnetic storms magnetize iron and auroras leave dust", () -> checkRareSkies(level));
                 run("hail hurts crops and glass and leaves hailstones", () -> checkHailGround(level));
                 finish(server);
             }
@@ -368,6 +369,7 @@ public final class SelfTest {
             coldHasBlizzard |= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.COLD) == FrontType.BLIZZARD;
             blizzardOnlyCold &= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE) != FrontType.MONSOON;
             monsoonInHumid |= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.HUMID) == FrontType.MONSOON;
+            blizzardOnlyCold &= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.HUMID) != FrontType.AURORA;
             FrontType dryType = sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.DRY);
             dryOnlyStorms &= dryType == FrontType.THUNDERSTORM || dryType == FrontType.HEAT_WAVE;
             temperateHasRain |= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE) == FrontType.RAIN;
@@ -705,6 +707,28 @@ public final class SelfTest {
         check("heat waves dry the ground and clear the sky", drier && clear <= calm / 3,
                 "humedad tras 10 min: normal=" + normal.surface() + ", con calor=" + hot.surface()
                         + "; nubes de buen tiempo sin/con calor=" + calm + "/" + clear);
+    }
+
+    /** El hierro se magnetiza (y nada más); la aurora deja polvo en el suelo. */
+    private static void checkRareSkies(ServerLevel level) {
+        BlockPos ore = new BlockPos(BX + 12, Y_TOP + 1, BZ + 12);
+        BlockPos other = ore.east();
+        level.setBlock(ore, Blocks.IRON_ORE.defaultBlockState(), Block.UPDATE_CLIENTS);
+        level.setBlock(other, Blocks.COAL_ORE.defaultBlockState(), Block.UPDATE_CLIENTS);
+        boolean magnetized = io.github.hcuadrado428.stormroot.weather.RareSkies.magnetize(level, ore)
+                && level.getBlockState(ore).is(io.github.hcuadrado428.stormroot.registry.ModBlocks.MAGNETIC_ROCK);
+        boolean coalSafe = !io.github.hcuadrado428.stormroot.weather.RareSkies.magnetize(level, other)
+                && level.getBlockState(other).is(Blocks.COAL_ORE);
+        io.github.hcuadrado428.stormroot.weather.RareSkies.dropDust(level, ore.above());
+        List<net.minecraft.world.entity.item.ItemEntity> dust = level.getEntitiesOfClass(
+                net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(ore).inflate(3),
+                e -> e.getItem().is(io.github.hcuadrado428.stormroot.registry.ModItems.AURORA_DUST));
+        int count = dust.size();
+        dust.forEach(net.minecraft.world.entity.Entity::discard);
+        level.setBlock(ore, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+        level.setBlock(other, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+        check("magnetic storms magnetize iron and auroras leave dust", magnetized && coalSafe && count == 1,
+                "hierro magnetizado=" + magnetized + ", carbón intacto=" + coalSafe + ", polvo de aurora=" + count);
     }
 
     /** El núcleo de las tormentas con id múltiplo de 3 es de granizo; el resto, tormenta normal; el borde, sin granizo. */

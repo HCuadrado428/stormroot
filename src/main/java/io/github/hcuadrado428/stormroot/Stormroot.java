@@ -100,6 +100,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 () -> ModBlocks.ICICLE = ModBlocks.createIcicle());
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.ICE_CRYSTAL_ID),
                 () -> ModBlocks.ICE_CRYSTAL = ModBlocks.createIceCrystal());
+        event.register(Registries.BLOCK, ModIds.id(ModBlocks.MAGNETIC_ROCK_ID),
+                () -> ModBlocks.MAGNETIC_ROCK = ModBlocks.createMagneticRock());
         event.register(Registries.ITEM, ModIds.id("lightning_crystal"),
                 () -> ModItems.LIGHTNING_CRYSTAL = ModItems.create("lightning_crystal"));
         event.register(Registries.ITEM, ModIds.id("hailstone"),
@@ -114,6 +116,9 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 () -> ModBlocks.ICICLE_ITEM = ModBlocks.createBlockItem(ModBlocks.ICICLE_ID, ModBlocks.ICICLE));
         event.register(Registries.ITEM, ModIds.id(ModBlocks.ICE_CRYSTAL_ID),
                 () -> ModBlocks.ICE_CRYSTAL_ITEM = ModBlocks.createBlockItem(ModBlocks.ICE_CRYSTAL_ID, ModBlocks.ICE_CRYSTAL));
+        event.register(Registries.ITEM, ModIds.id(ModBlocks.MAGNETIC_ROCK_ID),
+                () -> ModBlocks.MAGNETIC_ROCK_ITEM = ModBlocks.createBlockItem(ModBlocks.MAGNETIC_ROCK_ID, ModBlocks.MAGNETIC_ROCK));
+        event.register(Registries.ITEM, ModIds.id("aurora_dust"), () -> ModItems.AURORA_DUST = ModItems.create("aurora_dust"));
     }
 
     private static void onCreativeTabs(BuildCreativeModeTabContentsEvent event) {
@@ -123,6 +128,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
             event.accept(ModBlocks.LIGHTNING_ROOT_ITEM);
             event.accept(ModBlocks.ICICLE_ITEM);
             event.accept(ModBlocks.ICE_CRYSTAL_ITEM);
+            event.accept(ModBlocks.MAGNETIC_ROCK_ITEM);
+            event.accept(ModItems.AURORA_DUST);
         }
         if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
             event.accept(ModBlocks.WEATHERVANE_ITEM);
@@ -175,6 +182,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 () -> ModBlocks.ICICLE = ModBlocks.createIcicle());
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.ICE_CRYSTAL_ID),
                 () -> ModBlocks.ICE_CRYSTAL = ModBlocks.createIceCrystal());
+        event.register(Registries.BLOCK, ModIds.id(ModBlocks.MAGNETIC_ROCK_ID),
+                () -> ModBlocks.MAGNETIC_ROCK = ModBlocks.createMagneticRock());
         event.register(Registries.ITEM, ModIds.id("lightning_crystal"),
                 () -> ModItems.LIGHTNING_CRYSTAL = ModItems.create("lightning_crystal"));
         event.register(Registries.ITEM, ModIds.id("hailstone"),
@@ -189,6 +198,9 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 () -> ModBlocks.ICICLE_ITEM = ModBlocks.createBlockItem(ModBlocks.ICICLE_ID, ModBlocks.ICICLE));
         event.register(Registries.ITEM, ModIds.id(ModBlocks.ICE_CRYSTAL_ID),
                 () -> ModBlocks.ICE_CRYSTAL_ITEM = ModBlocks.createBlockItem(ModBlocks.ICE_CRYSTAL_ID, ModBlocks.ICE_CRYSTAL));
+        event.register(Registries.ITEM, ModIds.id(ModBlocks.MAGNETIC_ROCK_ID),
+                () -> ModBlocks.MAGNETIC_ROCK_ITEM = ModBlocks.createBlockItem(ModBlocks.MAGNETIC_ROCK_ID, ModBlocks.MAGNETIC_ROCK));
+        event.register(Registries.ITEM, ModIds.id("aurora_dust"), () -> ModItems.AURORA_DUST = ModItems.create("aurora_dust"));
     }
 
     private static void onCreativeTabs(BuildCreativeModeTabContentsEvent event) {
@@ -198,6 +210,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
             event.accept(ModBlocks.LIGHTNING_ROOT_ITEM);
             event.accept(ModBlocks.ICICLE_ITEM);
             event.accept(ModBlocks.ICE_CRYSTAL_ITEM);
+            event.accept(ModBlocks.MAGNETIC_ROCK_ITEM);
+            event.accept(ModItems.AURORA_DUST);
         }
         if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
             event.accept(ModBlocks.WEATHERVANE_ITEM);
@@ -235,6 +249,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 ModIds.id(ModBlocks.ICICLE_ID), ModBlocks.createIcicle());
         ModBlocks.ICE_CRYSTAL = Registry.register(BuiltInRegistries.BLOCK,
                 ModIds.id(ModBlocks.ICE_CRYSTAL_ID), ModBlocks.createIceCrystal());
+        ModBlocks.MAGNETIC_ROCK = Registry.register(BuiltInRegistries.BLOCK,
+                ModIds.id(ModBlocks.MAGNETIC_ROCK_ID), ModBlocks.createMagneticRock());
         ModItems.LIGHTNING_CRYSTAL = Registry.register(BuiltInRegistries.ITEM,
                 ModIds.id("lightning_crystal"), ModItems.create("lightning_crystal"));
         ModItems.HAILSTONE = Registry.register(BuiltInRegistries.ITEM, ModIds.id("hailstone"), ModItems.create("hailstone"));
@@ -248,6 +264,9 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 ModBlocks.createBlockItem(ModBlocks.ICICLE_ID, ModBlocks.ICICLE));
         ModBlocks.ICE_CRYSTAL_ITEM = Registry.register(BuiltInRegistries.ITEM, ModIds.id(ModBlocks.ICE_CRYSTAL_ID),
                 ModBlocks.createBlockItem(ModBlocks.ICE_CRYSTAL_ID, ModBlocks.ICE_CRYSTAL));
+        ModBlocks.MAGNETIC_ROCK_ITEM = Registry.register(BuiltInRegistries.ITEM, ModIds.id(ModBlocks.MAGNETIC_ROCK_ID),
+                ModBlocks.createBlockItem(ModBlocks.MAGNETIC_ROCK_ID, ModBlocks.MAGNETIC_ROCK));
+        ModItems.AURORA_DUST = Registry.register(BuiltInRegistries.ITEM, ModIds.id("aurora_dust"), ModItems.create("aurora_dust"));
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.INGREDIENTS)
                 .register(entries -> {
                     entries.accept(ModItems.LIGHTNING_CRYSTAL);
@@ -255,6 +274,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                     entries.accept(ModBlocks.LIGHTNING_ROOT_ITEM);
                     entries.accept(ModBlocks.ICICLE_ITEM);
                     entries.accept(ModBlocks.ICE_CRYSTAL_ITEM);
+                    entries.accept(ModBlocks.MAGNETIC_ROCK_ITEM);
+                    entries.accept(ModItems.AURORA_DUST);
                 });
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(entries -> {
             entries.accept(ModBlocks.WEATHERVANE_ITEM);

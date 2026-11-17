@@ -55,6 +55,7 @@ public final class FrontTicker {
             HeatWaves.tick(server.overworld());
             Hail.tick(server.overworld());
             Monsoons.tick(server.overworld());
+            RareSkies.tick(server.overworld());
         }
         if (++tickCounter < STEP_TICKS && server == currentServer) {
             return;

@@ -16,7 +16,11 @@ public enum FrontType {
     /** Ola de calor: enorme, larga y casi quieta. Despeja el cielo, seca el suelo y derrite las cuevas heladas. */
     HEAT_WAVE("heat_wave", 192, 320, 0.15, 1200, 2400),
     /** Monzón: lluvia torrencial enorme y larga en junglas, pantanos y costas cálidas; inunda cuevas y orillas. */
-    MONSOON("monsoon", 160, 256, 0.4, 1500, 2400);
+    MONSOON("monsoon", 160, 256, 0.4, 1500, 2400),
+    /** Aurora (rara): solo se ve de noche, en biomas fríos y cumbres; deja polvo de aurora. */
+    AURORA("aurora", 192, 320, 0.2, 900, 1800),
+    /** Tormenta magnética (rara, en cualquier bioma): destellos sin trueno, instrumentos locos y hierro magnetizado. */
+    MAGNETIC_STORM("magnetic_storm", 128, 224, 0.5, 600, 1200);
 
     private final String id;
     private final int minRadius;

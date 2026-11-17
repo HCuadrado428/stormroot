@@ -26,5 +26,7 @@
     "block.stormroot.storm_fire": "Fuego del clima",
     "block.stormroot.icicle": "Carámbano",
     "block.stormroot.ice_crystal": "Cristal de hielo",
-    "item.stormroot.hailstone": "Granizo"
+    "item.stormroot.hailstone": "Granizo",
+    "block.stormroot.magnetic_rock": "Roca magnetizada",
+    "item.stormroot.aurora_dust": "Polvo de aurora"
 }

@@ -25,6 +25,7 @@ public final class ModBlocks {
     public static final String STORM_FIRE_ID = "storm_fire";
     public static final String ICICLE_ID = "icicle";
     public static final String ICE_CRYSTAL_ID = "ice_crystal";
+    public static final String MAGNETIC_ROCK_ID = "magnetic_rock";
 
     public static Block WEATHERVANE;
     public static Block BAROMETER;
@@ -39,6 +40,8 @@ public final class ModBlocks {
     public static Item ICICLE_ITEM;
     public static Block ICE_CRYSTAL;
     public static Item ICE_CRYSTAL_ITEM;
+    public static Block MAGNETIC_ROCK;
+    public static Item MAGNETIC_ROCK_ITEM;
 
     private ModBlocks() {
     }
@@ -87,6 +90,12 @@ public final class ModBlocks {
                 .sound(SoundType.AMETHYST_CLUSTER).noOcclusion().lightLevel(state -> 4)
                 .pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY);
         return create(ICE_CRYSTAL_ID, io.github.hcuadrado428.stormroot.block.IceCrystalBlock::new, properties);
+    }
+
+    public static Block createMagneticRock() {
+        BlockBehaviour.Properties properties = BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(3.0F)
+                .sound(SoundType.STONE).lightLevel(state -> 3);
+        return create(MAGNETIC_ROCK_ID, io.github.hcuadrado428.stormroot.block.MagneticRockBlock::new, properties);
     }
 
     public static Item createBlockItem(String name, Block block) {

@@ -26,5 +26,7 @@
     "block.stormroot.storm_fire": "Storm Fire",
     "block.stormroot.icicle": "Icicle",
     "block.stormroot.ice_crystal": "Ice Crystal",
-    "item.stormroot.hailstone": "Hailstone"
+    "item.stormroot.hailstone": "Hailstone",
+    "block.stormroot.magnetic_rock": "Magnetized Rock",
+    "item.stormroot.aurora_dust": "Aurora Dust"
 }
