@@ -38,6 +38,16 @@ public final class BloombertoCompat {
         b.push("lightning");
         ConfigValue<Double> crystalChance = b.defineDouble("crystal_chance", 0.25, 0.0, 1.0,
                 "Probabilidad de que un rayo sobre arena o piedra deje un Cristal de rayo");
+        ConfigValue<Double> rootChance = b.defineDouble("root_chance", 0.35, 0.0, 1.0,
+                "Probabilidad de que un rayo sobre piedra, tierra o arena haga crecer una raíz de rayo hacia abajo");
+        b.pop();
+        b.push("seepage");
+        ConfigValue<Boolean> seepage = b.defineBoolean("enabled", true,
+                "La lluvia se filtra al subsuelo y las cuevas reaccionan");
+        ConfigValue<Boolean> worldChanges = b.defineBoolean("world_changes", true,
+                "Permite crear charcos y barro en las cuevas (y deshacerlos al secarse)");
+        ConfigValue<Double> seepSpeed = b.defineDouble("speed", 1.0, 0.1, 50.0,
+                "Velocidad de la filtración (1 = normal; súbela para probar)");
         b.pop();
         b.push("client");
         ConfigValue<Integer> edgeParticles = b.defineInt("edge_particles_per_tick", 6, 0, 64,
@@ -54,6 +64,10 @@ public final class BloombertoCompat {
         StormrootConfig.maxFronts = maxFronts::get;
         StormrootConfig.frontSpawnChance = spawnChance::get;
         StormrootConfig.lightningCrystalChance = crystalChance::get;
+        StormrootConfig.lightningRootChance = rootChance::get;
+        StormrootConfig.seepageEnabled = seepage::get;
+        StormrootConfig.seepageWorldChanges = worldChanges::get;
+        StormrootConfig.seepageSpeed = seepSpeed::get;
         StormrootConfig.edgeParticlesPerTick = edgeParticles::get;
         StormrootConfig.stormScreenEffects = screenEffects::get;
         StormrootConfig.lightningCameraShake = cameraShake::get;

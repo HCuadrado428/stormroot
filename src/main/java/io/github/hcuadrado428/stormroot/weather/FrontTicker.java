@@ -4,6 +4,7 @@ import io.github.hcuadrado428.stormroot.Stormroot;
 import io.github.hcuadrado428.stormroot.config.StormrootConfig;
 import io.github.hcuadrado428.stormroot.network.FrontsSyncPayload;
 import io.github.hcuadrado428.stormroot.network.StormrootNetwork;
+import io.github.hcuadrado428.stormroot.seep.SeepageTicker;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
@@ -38,6 +39,7 @@ public final class FrontTicker {
 
     public static void onServerTick(MinecraftServer server) {
         LightningCrystals.tick();
+        LightningRoots.tick();
         if (++tickCounter < STEP_TICKS && server == currentServer) {
             return;
         }
@@ -57,6 +59,7 @@ public final class FrontTicker {
             Stormroot.LOGGER.info("[Stormroot] Nuevo frente: {}", front);
         }
         applyWeather(overworld, sim);
+        SeepageTicker.step(server, sim, STEP_TICKS / 20.0);
         save(server);
     }
 
@@ -73,7 +76,8 @@ public final class FrontTicker {
                     near.add(front);
                 }
             }
-            StormrootNetwork.sendFronts(player, new FrontsSyncPayload(controlsWeather, sim.windAngle(), near));
+            float seep = (float) SeepageTicker.deepAt(server, player.getBlockX(), player.getBlockZ());
+            StormrootNetwork.sendFronts(player, new FrontsSyncPayload(controlsWeather, sim.windAngle(), seep, near));
         }
     }
 
@@ -82,6 +86,7 @@ public final class FrontTicker {
         if (server != currentServer || simulation == null) {
             currentServer = server;
             LightningCrystals.clear();
+            LightningRoots.clear();
             simulation = new FrontSimulation(server.overworld().getSeed());
             tickCounter = 0;
             FrontSavedData data = FrontSavedData.get(server);

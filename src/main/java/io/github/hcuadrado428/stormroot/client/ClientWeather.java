@@ -6,6 +6,7 @@ import io.github.hcuadrado428.stormroot.weather.WeatherFront;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.RandomSource;
@@ -68,6 +69,37 @@ public final class ClientWeather {
         level.setThunderLevel(thunder);
 
         spawnEdgeParticles(level, player);
+        spawnCaveParticles(level, player);
+    }
+
+    /** Bajo tierra: goteo del techo si el subsuelo está empapado, polvo si hay sequía. */
+    private static void spawnCaveParticles(ClientLevel level, LocalPlayer player) {
+        float seep = ClientFronts.seep();
+        if (Math.abs(seep) < 0.3f || level.canSeeSky(player.blockPosition())) {
+            return;
+        }
+        RandomSource random = level.getRandom();
+        if (random.nextFloat() > Math.abs(seep)) {
+            return;
+        }
+        BlockPos base = player.blockPosition();
+        if (seep > 0) {
+            for (int attempt = 0; attempt < 4; attempt++) {
+                BlockPos air = base.offset(random.nextInt(17) - 8, random.nextInt(6), random.nextInt(17) - 8);
+                BlockPos ceiling = air.above();
+                if (level.getBlockState(air).isAir() && !level.getBlockState(ceiling).isAir()
+                        && level.getBlockState(ceiling).getFluidState().isEmpty()) {
+                    level.addParticle(ParticleTypes.DRIPPING_WATER, air.getX() + random.nextDouble(),
+                            ceiling.getY() - 0.05, air.getZ() + random.nextDouble(), 0, 0, 0);
+                    return;
+                }
+            }
+        } else {
+            double x = player.getX() + (random.nextDouble() - 0.5) * 12;
+            double y = player.getY() + random.nextDouble() * 3;
+            double z = player.getZ() + (random.nextDouble() - 0.5) * 12;
+            level.addParticle(ParticleTypes.WHITE_ASH, x, y, z, 0, 0, 0);
+        }
     }
 
     /** Lluvia visible ahora mismo (0–1), ya suavizada. */

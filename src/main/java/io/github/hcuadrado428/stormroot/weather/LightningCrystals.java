@@ -39,6 +39,10 @@ public final class LightningCrystals {
         }
         BlockPos impact = entity.blockPosition();
         BlockState struck = serverLevel.getBlockState(impact.below());
+        if (LightningRoots.canGrowInto(struck)
+                && serverLevel.getRandom().nextDouble() < StormrootConfig.lightningRootChance.getAsDouble()) {
+            LightningRoots.start(serverLevel, impact.below());
+        }
         if (!struck.is(BlockTags.SAND) && !struck.is(BlockTags.BASE_STONE_OVERWORLD)) {
             return;
         }

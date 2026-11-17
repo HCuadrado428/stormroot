@@ -1,7 +1,10 @@
 package io.github.hcuadrado428.stormroot.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import io.github.hcuadrado428.stormroot.seep.SeepageCell;
+import io.github.hcuadrado428.stormroot.seep.SeepageSavedData;
 import io.github.hcuadrado428.stormroot.weather.FrontSimulation;
 import io.github.hcuadrado428.stormroot.weather.FrontTicker;
 import io.github.hcuadrado428.stormroot.weather.FrontType;
@@ -21,6 +24,8 @@ import net.minecraft.world.phys.Vec3;
  * /stormroot front clear             borra todos los frentes
  * /stormroot here                    qué frente hay donde estás y el viento
  * /stormroot weather on|off          Stormroot controla (o no) el clima vanilla
+ * /stormroot seep                    humedad del suelo/subsuelo de tu chunk
+ * /stormroot seep set <-1..1>        fija la humedad de tu chunk (para probar charcos y sequía)
  * </pre>
  */
 public final class StormrootCommands {
@@ -44,6 +49,11 @@ public final class StormrootCommands {
                         .then(spawn)
                         .then(Commands.literal("clear").executes(ctx -> clear(ctx.getSource()))))
                 .then(Commands.literal("here").executes(ctx -> here(ctx.getSource())))
+                .then(Commands.literal("seep")
+                        .executes(ctx -> seep(ctx.getSource()))
+                        .then(Commands.literal("set")
+                                .then(Commands.argument("value", DoubleArgumentType.doubleArg(-1, 1))
+                                        .executes(ctx -> setSeep(ctx.getSource(), DoubleArgumentType.getDouble(ctx, "value"))))))
                 .then(Commands.literal("weather")
                         .then(Commands.literal("on").executes(ctx -> setWeatherControl(ctx.getSource(), true)))
                         .then(Commands.literal("off").executes(ctx -> setWeatherControl(ctx.getSource(), false)))));
@@ -109,6 +119,31 @@ public final class StormrootCommands {
         reply(source, enabled
                 ? "Stormroot controla el clima del Overworld."
                 : "Stormroot ya no toca el clima vanilla (los frentes siguen simulándose).");
+        return 1;
+    }
+
+    private static int seep(CommandSourceStack source) {
+        Vec3 pos = source.getPosition();
+        int cx = (int) Math.floor(pos.x) >> 4;
+        int cz = (int) Math.floor(pos.z) >> 4;
+        SeepageCell cell = SeepageSavedData.get(source.getServer()).field().get(cx, cz);
+        if (cell == null) {
+            reply(source, String.format(Locale.ROOT, "Chunk %d,%d: sin registro (neutro).", cx, cz));
+            return 0;
+        }
+        reply(source, String.format(Locale.ROOT, "Chunk %d,%d: suelo %.2f, subsuelo %.2f, %d bloque(s) cambiados.",
+                cx, cz, cell.surface(), cell.deep(), cell.changes().size()));
+        return 1;
+    }
+
+    private static int setSeep(CommandSourceStack source, double value) {
+        Vec3 pos = source.getPosition();
+        int cx = (int) Math.floor(pos.x) >> 4;
+        int cz = (int) Math.floor(pos.z) >> 4;
+        SeepageSavedData data = SeepageSavedData.get(source.getServer());
+        data.field().getOrCreate(cx, cz).set(value);
+        data.changed();
+        reply(source, String.format(Locale.ROOT, "Chunk %d,%d: suelo y subsuelo = %.2f.", cx, cz, value));
         return 1;
     }
 

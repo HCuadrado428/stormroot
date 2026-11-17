@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "stormroot:weathervane"
+    "stormroot:weathervane",
+    "stormroot:lightning_root"
   ]
 }

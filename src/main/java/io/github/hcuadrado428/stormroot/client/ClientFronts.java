@@ -16,14 +16,17 @@ public final class ClientFronts {
     private static final List<WeatherFront> FRONTS = new ArrayList<>();
     private static boolean active;
     private static double windAngle;
+    private static float seep;
 
     private ClientFronts() {
     }
 
     /** Llamado al recibir un paquete del servidor (en el hilo principal del cliente). */
-    public static synchronized void accept(boolean serverControlsWeather, double wind, List<WeatherFront> fronts) {
+    public static synchronized void accept(boolean serverControlsWeather, double wind, float seepage,
+                                           List<WeatherFront> fronts) {
         active = serverControlsWeather;
         windAngle = wind;
+        seep = seepage;
         FRONTS.clear();
         for (WeatherFront front : fronts) {
             FRONTS.add(front.copy());
@@ -61,9 +64,15 @@ public final class ClientFronts {
         return windAngle;
     }
 
+    /** Humedad del subsuelo donde está el jugador (-1 sequía … 1 empapado). */
+    public static synchronized float seep() {
+        return seep;
+    }
+
     /** Al salir del mundo. */
     public static synchronized void reset() {
         active = false;
+        seep = 0;
         FRONTS.clear();
     }
 }

@@ -1,0 +1,32 @@
+{
+  "size": [
+    16,
+    16
+  ],
+  "palette": {
+    "k": "#1d3557",
+    "d": "#2b6cb0",
+    "m": "#5aa9e6",
+    "l": "#a7d8f5",
+    "w": "#effaff",
+    "y": "#ffe066"
+  },
+  "rows": [
+    "kdmmdkdmmldkdmmk",
+    "dmllmdmlwmdmllmd",
+    "mlwlmdmllmdmlwlm",
+    "mllmdkdmmdkdmllm",
+    "dmmdkymdkdmmdkdm",
+    "kddkdyymdmllmdkd",
+    "dmmdmdyydmlwlmdm",
+    "mllmdkdyykmllmdk",
+    "mlwlmdmdyydmmdkd",
+    "mllmdmlwmyydkdmm",
+    "dmmdkmllmdyydmll",
+    "kddkdmmdkdmyymlw",
+    "dmlmdkddkdmdyyml",
+    "mlwlmdmmdmllmdym",
+    "mllmdmlwmmlwlmdd",
+    "dmmdkdmmddmmdkdk"
+  ]
+}

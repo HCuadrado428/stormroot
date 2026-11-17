@@ -15,6 +15,13 @@ public final class StormrootConfig {
     public static volatile IntSupplier maxFronts = () -> 8;
     public static volatile DoubleSupplier frontSpawnChance = () -> 0.05;
     public static volatile DoubleSupplier lightningCrystalChance = () -> 0.25;
+    public static volatile DoubleSupplier lightningRootChance = () -> 0.35;
+    /** Registro climático por chunk (humedad del suelo y del subsuelo). */
+    public static volatile BooleanSupplier seepageEnabled = () -> true;
+    /** Si la filtración puede cambiar bloques en las cuevas (charcos, barro). */
+    public static volatile BooleanSupplier seepageWorldChanges = () -> true;
+    /** Multiplicador de velocidad de la filtración (1 = normal, 10 = para pruebas). */
+    public static volatile DoubleSupplier seepageSpeed = () -> 1.0;
 
     // Cliente
     public static volatile IntSupplier edgeParticlesPerTick = () -> 6;

@@ -20,11 +20,14 @@ import net.minecraft.resources.ResourceKey;
 public final class ModBlocks {
     public static final String WEATHERVANE_ID = "weathervane";
     public static final String BAROMETER_ID = "barometer";
+    public static final String LIGHTNING_ROOT_ID = "lightning_root";
 
     public static Block WEATHERVANE;
     public static Block BAROMETER;
     public static Item WEATHERVANE_ITEM;
     public static Item BAROMETER_ITEM;
+    public static Block LIGHTNING_ROOT;
+    public static Item LIGHTNING_ROOT_ITEM;
 
     private ModBlocks() {
     }
@@ -39,6 +42,13 @@ public final class ModBlocks {
         return create(BAROMETER_ID, BarometerBlock::new,
                 BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(1.5f)
                         .sound(SoundType.WOOD).noOcclusion());
+    }
+
+    /** Columna de cristal que deja un rayo al crecer hacia abajo. Da luz. */
+    public static Block createLightningRoot() {
+        return create(LIGHTNING_ROOT_ID, Block::new,
+                BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_LIGHT_BLUE).strength(1.5f)
+                        .sound(SoundType.AMETHYST).lightLevel(state -> 7));
     }
 
     public static Item createBlockItem(String name, Block block) {

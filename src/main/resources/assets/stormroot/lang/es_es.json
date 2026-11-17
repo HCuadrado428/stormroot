@@ -20,5 +20,7 @@
     "compass.stormroot.s": "sur",
     "compass.stormroot.sw": "suroeste",
     "compass.stormroot.w": "oeste",
-    "compass.stormroot.nw": "noroeste"
+    "compass.stormroot.nw": "noroeste",
+    "block.stormroot.lightning_root": "Raíz de rayo",
+    "item.stormroot.lightning_root": "Raíz de rayo"
 }

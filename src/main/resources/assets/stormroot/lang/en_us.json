@@ -20,5 +20,7 @@
     "compass.stormroot.s": "south",
     "compass.stormroot.sw": "southwest",
     "compass.stormroot.w": "west",
-    "compass.stormroot.nw": "northwest"
+    "compass.stormroot.nw": "northwest",
+    "block.stormroot.lightning_root": "Lightning Root",
+    "item.stormroot.lightning_root": "Lightning Root"
 }

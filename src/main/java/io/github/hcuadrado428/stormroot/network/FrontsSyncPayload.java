@@ -32,11 +32,14 @@ public final class FrontsSyncPayload /*? if >=1.20.5 {*/ implements CustomPacket
 
     private final boolean controlsWeather;
     private final double windAngle;
+    /** Humedad del subsuelo en el chunk del jugador (-1 sequía … 1 empapado). */
+    private final float seep;
     private final List<WeatherFront> fronts;
 
-    public FrontsSyncPayload(boolean controlsWeather, double windAngle, List<WeatherFront> fronts) {
+    public FrontsSyncPayload(boolean controlsWeather, double windAngle, float seep, List<WeatherFront> fronts) {
         this.controlsWeather = controlsWeather;
         this.windAngle = windAngle;
+        this.seep = seep;
         // Copias: en un solo jugador el paquete no se serializa y no hay que compartir objetos con el servidor.
         this.fronts = new ArrayList<>();
         for (WeatherFront front : fronts) {
@@ -50,6 +53,7 @@ public final class FrontsSyncPayload /*? if >=1.20.5 {*/ implements CustomPacket
     public FrontsSyncPayload(FriendlyByteBuf buf) {
         this.controlsWeather = buf.readBoolean();
         this.windAngle = buf.readDouble();
+        this.seep = buf.readFloat();
         int count = Math.min(buf.readVarInt(), MAX_FRONTS);
         this.fronts = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
@@ -65,6 +69,7 @@ public final class FrontsSyncPayload /*? if >=1.20.5 {*/ implements CustomPacket
     public void write(FriendlyByteBuf buf) {
         buf.writeBoolean(controlsWeather);
         buf.writeDouble(windAngle);
+        buf.writeFloat(seep);
         buf.writeVarInt(fronts.size());
         for (WeatherFront front : fronts) {
             buf.writeLong(front.id());
@@ -81,7 +86,7 @@ public final class FrontsSyncPayload /*? if >=1.20.5 {*/ implements CustomPacket
 
     /** Se ejecuta en el hilo principal del cliente. Solo toca {@link ClientFronts} (Java puro). */
     public static void handleOnClient(FrontsSyncPayload payload) {
-        ClientFronts.accept(payload.controlsWeather, payload.windAngle, payload.fronts);
+        ClientFronts.accept(payload.controlsWeather, payload.windAngle, payload.seep, payload.fronts);
     }
 
     //? if >=1.20.5 {
