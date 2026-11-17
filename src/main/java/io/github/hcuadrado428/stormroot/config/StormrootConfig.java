@@ -22,6 +22,8 @@ public final class StormrootConfig {
     public static volatile BooleanSupplier seepageWorldChanges = () -> true;
     /** Multiplicador de velocidad de la filtración (1 = normal, 10 = para pruebas). */
     public static volatile DoubleSupplier seepageSpeed = () -> 1.0;
+    /** Máximo de bloques que la filtración puede cambiar en un chunk (charcos, pozas, barro, musgo, grietas). */
+    public static volatile IntSupplier seepageMaxChangesPerChunk = () -> 48;
 
     // Cliente
     public static volatile IntSupplier edgeParticlesPerTick = () -> 6;

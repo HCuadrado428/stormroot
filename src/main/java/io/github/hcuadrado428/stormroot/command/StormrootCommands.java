@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.github.hcuadrado428.stormroot.seep.SeepageCell;
 import io.github.hcuadrado428.stormroot.seep.SeepageSavedData;
+import io.github.hcuadrado428.stormroot.seep.SeepageTicker;
 import io.github.hcuadrado428.stormroot.weather.FrontSimulation;
 import io.github.hcuadrado428.stormroot.weather.FrontTicker;
 import io.github.hcuadrado428.stormroot.weather.FrontType;
@@ -131,9 +132,31 @@ public final class StormrootCommands {
             reply(source, String.format(Locale.ROOT, "Chunk %d,%d: sin registro (neutro).", cx, cz));
             return 0;
         }
-        reply(source, String.format(Locale.ROOT, "Chunk %d,%d: suelo %.2f, subsuelo %.2f, %d bloque(s) cambiados.",
-                cx, cz, cell.surface(), cell.deep(), cell.changes().size()));
+        reply(source, String.format(Locale.ROOT, "Chunk %d,%d: suelo %.2f, subsuelo %.2f (%s).",
+                cx, cz, cell.surface(), cell.deep(), stage(cell.deep())));
+        reply(source, String.format(Locale.ROOT, " charcos %d, pozas %d, barro %d, musgo %d, grietas %d",
+                cell.count(SeepageCell.Kind.PUDDLE), cell.count(SeepageCell.Kind.POOL), cell.count(SeepageCell.Kind.MUD),
+                cell.count(SeepageCell.Kind.MOSS), cell.count(SeepageCell.Kind.CRACKED)));
         return 1;
+    }
+
+    private static String stage(double deep) {
+        if (deep >= SeepageTicker.POOL_AT) {
+            return "pozas";
+        }
+        if (deep >= SeepageTicker.PUDDLE_AT) {
+            return "charcos";
+        }
+        if (deep >= SeepageTicker.MUD_AT) {
+            return "barro";
+        }
+        if (deep <= SeepageTicker.DROUGHT_AT) {
+            return "sequía";
+        }
+        if (deep <= SeepageTicker.RECEDE_AT) {
+            return "secándose";
+        }
+        return "húmedo";
     }
 
     private static int setSeep(CommandSourceStack source, double value) {

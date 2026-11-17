@@ -28,7 +28,8 @@ public class SeepageSavedData extends SavedData {
 
     private static final Codec<SeepageCell.Change> CHANGE_CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.LONG.fieldOf("pos").forGetter(SeepageCell.Change::pos),
-            Codec.STRING.xmap(SeepageCell.Kind::byId, SeepageCell.Kind::id).fieldOf("kind").forGetter(SeepageCell.Change::kind)
+            Codec.STRING.xmap(SeepageCell.Kind::byId, SeepageCell.Kind::id).fieldOf("kind").forGetter(SeepageCell.Change::kind),
+            Codec.STRING.optionalFieldOf("original", "").forGetter(SeepageCell.Change::original)
     ).apply(i, SeepageCell.Change::new));
 
     private record CellEntry(long key, double surface, double deep, List<SeepageCell.Change> changes) {

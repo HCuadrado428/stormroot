@@ -4,14 +4,16 @@ import io.github.hcuadrado428.stormroot.config.StormrootConfig;
 import io.github.hcuadrado428.stormroot.weather.FrontSimulation;
 import io.github.hcuadrado428.stormroot.weather.FrontType;
 import io.github.hcuadrado428.stormroot.weather.WeatherFront;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -19,29 +21,40 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 /**
- * Filtración: conecta {@link SeepageField} (Java puro) con el mundo. Lo llama {@code FrontTicker} en cada paso.
+ * Filtración: conecta {@link SeepageField} (Java puro) con el mundo. Lo llama {@code FrontTicker} en cada paso (5 s).
  *
- * <ol>
- *   <li>Actualiza la humedad de los chunks cercanos a los jugadores según la lluvia de los frentes.</li>
- *   <li>En los chunks más cercanos, si el subsuelo está empapado, crea charcos y barro en el suelo de las cuevas;
- *       si se ha secado, los deshace (solo lo que creó Stormroot y solo si sigue igual).</li>
- * </ol>
- * Los chunks lejos de los jugadores no cambian: su registro se queda como estaba.
+ * <p>Según la humedad del subsuelo ({@code deep}) del chunk, en el suelo de las cuevas:
+ * <ul>
+ *   <li>≥ {@link #MUD_AT}: la tierra se vuelve barro.</li>
+ *   <li>≥ {@link #PUDDLE_AT}: aparecen charcos (un bloque del suelo pasa a ser agua, encerrado) y los que hay crecen.</li>
+ *   <li>≥ {@link #POOL_AT}: los hoyos naturales cerrados se llenan de agua (pozas).</li>
+ *   <li>≥ {@link #MOSS_AT}: a veces sale musgo en la roca.</li>
+ *   <li>≤ {@link #RECEDE_AT}: el agua se retira poco a poco (primero pozas, luego charcos, luego barro).</li>
+ *   <li>≤ {@link #DROUGHT_AT}: la tierra y el barro se agrietan; el musgo se seca. Se deshace al volver la humedad.</li>
+ * </ul>
+ * Solo se tocan bloques de {@link CaveMaterials} (o aire, en las pozas), siempre se apunta qué había y solo se
+ * deshace si el bloque sigue tal cual lo dejó Stormroot. El agua nunca queda abierta: no se derrama por la cueva.
  */
 public final class SeepageTicker {
     /** Radio (en chunks) alrededor de cada jugador en el que se actualiza la humedad. */
     public static final int UPDATE_RADIUS = 6;
     /** Radio (en chunks) en el que las cuevas cambian. */
     public static final int EFFECT_RADIUS = 3;
-    /** Subsuelo a partir del cual aparecen charcos y barro. */
-    public static final double FLOOD_THRESHOLD = 0.55;
-    /** Subsuelo por debajo del cual se deshacen. */
-    public static final double RECEDE_THRESHOLD = 0.2;
-    /** Máximo de bloques cambiados por chunk. */
-    public static final int MAX_CHANGES_PER_CHUNK = 12;
-    private static final int ATTEMPTS_PER_CHUNK = 6;
-    /** Los charcos solo aparecen a esta profundidad bajo la superficie, como mínimo. */
+
+    public static final double MUD_AT = 0.4;
+    public static final double PUDDLE_AT = 0.55;
+    public static final double MOSS_AT = 0.75;
+    public static final double POOL_AT = 0.8;
+    public static final double RECEDE_AT = 0.1;
+    public static final double DROUGHT_AT = -0.55;
+
+    /** Probabilidad por paso de deshacer un cambio cuando toca secarse: hace que el secado dure. */
+    private static final double RECEDE_CHANCE = 0.35;
+    private static final int ATTEMPTS_PER_CHUNK = 8;
+    /** Los cambios solo ocurren a esta profundidad bajo la superficie, como mínimo. */
     private static final int MIN_DEPTH = 10;
+    /** Tamaño máximo de una poza (bloques de agua de una capa). */
+    private static final int MAX_POOL = 24;
 
     private SeepageTicker() {
     }
@@ -80,12 +93,13 @@ public final class SeepageTicker {
         }
 
         if (StormrootConfig.seepageWorldChanges.getAsBoolean()) {
+            int maxChanges = StormrootConfig.seepageMaxChangesPerChunk.getAsInt();
             for (long key : affected) {
                 int cx = SeepageField.keyX(key);
                 int cz = SeepageField.keyZ(key);
                 SeepageCell cell = field.get(cx, cz);
                 if (cell != null && level.hasChunk(cx, cz)) {
-                    applyEffects(level, cx, cz, cell);
+                    applyEffects(level, cx, cz, cell, maxChanges);
                 }
             }
         }
@@ -109,54 +123,82 @@ public final class SeepageTicker {
         return best;
     }
 
-    private static void applyEffects(ServerLevel level, int cx, int cz, SeepageCell cell) {
-        if (cell.deep() >= FLOOD_THRESHOLD && cell.changes().size() < MAX_CHANGES_PER_CHUNK) {
-            tryFlood(level, cx, cz, cell);
-        } else if (cell.deep() <= RECEDE_THRESHOLD && !cell.changes().isEmpty()) {
-            recedeOne(level, cell);
+    // ------------------------------------------------------------------ efectos
+
+    private static void applyEffects(ServerLevel level, int cx, int cz, SeepageCell cell, int maxChanges) {
+        RandomSource random = level.getRandom();
+        double deep = cell.deep();
+
+        // Secado y sequía primero: deshacen cambios.
+        if (deep <= RECEDE_AT && random.nextDouble() < RECEDE_CHANCE) {
+            undo(level, cell, cell.lastIndexOf(SeepageCell.Kind.POOL, SeepageCell.Kind.PUDDLE, SeepageCell.Kind.MUD));
+        }
+        if (deep <= DROUGHT_AT && random.nextDouble() < RECEDE_CHANCE) {
+            undo(level, cell, cell.lastIndexOf(SeepageCell.Kind.MOSS));
+        }
+        if (deep > 0 && random.nextDouble() < RECEDE_CHANCE) {
+            undo(level, cell, cell.lastIndexOf(SeepageCell.Kind.CRACKED));
+        }
+        if (cell.changes().size() >= maxChanges) {
+            return;
+        }
+
+        // Crecer: primero los charcos que ya hay.
+        if (deep >= PUDDLE_AT && cell.count(SeepageCell.Kind.PUDDLE) > 0 && random.nextBoolean()
+                && growPuddle(level, cell, random)) {
+            return;
+        }
+
+        for (int attempt = 0; attempt < ATTEMPTS_PER_CHUNK; attempt++) {
+            BlockPos air = randomCaveFloor(level, cx, cz, random);
+            if (air == null) {
+                continue;
+            }
+            BlockPos floor = air.below();
+            String material = CaveMaterials.idOf(level.getBlockState(floor));
+            if (material == null) {
+                continue;
+            }
+            if (deep >= POOL_AT && random.nextInt(3) == 0 && fillPool(level, cell, air, maxChanges)) {
+                return;
+            }
+            if (deep >= PUDDLE_AT && CaveMaterials.PUDDLE_FLOOR.contains(material)
+                    && canHoldWater(level, floor) && place(level, cell, floor, Blocks.WATER.defaultBlockState(),
+                    SeepageCell.Kind.PUDDLE, material)) {
+                return;
+            }
+            if (deep >= MUD_AT && CaveMaterials.SOIL.contains(material)
+                    && place(level, cell, floor, Blocks.MUD.defaultBlockState(), SeepageCell.Kind.MUD, material)) {
+                return;
+            }
+            if (deep >= MOSS_AT && random.nextInt(8) == 0 && CaveMaterials.ROCK.contains(material)
+                    && place(level, cell, floor, Blocks.MOSS_BLOCK.defaultBlockState(), SeepageCell.Kind.MOSS, material)) {
+                return;
+            }
+            if (deep <= DROUGHT_AT && CaveMaterials.CRACKABLE.contains(material)
+                    && place(level, cell, floor, Blocks.COARSE_DIRT.defaultBlockState(), SeepageCell.Kind.CRACKED, material)) {
+                return;
+            }
         }
     }
 
-    private static void tryFlood(ServerLevel level, int cx, int cz, SeepageCell cell) {
-        RandomSource random = level.getRandom();
+    /** Un punto de aire en el suelo de una cueva de ese chunk, o {@code null}. */
+    private static BlockPos randomCaveFloor(ServerLevel level, int cx, int cz, RandomSource random) {
         //? if >=1.21.2 {
         int minY = level.getMinY();
         //?} else {
         /*int minY = level.getMinBuildHeight();
         *///?}
-        for (int attempt = 0; attempt < ATTEMPTS_PER_CHUNK; attempt++) {
-            int x = (cx << 4) + random.nextInt(16);
-            int z = (cz << 4) + random.nextInt(16);
-            int top = level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z) - MIN_DEPTH;
-            if (top <= minY + 2) {
-                continue;
-            }
-            BlockPos start = new BlockPos(x, minY + 1 + random.nextInt(top - minY - 1), z);
-            BlockPos floorAir = findCaveFloor(level, start);
-            if (floorAir == null) {
-                continue;
-            }
-            BlockPos below = floorAir.below();
-            BlockState ground = level.getBlockState(below);
-            if (ground.is(Blocks.DIRT)) {
-                level.setBlock(below, Blocks.MUD.defaultBlockState(), Block.UPDATE_ALL);
-                cell.changes().add(new SeepageCell.Change(below.asLong(), SeepageCell.Kind.MUD));
-                return;
-            }
-            if (ground.is(BlockTags.BASE_STONE_OVERWORLD)) {
-                level.setBlock(floorAir, Blocks.WATER.defaultBlockState(), Block.UPDATE_ALL);
-                cell.changes().add(new SeepageCell.Change(floorAir.asLong(), SeepageCell.Kind.PUDDLE));
-                return;
-            }
-        }
-    }
-
-    /** Desde un punto de aire de cueva, baja hasta el suelo. {@code null} si no es una cueva válida. */
-    private static BlockPos findCaveFloor(ServerLevel level, BlockPos start) {
-        if (!level.getBlockState(start).isAir() || level.canSeeSky(start)) {
+        int x = (cx << 4) + random.nextInt(16);
+        int z = (cz << 4) + random.nextInt(16);
+        int top = level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z) - MIN_DEPTH;
+        if (top <= minY + 2) {
             return null;
         }
-        BlockPos pos = start;
+        BlockPos pos = new BlockPos(x, minY + 1 + random.nextInt(top - minY - 1), z);
+        if (!level.getBlockState(pos).isAir() || level.canSeeSky(pos)) {
+            return null;
+        }
         for (int i = 0; i < 16; i++) {
             BlockPos below = pos.below();
             BlockState state = level.getBlockState(below);
@@ -168,22 +210,130 @@ public final class SeepageTicker {
         return null;
     }
 
-    private static void recedeOne(ServerLevel level, SeepageCell cell) {
-        SeepageCell.Change change = cell.changes().get(cell.changes().size() - 1);
+    /**
+     * Un bloque del suelo puede pasar a ser agua sin derramarse: debajo y a los cuatro lados hay bloques completos
+     * o agua quieta (nunca aire, antorchas, plantas... por donde se escaparía).
+     */
+    private static boolean canHoldWater(ServerLevel level, BlockPos floor) {
+        if (!isWall(level, floor.below())) {
+            return false;
+        }
+        for (Direction side : Direction.Plane.HORIZONTAL) {
+            BlockPos next = floor.relative(side);
+            if (!isWall(level, next) && !isStillWater(level, next)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** Hace crecer un charco existente hacia un bloque vecino del mismo nivel. */
+    private static boolean growPuddle(ServerLevel level, SeepageCell cell, RandomSource random) {
+        List<SeepageCell.Change> puddles = new ArrayList<>();
+        for (SeepageCell.Change change : cell.changes()) {
+            if (change.kind() == SeepageCell.Kind.PUDDLE) {
+                puddles.add(change);
+            }
+        }
+        SeepageCell.Change origin = puddles.get(random.nextInt(puddles.size()));
+        BlockPos from = BlockPos.of(origin.pos());
+        if (!level.isLoaded(from) || !level.getBlockState(from).is(Blocks.WATER)) {
+            return false;
+        }
+        List<Direction> sides = new ArrayList<>();
+        for (Direction side : Direction.Plane.HORIZONTAL) {
+            sides.add(side);
+        }
+        java.util.Collections.shuffle(sides, new java.util.Random(random.nextLong()));
+        for (Direction side : sides) {
+            BlockPos next = from.relative(side);
+            if (!level.isLoaded(next) || !level.getBlockState(next.above()).isAir()) {
+                continue;
+            }
+            String material = CaveMaterials.idOf(level.getBlockState(next));
+            if (material != null && CaveMaterials.PUDDLE_FLOOR.contains(material) && canHoldWater(level, next)) {
+                return place(level, cell, next, Blocks.WATER.defaultBlockState(), SeepageCell.Kind.PUDDLE, material);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Rellena con agua un hoyo cerrado del suelo de la cueva que contiene {@code start} (una sola capa,
+     * como mucho {@link #MAX_POOL} bloques). Si el hoyo no está cerrado o es demasiado grande, no hace nada.
+     */
+    private static boolean fillPool(ServerLevel level, SeepageCell cell, BlockPos start, int maxChanges) {
+        List<BlockPos> basin = new ArrayList<>();
+        Set<Long> seen = new HashSet<>();
+        ArrayDeque<BlockPos> queue = new ArrayDeque<>();
+        queue.add(start);
+        seen.add(start.asLong());
+        while (!queue.isEmpty()) {
+            BlockPos pos = queue.poll();
+            if (!level.isLoaded(pos) || !level.getBlockState(pos).isAir() || level.canSeeSky(pos)
+                    || !isWall(level, pos.below())) {
+                return false; // se escaparía el agua, o no es una cueva
+            }
+            basin.add(pos);
+            if (basin.size() > MAX_POOL || cell.changes().size() + basin.size() > maxChanges) {
+                return false;
+            }
+            for (Direction side : Direction.Plane.HORIZONTAL) {
+                BlockPos next = pos.relative(side);
+                BlockState neighbor = level.getBlockState(next);
+                if (neighbor.isAir()) {
+                    if (seen.add(next.asLong())) {
+                        queue.add(next);
+                    }
+                } else if (!isWall(level, next)) {
+                    return false; // agua, lava, antorchas, plantas...: el agua se escaparía o se mezclaría
+                }
+            }
+        }
+        for (BlockPos pos : basin) {
+            level.setBlock(pos, Blocks.WATER.defaultBlockState(), Block.UPDATE_ALL);
+            cell.changes().add(new SeepageCell.Change(pos.asLong(), SeepageCell.Kind.POOL, ""));
+        }
+        return true;
+    }
+
+    private static boolean place(ServerLevel level, SeepageCell cell, BlockPos pos, BlockState newState,
+                                 SeepageCell.Kind kind, String original) {
+        level.setBlock(pos, newState, Block.UPDATE_ALL);
+        cell.changes().add(new SeepageCell.Change(pos.asLong(), kind, original));
+        return true;
+    }
+
+    /** Deshace el cambio de ese índice si el bloque sigue tal cual lo dejó Stormroot. */
+    private static void undo(ServerLevel level, SeepageCell cell, int index) {
+        if (index < 0) {
+            return;
+        }
+        SeepageCell.Change change = cell.changes().get(index);
         BlockPos pos = BlockPos.of(change.pos());
         if (!level.isLoaded(pos)) {
             return;
         }
-        cell.changes().remove(cell.changes().size() - 1);
+        cell.changes().remove(index);
         BlockState state = level.getBlockState(pos);
-        if (change.kind() == SeepageCell.Kind.PUDDLE) {
-            if (state.is(Blocks.WATER) && level.getFluidState(pos).isSource()) {
-                level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
-            }
-        } else if (change.kind() == SeepageCell.Kind.MUD) {
-            if (state.is(Blocks.MUD)) {
-                level.setBlock(pos, Blocks.DIRT.defaultBlockState(), Block.UPDATE_ALL);
-            }
+        boolean unchanged = switch (change.kind()) {
+            case PUDDLE, POOL -> state.is(Blocks.WATER) && level.getFluidState(pos).isSource();
+            case MUD -> state.is(Blocks.MUD);
+            case MOSS -> state.is(Blocks.MOSS_BLOCK);
+            case CRACKED -> state.is(Blocks.COARSE_DIRT);
+        };
+        if (unchanged) {
+            level.setBlock(pos, CaveMaterials.restore(change.original()), Block.UPDATE_ALL);
         }
+    }
+
+    /** Bloque completo sin fluido: el agua no lo atraviesa. */
+    private static boolean isWall(ServerLevel level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        return state.getFluidState().isEmpty() && state.isCollisionShapeFullBlock(level, pos);
+    }
+
+    private static boolean isStillWater(ServerLevel level, BlockPos pos) {
+        return level.getBlockState(pos).is(Blocks.WATER) && level.getFluidState(pos).isSource();
     }
 }
