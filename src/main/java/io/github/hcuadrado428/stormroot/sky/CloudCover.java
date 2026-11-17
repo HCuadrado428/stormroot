@@ -50,6 +50,14 @@ public final class CloudCover {
      * @return {@code true} si hay nube
      */
     public static boolean fairCloud(long seed, double u, double v, double seconds) {
+        return fairCloud(seed, u, v, seconds, 0);
+    }
+
+    /**
+     * Como {@link #fairCloud(long, double, double, double)}, con {@code approach} (0–1) = cuánto se acerca un frente
+     * ({@link #approach}): delante de un nubarrón el cielo se va llenando de nubes (aviso de tormenta).
+     */
+    public static boolean fairCloud(long seed, double u, double v, double seconds, double approach) {
         // Zona: decide si por ahí las nubes son pequeñas o enormes y si está más o menos nublado.
         // (Se mezclan valores de ruido a escalas fijas; cambiar la escala según la posición deformaría el patrón.)
         double zone = ValueNoise.sample(seed ^ 0x51L, u / 1100.0, seconds / 2400.0, v / 1100.0);
@@ -59,7 +67,7 @@ public final class CloudCover {
         double n = small * (1 - big) + large * big;
         double cloudiness = ValueNoise.sample(seed ^ 0x77L, u / 1500.0, seconds / 3000.0, v / 1500.0);
         // Pocas y sueltas: umbral alto (más aún para las pequeñas), que baja algo en las zonas más nubladas.
-        double threshold = 0.72 - 0.09 * big - 0.1 * cloudiness;
+        double threshold = 0.72 - 0.09 * big - 0.1 * cloudiness - 0.3 * approach;
         return n > threshold;
     }
 
@@ -96,6 +104,52 @@ public final class CloudCover {
         return best;
     }
 
+    /** Hasta dónde llega el aviso por delante de un frente, en radios del frente. */
+    public static final double WARNING_REACH = 1.9;
+
+    /**
+     * Aviso de tormenta (0–1): cerca del borde de un frente de lluvia o tormenta, sobre todo por DELANTE (hacia donde
+     * avanza). 0 dentro del frente y a más de {@link #WARNING_REACH} radios. Las tormentas avisan más.
+     */
+    public static double approach(double x, double z, List<WeatherFront> fronts) {
+        double best = 0;
+        for (WeatherFront front : fronts) {
+            if (front.type() == FrontType.FOG) {
+                continue;
+            }
+            double dx = x - front.x();
+            double dz = z - front.z();
+            double dist = Math.sqrt(dx * dx + dz * dz);
+            double r = front.radius();
+            if (dist <= r * 0.8 || dist >= r * WARNING_REACH) {
+                continue;
+            }
+            double ring = 1 - (dist - r * 0.8) / (r * (WARNING_REACH - 0.8));
+            double speed = Math.hypot(front.vx(), front.vz());
+            double ahead = speed < 1e-6 || dist < 1e-6 ? 0.5 : 0.5 + 0.5 * (dx * front.vx() + dz * front.vz()) / (dist * speed);
+            double strength = front.type() == FrontType.THUNDERSTORM ? 1.0 : 0.6;
+            best = Math.max(best, ring * (0.25 + 0.75 * ahead) * strength * front.lifeFactor());
+        }
+        return Math.min(1, best);
+    }
+
+    /** Intensidad del frente de lluvia o tormenta más fuerte en un punto (para el grosor y el color del nubarrón). */
+    public static double frontIntensity(double x, double z, List<WeatherFront> fronts) {
+        double best = 0;
+        for (WeatherFront front : fronts) {
+            if (front.type() != FrontType.FOG) {
+                best = Math.max(best, front.intensityAt(x, z));
+            }
+        }
+        return best;
+    }
+
+    /** Nubes altas y finas (una capa más arriba, solo decorativa): {@code true} si hay en ese punto del cielo. */
+    public static boolean highCloud(long seed, double u, double v, double seconds) {
+        double n = ValueNoise.fbm(seed ^ 0xC1C1L, u / 140.0, seconds / 1200.0, v / 320.0, 3);
+        return n > 0.66;
+    }
+
     /** Nube en el centro de una celda (frentes primero; si no, buen tiempo). */
     public static Kind at(long seed, double x, double z, double windAngle, double seconds, List<WeatherFront> fronts) {
         double u = x - driftX(windAngle, seconds);
@@ -104,6 +158,6 @@ public final class CloudCover {
         if (front != Kind.NONE) {
             return front;
         }
-        return fairCloud(seed, u, v, seconds) ? Kind.FAIR : Kind.NONE;
+        return fairCloud(seed, u, v, seconds, approach(x, z, fronts)) ? Kind.FAIR : Kind.NONE;
     }
 }

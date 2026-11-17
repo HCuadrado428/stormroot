@@ -161,6 +161,8 @@ public final class ClientSelfTest {
                     SelfTest.report("stormroot sky draws a distant storm", storm, "celdas de tormenta="
                             + SkyRenderer.stormCells() + ", celdas dibujadas=" + SkyRenderer.cellsDrawn()
                             + ", fotogramas=" + SkyRenderer.framesDrawn());
+                    SelfTest.report("cloud shadows on the ground", SkyRenderer.shadowQuads() > 0,
+                            "trozos de sombra dibujados=" + SkyRenderer.shadowQuads());
                     stage = 60;
                     stageStart = ticks;
                     requestShot(mc, "tormenta_a_lo_lejos", -90f, -30f);
@@ -185,7 +187,14 @@ public final class ClientSelfTest {
                     requestShot(mc, "cielo_de_buen_tiempo", 0f, -35f);
                 }
             }
-            case 62 -> finish(mc);
+            case 62 -> {
+                // Mirando al suelo: las sombras de las nubes de buen tiempo.
+                mc.options.hideGui = false;
+                stage = 63;
+                stageStart = ticks;
+                requestShot(mc, "sombras_en_el_suelo", 0f, 80f);
+            }
+            case 63 -> finish(mc);
             case 20 -> {
                 clear(server);
                 mc.options.hideGui = false;

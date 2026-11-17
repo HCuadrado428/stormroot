@@ -25,6 +25,11 @@ public final class ClientSettingsFile {
         return Boolean.parseBoolean(load().getProperty("custom_clouds", "true").trim());
     }
 
+    /** Sombra de las nubes en el suelo (por defecto sí). */
+    public static boolean cloudShadows() {
+        return Boolean.parseBoolean(load().getProperty("cloud_shadows", "true").trim());
+    }
+
     private static synchronized Properties load() {
         if (props != null) {
             return props;
@@ -38,10 +43,12 @@ public final class ClientSettingsFile {
                 }
             } else {
                 props.setProperty("custom_clouds", "true");
+                props.setProperty("cloud_shadows", "true");
                 Files.createDirectories(file.getParent());
                 try (Writer w = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
                     props.store(w, "Stormroot (cliente). custom_clouds=false para volver a las nubes vanilla"
-                            + " (por ejemplo, si tu shader pack dibuja las suyas). Reinicia el juego tras cambiarlo.");
+                            + " (por ejemplo, si tu shader pack dibuja las suyas); cloud_shadows=false quita la sombra"
+                            + " de las nubes en el suelo. Reinicia el juego tras cambiarlo.");
                 }
             }
         } catch (IOException | IllegalArgumentException e) {

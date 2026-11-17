@@ -74,6 +74,7 @@ public final class ClientWeather {
         level.setThunderLevel(thunder);
 
         spawnEdgeParticles(level, player);
+        spawnRollingFog(level, player);
         spawnCaveParticles(level, player);
     }
 
@@ -167,6 +168,32 @@ public final class ClientWeather {
                 double pz = front.z() + nz * front.radius() + nx * along;
                 spawnFor(level, front.type(), random, px, player.getY(), pz);
             }
+        }
+    }
+
+    /**
+     * Niebla que rueda: dentro de un banco de niebla, jirones bajos pegados al suelo que avanzan con el viento.
+     * Más cuanto más espesa es la niebla.
+     */
+    private static void spawnRollingFog(ClientLevel level, LocalPlayer player) {
+        if (fog < 0.15f) {
+            return;
+        }
+        RandomSource random = level.getRandom();
+        double wind = ClientFronts.windAngle();
+        double speed = 0.04 + 0.03 * fog;
+        double vx = Math.cos(wind) * speed;
+        double vz = Math.sin(wind) * speed;
+        int count = 1 + (int) (fog * 4);
+        for (int i = 0; i < count; i++) {
+            double x = player.getX() + (random.nextDouble() - 0.5) * 40;
+            double z = player.getZ() + (random.nextDouble() - 0.5) * 40;
+            int ground = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,
+                    (int) Math.floor(x), (int) Math.floor(z));
+            if (Math.abs(ground - player.getY()) > 12) {
+                continue;
+            }
+            level.addParticle(ParticleTypes.CLOUD, x, ground + 0.2 + random.nextDouble() * 1.2, z, vx, 0.002, vz);
         }
     }
 

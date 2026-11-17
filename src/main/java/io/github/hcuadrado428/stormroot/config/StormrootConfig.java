@@ -36,6 +36,8 @@ public final class StormrootConfig {
      * Sin Bloomberto se lee de {@code config/stormroot-client.properties} ({@link ClientSettingsFile}).
      */
     public static volatile BooleanSupplier customClouds = ClientSettingsFile::customClouds;
+    /** Sombra de las nubes en el suelo. Sin Bloomberto: {@code cloud_shadows} en {@code config/stormroot-client.properties}. */
+    public static volatile BooleanSupplier cloudShadows = ClientSettingsFile::cloudShadows;
     /** Indicador del clima en pantalla (solo con Bloomberto). */
     public static volatile BooleanSupplier weatherHud = () -> false;
 
