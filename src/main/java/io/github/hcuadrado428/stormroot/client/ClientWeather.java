@@ -62,7 +62,8 @@ public final class ClientWeather {
         double x = player.getX();
         double z = player.getZ();
         double storm = ClientFronts.intensity(FrontType.THUNDERSTORM, x, z);
-        double wet = Math.max(ClientFronts.intensity(FrontType.RAIN, x, z), storm);
+        double blizzard = ClientFronts.intensity(FrontType.BLIZZARD, x, z);
+        double wet = Math.max(Math.max(ClientFronts.intensity(FrontType.RAIN, x, z), storm), blizzard);
         double mist = ClientFronts.intensity(FrontType.FOG, x, z);
         // La niebla se deshace sobre los biomas sin lluvia (desierto, badlands, sabana).
         if (!level.getBiome(player.blockPosition()).value().hasPrecipitation()) {
@@ -72,7 +73,8 @@ public final class ClientWeather {
         // La mayor parte del frente debe verse "a tope": intensidad 0.5 ya es lluvia completa.
         rain = approach(rain, (float) Math.min(1.0, wet * 2));
         thunder = approach(thunder, (float) Math.min(1.0, storm * 2));
-        fog = approach(fog, (float) Math.min(1.0, mist * 2));
+        // Ventisca: casi tanta niebla como un banco de niebla (la nieve no deja ver).
+        fog = approach(fog, (float) Math.min(1.0, Math.max(mist, blizzard * 0.8) * 2));
 
         level.setRainLevel(rain);
         level.setThunderLevel(thunder);
@@ -209,6 +211,11 @@ public final class ClientWeather {
             case THUNDERSTORM:
                 particle = random.nextInt(3) == 0 ? ParticleTypes.LARGE_SMOKE : ParticleTypes.FALLING_WATER;
                 y = playerY + 6 + random.nextDouble() * 10;
+                break;
+            case BLIZZARD:
+                particle = ParticleTypes.SNOWFLAKE;
+                y = playerY + 2 + random.nextDouble() * 10;
+                vy = -0.05;
                 break;
             case FOG:
                 particle = ParticleTypes.CLOUD;

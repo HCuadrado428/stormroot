@@ -42,6 +42,15 @@ public final class BiomeClimate {
         return ClimateZone.TEMPERATE;
     }
 
+    /** Lo que cae en esa posición ahora (vanilla + Stormroot: fuera de un nubarrón, nada). */
+    public static Biome.Precipitation precipitationAt(ServerLevel level, BlockPos pos) {
+        //? if >=1.21.11 {
+        return level.getBiome(pos).value().getPrecipitationAt(pos, level.getSeaLevel());
+        //?} else {
+        /*return level.getBiome(pos).value().getPrecipitationAt(pos);
+        *///?}
+    }
+
     /** Bioma sin lluvia en vanilla en esa posición (desierto, badlands, sabana...): ahí las tormentas son secas. */
     public static boolean isDry(ServerLevel level, BlockPos pos) {
         return !level.getBiome(pos).value().hasPrecipitation();

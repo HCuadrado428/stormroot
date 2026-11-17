@@ -143,6 +143,7 @@ public final class SelfTest {
                 run("rain falls only under rain clouds", () -> checkRainUnderClouds(server));
                 run("fronts are born by biome", () -> checkFrontsByBiome(level));
                 run("fog dampens without puddles", SelfTest::checkFogDamp);
+                run("blizzards pile up snow", () -> checkBlizzardSnow(level));
                 run("weathervane", () -> checkWeathervane(server, level));
                 run("barometer", () -> checkBarometer(server, level));
                 run("pool fills a closed hole only", () -> checkPool(level));
@@ -342,11 +343,7 @@ public final class SelfTest {
     }
 
     private static net.minecraft.world.level.biome.Biome.Precipitation precipitation(ServerLevel level, BlockPos pos) {
-        //? if >=1.21.11 {
-        return level.getBiome(pos).value().getPrecipitationAt(pos, level.getSeaLevel());
-        //?} else {
-        /*return level.getBiome(pos).value().getPrecipitationAt(pos);
-        *///?}
+        return io.github.hcuadrado428.stormroot.weather.BiomeClimate.precipitationAt(level, pos);
     }
 
     /** El mundo plano es de llanuras (templado); en zona seca solo nacen tormentas (secas); nunca niebla en el desierto. */
@@ -356,13 +353,39 @@ public final class SelfTest {
         FrontSimulation sim = new FrontSimulation(7);
         boolean dryOnlyStorms = true;
         boolean temperateHasRain = false;
+        boolean blizzardOnlyCold = true;
+        boolean coldHasBlizzard = false;
         for (int i = 0; i < 200; i++) {
+            blizzardOnlyCold &= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE) != FrontType.BLIZZARD
+                    && sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.DRY) != FrontType.BLIZZARD;
+            coldHasBlizzard |= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.COLD) == FrontType.BLIZZARD;
             dryOnlyStorms &= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.DRY) == FrontType.THUNDERSTORM;
             temperateHasRain |= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE) == FrontType.RAIN;
         }
         check("fronts are born by biome",
-                here == io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE && dryOnlyStorms && temperateHasRain,
-                "zona del mundo plano=" + here + ", en seco solo tormentas=" + dryOnlyStorms + ", lluvia en templado=" + temperateHasRain);
+                here == io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE && dryOnlyStorms && temperateHasRain
+                        && blizzardOnlyCold && coldHasBlizzard,
+                "zona del mundo plano=" + here + ", en seco solo tormentas=" + dryOnlyStorms + ", lluvia en templado="
+                        + temperateHasRain + ", ventiscas solo en frío=" + blizzardOnlyCold + ", ventiscas en frío=" + coldHasBlizzard);
+    }
+
+    /** La nieve de ventisca se apila hasta 4 capas y, sin ventisca, baja hasta 1 (la de vanilla). */
+    private static void checkBlizzardSnow(ServerLevel level) {
+        BlockPos above = new BlockPos(BX + 12, Y_TOP + 1, BZ + 6);
+        level.setBlock(above, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+        for (int i = 0; i < 10; i++) {
+            io.github.hcuadrado428.stormroot.weather.BlizzardSnow.addLayer(level, above);
+        }
+        BlockState piled = level.getBlockState(above);
+        int layers = piled.is(Blocks.SNOW) ? piled.getValue(net.minecraft.world.level.block.SnowLayerBlock.LAYERS) : 0;
+        for (int i = 0; i < 10; i++) {
+            io.github.hcuadrado428.stormroot.weather.BlizzardSnow.melt(level, above.above());
+        }
+        BlockState melted = level.getBlockState(above);
+        int left = melted.is(Blocks.SNOW) ? melted.getValue(net.minecraft.world.level.block.SnowLayerBlock.LAYERS) : 0;
+        level.setBlock(above, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+        check("blizzards pile up snow", layers == io.github.hcuadrado428.stormroot.weather.BlizzardSnow.MAX_LAYERS && left == 1,
+                "capas tras la ventisca=" + layers + ", capas tras derretirse=" + left);
     }
 
     /** La niebla humedece hasta FOG_CAP (barro y musgo sí, charcos no) y no seca mientras está encima. */

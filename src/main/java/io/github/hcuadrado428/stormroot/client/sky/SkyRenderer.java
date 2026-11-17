@@ -177,6 +177,15 @@ public final class SkyRenderer {
                         b = (int) (140 - 26 * amount);
                         alpha = 248;
                     }
+                    case SNOW -> {
+                        // Ventisca: nubarrón blanco grisáceo, bajo y espeso.
+                        bottom = FAIR_Y - 10;
+                        height = heightOf(kind, amount);
+                        r = (int) (214 - 24 * amount);
+                        g = (int) (218 - 22 * amount);
+                        b = (int) (228 - 18 * amount);
+                        alpha = 244;
+                    }
                     case RAIN -> {
                         bottom = FAIR_Y - 6;
                         height = heightOf(kind, amount);
@@ -244,6 +253,7 @@ public final class SkyRenderer {
     private static double heightOf(CloudCover.Kind kind, float amount) {
         return switch (kind) {
             case STORM -> 5 + 9 * amount;
+            case SNOW -> 6 + 6 * amount;
             case RAIN -> 4 + 3 * amount;
             default -> 4;
         };
@@ -274,7 +284,7 @@ public final class SkyRenderer {
                 CloudCover.Kind kind = CloudCover.Kind.values()[k];
                 double darkness = switch (kind) {
                     case STORM -> 0.42;
-                    case RAIN -> 0.32;
+                    case RAIN, SNOW -> 0.32;
                     default -> 0.2 + 0.12 * SHADE[i + 1][j + 1];
                 };
                 double wx0 = (camCellX - RADIUS + i) * C + driftX;

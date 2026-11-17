@@ -29,7 +29,8 @@ public final class CloudCover {
 
     /** Tipo de nube de una celda. */
     public enum Kind {
-        NONE, FAIR, RAIN, STORM
+        /** Orden = fuerza: cuando dos frentes se tapan, se ve el de más abajo en la lista. */
+        NONE, FAIR, RAIN, SNOW, STORM
     }
 
     private CloudCover() {
@@ -96,7 +97,11 @@ public final class CloudCover {
             if (!cloud) {
                 continue;
             }
-            Kind kind = front.type() == FrontType.THUNDERSTORM ? Kind.STORM : Kind.RAIN;
+            Kind kind = switch (front.type()) {
+                case THUNDERSTORM -> Kind.STORM;
+                case BLIZZARD -> Kind.SNOW;
+                default -> Kind.RAIN;
+            };
             if (kind.ordinal() > best.ordinal()) {
                 best = kind;
             }
@@ -127,7 +132,7 @@ public final class CloudCover {
             double ring = 1 - (dist - r * 0.8) / (r * (WARNING_REACH - 0.8));
             double speed = Math.hypot(front.vx(), front.vz());
             double ahead = speed < 1e-6 || dist < 1e-6 ? 0.5 : 0.5 + 0.5 * (dx * front.vx() + dz * front.vz()) / (dist * speed);
-            double strength = front.type() == FrontType.THUNDERSTORM ? 1.0 : 0.6;
+            double strength = front.type() == FrontType.THUNDERSTORM ? 1.0 : front.type() == FrontType.BLIZZARD ? 0.8 : 0.6;
             best = Math.max(best, ring * (0.25 + 0.75 * ahead) * strength * front.lifeFactor());
         }
         return Math.min(1, best);

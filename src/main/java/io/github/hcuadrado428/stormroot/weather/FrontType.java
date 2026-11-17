@@ -10,7 +10,9 @@ public enum FrontType {
     //            id               radio min/max (bloques)  velocidad (bloques/s)  duración (min/max, segundos)
     RAIN("rain", 96, 192, 0.6, 600, 1500),
     THUNDERSTORM("thunderstorm", 64, 128, 1.0, 300, 900),
-    FOG("fog", 80, 160, 0.3, 450, 1200);
+    FOG("fog", 80, 160, 0.3, 450, 1200),
+    /** Solo nace en biomas fríos y cumbres: nieve que se acumula, poca visibilidad y cuevas que se hielan. */
+    BLIZZARD("blizzard", 96, 160, 0.8, 600, 1200);
 
     private final String id;
     private final int minRadius;
@@ -51,6 +53,11 @@ public enum FrontType {
 
     public int maxDurationSeconds() {
         return maxDurationSeconds;
+    }
+
+    /** {@code true} si trae precipitación (lluvia o nieve según el bioma). */
+    public boolean precipitates() {
+        return this == RAIN || this == THUNDERSTORM || this == BLIZZARD;
     }
 
     public static FrontType byId(String id) {

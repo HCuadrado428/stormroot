@@ -50,6 +50,7 @@ public final class FrontTicker {
         LightningRoots.tick();
         if (server == currentServer) {
             DryStorms.tick(server.overworld());
+            BlizzardSnow.tick(server.overworld());
         }
         if (++tickCounter < STEP_TICKS && server == currentServer) {
             return;
@@ -215,7 +216,9 @@ public final class FrontTicker {
                 }
                 if (front.type() == FrontType.THUNDERSTORM) {
                     strongest = FrontType.THUNDERSTORM;
-                } else if (front.type() == FrontType.RAIN && strongest != FrontType.THUNDERSTORM) {
+                } else if ((front.type() == FrontType.RAIN || front.type() == FrontType.BLIZZARD)
+                        && strongest != FrontType.THUNDERSTORM) {
+                    // Ventisca: para vanilla es "lluvia" (en los biomas fríos, nieve).
                     strongest = FrontType.RAIN;
                 }
                 // FOG: no existe en vanilla; se verá cuando haya render en el cliente.

@@ -96,7 +96,7 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   sombras, aviso de tormenta (`CloudCover.approach`), capa alta, niebla que rueda (`ClientWeather.spawnRollingFog`).
 - Fuentes decompiladas desde la CI: `gh api -X POST repos/HCuadrado428/stormroot/actions/workflows/research.yml/dispatches`
   con `inputs[classes]` y `inputs[pattern]` (workflow `research`).
-- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 23 comprobaciones; cliente con
+- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 24 comprobaciones; cliente con
   un jugador en pantalla virtual: 12 más, incluidas las de Bloomberto y las del cielo).
 - En el self-test, el clima se lee de `server.getWorldData().overworldData()`: `level.isRaining()/isThundering()` son la
   intensidad visual, que sube tick a tick. Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.
