@@ -41,9 +41,16 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
 6. Delega en los subagentes del plugin: compilación rota → `minecraft-modding:build-fixer`; portar → `minecraft-modding:mod-porter`; mixins → `minecraft-modding:mixin-reviewer`; dudas de API → `minecraft-modding:api-researcher`; texturas → `minecraft-modding:texture-artist`; modelos 3D → `minecraft-modding:model-artist`.
 
 ## Estado
-- Hecho: plantilla, item `lightning_crystal` (en pestaña Ingredientes), núcleo de frentes, tick del servidor, clima vanilla controlado por frentes (`FrontTicker.applyWeather`) y comandos `/stormroot` (`command/StormrootCommands`).
-- Permisos de comandos: en 1.21.11 `Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)`; antes `source.hasPermission(2)` (bloque Stonecutter).
-- Compila en los 6 targets (CI de GitHub en verde). Aún no se ha probado dentro del juego.
+- Hecho: item `lightning_crystal`, simulación de frentes, `FrontSavedData` (guardado), clima vanilla del servidor
+  controlado por frentes, comandos `/stormroot`, cristales con los rayos (`LightningCrystals`), red
+  (`network/FrontsSyncPayload`, `StormrootNetwork`) y clima por zonas en el cliente (`client/ClientWeather`).
+- SavedData: 1.20.1 `computeIfAbsent(load, new, nombre)`; 1.21.1 `SavedData.Factory`; 1.21.11 `SavedDataType` + Codec.
+- Red: Fabric 1.20.1 `PacketByteBufs`; Fabric 1.21+ `PayloadTypeRegistry.playS2C()`; Forge 1.20.1 `SimpleChannel`
+  con `acceptMissingOr`; NeoForge `RegisterPayloadHandlersEvent` + `.optional()`.
+- Permisos de comandos: en 1.21.11 `Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)`; antes `source.hasPermission(2)`.
+- Código de cliente: SOLO en `client/`. `ClientFronts` es Java puro (lo llaman los handlers de red en ambos lados).
+- Niebla: evento `ViewportEvent.RenderFog` en Forge 1.20.1 y NeoForge 1.21.1. TODO en Fabric y NeoForge 1.21.11.
+- Compila en los 6 targets (CI en verde). **Aún no se ha probado dentro del juego.**
 - Siguientes pasos: ver "Siguientes pasos" en `README.md`.
 
 ## Mod

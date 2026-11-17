@@ -75,23 +75,26 @@ versions/dependencies/    → versiones de Minecraft, loaders y rangos de cada t
 
 ## ✅ Qué hay ya hecho
 
-- Proyecto multiloader con los 6 targets configurados.
-- Item **Cristal de rayo** (`stormroot:lightning_crystal`) con textura, modelo y traducciones en/es.
-- **Núcleo de la simulación de frentes**: lluvia, tormenta eléctrica y niebla. Los frentes nacen a contraviento de los jugadores, se mueven con un viento dominante que cambia despacio, crecen y se debilitan al nacer y morir, y caducan.
-- Enganchado al **tick del servidor** en los tres loaders: cada 5 s se avanza la simulación y los frentes nuevos aparecen en el log (`[Stormroot] Nuevo frente: ...`).
-- **El clima sigue a los frentes**: si un jugador está dentro de una tormenta truena, si está en un frente de lluvia llueve y, si no, está despejado.
-- **Comandos de depuración** `/stormroot ...` y el cristal en la pestaña creativa.
+- Proyecto multiloader con los 6 targets configurados (la CI compila todo en cada push).
+- Item **Cristal de rayo** (`stormroot:lightning_crystal`) con textura, modelo y traducciones en/es, en la pestaña *Ingredientes*.
+- **Simulación de frentes** (lluvia, tormenta eléctrica, niebla): nacen a contraviento de los jugadores, se mueven con un viento dominante que cambia despacio, crecen y se debilitan al nacer y morir, y caducan.
+- **Los frentes se guardan en el mundo** (`data/stormroot_fronts.dat`), junto con el viento y `/stormroot weather`.
+- **Clima en el servidor**: si algún jugador está en una tormenta truena, si está en un frente de lluvia llueve y, si no, está despejado (afecta a cultivos, fuego, rayos...).
+- **Clima por zonas en el cliente**: el servidor manda a cada jugador los frentes cercanos y cada uno **ve** la lluvia y los truenos de su zona, con transición suave al entrar y salir. Si el servidor o el cliente no tienen el mod, no se rompe nada.
+- **Niebla** dentro de los frentes de niebla (Forge 1.20.1 y NeoForge 1.21.1).
+- **Partículas en el borde** de los frentes cercanos (gotas, humo de tormenta, nubes bajas).
+- **Cristales de rayo**: un rayo sobre arena o piedra deja un cristal el 25 % de las veces.
+- **Comandos de depuración** `/stormroot ...`.
 
 ## 🔜 Siguientes pasos (en orden)
 
-1. ~~Compilar los 6 targets~~ ✅ · **probar en el juego** (`runClient`) en cada loader.
-2. ~~Pestaña creativa~~ ✅ (el Cristal de rayo está en *Ingredientes*).
-3. ~~Comandos de depuración~~ ✅ (ver abajo).
-4. **Guardar los frentes** con `SavedData` (la API cambia en 1.20.2 y en 1.21.5). Ahora se pierden al cerrar el mundo.
-5. ~~Aplicar el clima~~ ✅ *versión 1*: el clima vanilla (global) sigue al frente que toca a algún jugador. Falta la niebla y que cada jugador vea su clima.
-6. **Sincronizar con el cliente** (networking) para dibujar los frentes en el horizonte, la niebla y el clima por zonas.
-7. **Veleta y barómetro** (bloques con señal de redstone).
-8. **Filtración**: registro climático por chunk e inundación de cuevas.
+1. **Probar en el juego** los 6 targets (`runClient`) y en servidor dedicado (`runServer`). Nada de lo anterior se ha probado aún dentro del juego.
+2. **Niebla en Fabric (todas) y NeoForge 1.21.11**: necesita un mixin o el nuevo sistema de niebla de 1.21.6+.
+3. **Lluvia "de juego" por zonas** en el servidor (mixin en `Level#isRainingAt`): ahora, si un jugador está en una tormenta, los rayos y la lluvia afectan también a los demás.
+4. **Frentes visibles de lejos**: las partículas solo se dibujan a menos de 32 bloques; para verlos llegar en el horizonte hace falta render propio (nubes/cortinas).
+5. **Config del mod** (probabilidades, distancias, partículas...).
+6. **Veleta y barómetro** (bloques con señal de redstone).
+7. **Filtración**: registro climático por chunk e inundación de cuevas.
 
 ## 🧰 Comandos de depuración
 
@@ -304,13 +307,16 @@ Incluye **logros (advancements)** para cada paso y otros ocultos para eventos ra
 ## 🚀 MVP (primera versión jugable)
 
 - [x] Simulación de **frentes** con 3 tipos: lluvia, tormenta eléctrica y niebla (núcleo, sin efectos visibles aún)
-- [ ] Frentes que cambian el clima donde están y se ven en el horizonte
+- [x] Frentes que cambian el clima donde están (por zonas en el cliente)
+- [ ] Frentes que se ven llegar en el horizonte
 - [ ] **Veleta** y **barómetro**
 - [ ] **Filtración básica**: inundación de cuevas tras lluvia
 - [x] Item **Cristal de rayo**
-- [ ] Cristal de rayo que se forma al caer un rayo, y raíces que crecen hacia abajo
+- [x] Cristal de rayo que se forma al caer un rayo
+- [ ] Raíces de rayo que crecen hacia abajo
 - [ ] 2 mobs: polilla de tormenta y medusa de cueva
-- [ ] Config básica y comandos de depuración
+- [x] Comandos de depuración
+- [ ] Config básica
 - [x] Compila en los 6 targets · [ ] probado en el juego en los 6 (1.20.1 Fabric/Forge, 1.21.1 y 1.21.11 Fabric/NeoForge)
 
 ## 🗺️ Roadmap
