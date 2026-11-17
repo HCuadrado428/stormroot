@@ -22,7 +22,9 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
 - Paquete base: `io.github.hcuadrado428.stormroot`
   - `Stormroot.java`: SOLO pegamento de cada loader (registro y eventos).
   - `weather/FrontType`, `WeatherFront`, `FrontSimulation`: **Java puro**, sin imports de Minecraft ni de loaders. Mantenerlo así.
-  - `weather/FrontTicker`: puente vanilla entre Minecraft y la simulación.
+  - `weather/FrontTicker`: puente vanilla entre Minecraft y la simulación. Llama cada paso a `seep/SeepageTicker`.
+  - `seep/SeepageCell`, `SeepageRates`, `SeepageField`: **Java puro** (filtración). `SeepageTicker` y `SeepageSavedData` usan Minecraft.
+  - La filtración solo cambia bloques que puede deshacer: cada cambio se apunta en la celda y se revierte solo si el bloque sigue igual.
   - `registry/`: creación de items/bloques (común); el registro lo hace cada loader en `Stormroot.java`.
 - Datos con formato distinto por versión (recetas, loot tables, tags) → `src/versioned/<1.20.1|1.21.1|1.21.11>/resources`
   (1.20.1: carpetas en plural y `{"item": ...}`; 1.21.1: singular y resultado `{"id": ...}`; 1.21.11: ingredientes como texto `"minecraft:x"` / `"#tag"`).
@@ -61,6 +63,8 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   (`scripts/fetch-bloomberto.sh`, commit en `bloomberto.ref`); 1.21.11 no tiene Bloomberto y la excluye.
   NUNCA importes clases de Bloomberto fuera de `compat/bloomberto/`. Los ajustes se leen siempre de `config/StormrootConfig`.
   API de Bloomberto: `docs/es/uso.md` de su repo; nivel de API probado: 2 (`BloombertoCompat.API_LEVEL`).
+- Filtración v1 hecha: charcos/barro en cuevas, goteo y polvo en el cliente, raíces de rayo (`weather/LightningRoots`).
+  `getMinY()` desde 1.21.2 (`getMinBuildHeight()` antes).
 - Compila en los 6 targets (CI en verde). **Aún no se ha probado dentro del juego.**
 - Siguientes pasos: ver "Siguientes pasos" en `README.md`.
 
