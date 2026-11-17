@@ -1,4 +1,24 @@
 {
     "item.stormroot.lightning_crystal": "Lightning Crystal",
-    "hud.stormroot.weather": "Rain %s · Storm %s · Fog %s"
+    "hud.stormroot.weather": "Rain %s · Storm %s · Fog %s",
+    "block.stormroot.weathervane": "Weathervane",
+    "item.stormroot.weathervane": "Weathervane",
+    "block.stormroot.barometer": "Barometer",
+    "item.stormroot.barometer": "Barometer",
+    "message.stormroot.weathervane": "The wind blows towards the %s (%s°)",
+    "message.stormroot.barometer.clear": "Clear skies for the next few minutes",
+    "message.stormroot.barometer.incoming": "%s incoming in ~%s s (up to %s%%)",
+    "message.stormroot.barometer.here": "You are under a %s (%s%%)",
+    "message.stormroot.instrument.no_weather": "This instrument only works in the Overworld",
+    "front.stormroot.rain": "rain front",
+    "front.stormroot.thunderstorm": "thunderstorm",
+    "front.stormroot.fog": "fog bank",
+    "compass.stormroot.n": "north",
+    "compass.stormroot.ne": "northeast",
+    "compass.stormroot.e": "east",
+    "compass.stormroot.se": "southeast",
+    "compass.stormroot.s": "south",
+    "compass.stormroot.sw": "southwest",
+    "compass.stormroot.w": "west",
+    "compass.stormroot.nw": "northwest"
 }

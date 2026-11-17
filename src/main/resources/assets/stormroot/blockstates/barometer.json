@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "stormroot:block/barometer"
+    },
+    "facing=east": {
+      "model": "stormroot:block/barometer",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "stormroot:block/barometer",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "stormroot:block/barometer",
+      "y": 270
+    }
+  }
+}

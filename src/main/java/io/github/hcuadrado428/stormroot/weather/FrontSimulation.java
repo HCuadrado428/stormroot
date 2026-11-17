@@ -115,6 +115,39 @@ public final class FrontSimulation {
         this.spawnChance = Math.max(0.0, Math.min(1.0, spawnChance));
     }
 
+    /**
+     * Pronóstico para un punto: el primer frente que lo cubrirá en los próximos {@code horizonSeconds} segundos.
+     * Simula copias de los frentes, así que no cambia nada.
+     *
+     * @param threshold intensidad mínima para considerar que el frente "ha llegado"
+     * @return el pronóstico, o {@code null} si no llega ninguno
+     */
+    public Forecast forecast(double x, double z, double horizonSeconds, double stepSeconds, double threshold) {
+        Forecast best = null;
+        for (WeatherFront original : fronts) {
+            WeatherFront front = original.copy();
+            double peak = 0;
+            double eta = -1;
+            for (double t = 0; t <= horizonSeconds && !front.isExpired(); t += stepSeconds) {
+                double intensity = front.intensityAt(x, z);
+                if (intensity >= threshold && eta < 0) {
+                    eta = t;
+                }
+                peak = Math.max(peak, intensity);
+                front.advance(stepSeconds);
+            }
+            if (eta >= 0 && (best == null || eta < best.etaSeconds()
+                    || (eta == best.etaSeconds() && peak > best.peakIntensity()))) {
+                best = new Forecast(original.type(), eta, peak);
+            }
+        }
+        return best;
+    }
+
+    /** Resultado de {@link #forecast}: tipo de frente, segundos hasta que llegue (0 = ya está aquí) e intensidad máxima. */
+    public record Forecast(FrontType type, double etaSeconds, double peakIntensity) {
+    }
+
     public void clear() {
         fronts.clear();
     }

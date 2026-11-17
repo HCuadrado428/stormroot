@@ -39,6 +39,12 @@ stonecutter {
     }
 }
 
+// Recursos cuyo formato o carpeta cambia entre versiones (recetas, loot tables, tags):
+// src/versioned/<versión de Minecraft>/resources se añade solo al target de esa versión.
+extensions.getByType<SourceSetContainer>().named("main") {
+    resources.srcDir(rootProject.file("src/versioned/${stonecutter.current.version}/resources"))
+}
+
 // Bloomberto (opcional). Si existe libs/bloomberto/bloomberto-*+<target>.jar (scripts/fetch-bloomberto.sh),
 // se compila la integración (paquete compat.bloomberto) y Bloomberto se carga en runClient/runServer.
 // Si no existe (p. ej. 1.21.11, que Bloomberto no soporta), esa integración se excluye y el mod compila igual.

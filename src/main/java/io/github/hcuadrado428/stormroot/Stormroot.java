@@ -4,6 +4,7 @@ import io.github.hcuadrado428.stormroot.client.StormrootClient;
 import io.github.hcuadrado428.stormroot.command.StormrootCommands;
 import io.github.hcuadrado428.stormroot.compat.Compat;
 import io.github.hcuadrado428.stormroot.network.StormrootNetwork;
+import io.github.hcuadrado428.stormroot.registry.ModBlocks;
 import io.github.hcuadrado428.stormroot.registry.ModItems;
 import io.github.hcuadrado428.stormroot.weather.FrontTicker;
 import io.github.hcuadrado428.stormroot.weather.LightningCrystals;
@@ -87,13 +88,25 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
     }
 
     private static void onRegister(RegisterEvent event) {
+        event.register(Registries.BLOCK, ModIds.id(ModBlocks.WEATHERVANE_ID),
+                () -> ModBlocks.WEATHERVANE = ModBlocks.createWeathervane());
+        event.register(Registries.BLOCK, ModIds.id(ModBlocks.BAROMETER_ID),
+                () -> ModBlocks.BAROMETER = ModBlocks.createBarometer());
         event.register(Registries.ITEM, ModIds.id("lightning_crystal"),
                 () -> ModItems.LIGHTNING_CRYSTAL = ModItems.create("lightning_crystal"));
+        event.register(Registries.ITEM, ModIds.id(ModBlocks.WEATHERVANE_ID),
+                () -> ModBlocks.WEATHERVANE_ITEM = ModBlocks.createBlockItem(ModBlocks.WEATHERVANE_ID, ModBlocks.WEATHERVANE));
+        event.register(Registries.ITEM, ModIds.id(ModBlocks.BAROMETER_ID),
+                () -> ModBlocks.BAROMETER_ITEM = ModBlocks.createBlockItem(ModBlocks.BAROMETER_ID, ModBlocks.BAROMETER));
     }
 
     private static void onCreativeTabs(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.LIGHTNING_CRYSTAL);
+        }
+        if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
+            event.accept(ModBlocks.WEATHERVANE_ITEM);
+            event.accept(ModBlocks.BAROMETER_ITEM);
         }
     }
 
@@ -128,13 +141,25 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
     }
 
     private static void onRegister(RegisterEvent event) {
+        event.register(Registries.BLOCK, ModIds.id(ModBlocks.WEATHERVANE_ID),
+                () -> ModBlocks.WEATHERVANE = ModBlocks.createWeathervane());
+        event.register(Registries.BLOCK, ModIds.id(ModBlocks.BAROMETER_ID),
+                () -> ModBlocks.BAROMETER = ModBlocks.createBarometer());
         event.register(Registries.ITEM, ModIds.id("lightning_crystal"),
                 () -> ModItems.LIGHTNING_CRYSTAL = ModItems.create("lightning_crystal"));
+        event.register(Registries.ITEM, ModIds.id(ModBlocks.WEATHERVANE_ID),
+                () -> ModBlocks.WEATHERVANE_ITEM = ModBlocks.createBlockItem(ModBlocks.WEATHERVANE_ID, ModBlocks.WEATHERVANE));
+        event.register(Registries.ITEM, ModIds.id(ModBlocks.BAROMETER_ID),
+                () -> ModBlocks.BAROMETER_ITEM = ModBlocks.createBlockItem(ModBlocks.BAROMETER_ID, ModBlocks.BAROMETER));
     }
 
     private static void onCreativeTabs(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.LIGHTNING_CRYSTAL);
+        }
+        if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
+            event.accept(ModBlocks.WEATHERVANE_ITEM);
+            event.accept(ModBlocks.BAROMETER_ITEM);
         }
     }
 
@@ -154,10 +179,22 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
     /*? if fabric {*/
     @Override
     public void onInitialize() {
+        ModBlocks.WEATHERVANE = Registry.register(BuiltInRegistries.BLOCK,
+                ModIds.id(ModBlocks.WEATHERVANE_ID), ModBlocks.createWeathervane());
+        ModBlocks.BAROMETER = Registry.register(BuiltInRegistries.BLOCK,
+                ModIds.id(ModBlocks.BAROMETER_ID), ModBlocks.createBarometer());
         ModItems.LIGHTNING_CRYSTAL = Registry.register(BuiltInRegistries.ITEM,
                 ModIds.id("lightning_crystal"), ModItems.create("lightning_crystal"));
+        ModBlocks.WEATHERVANE_ITEM = Registry.register(BuiltInRegistries.ITEM, ModIds.id(ModBlocks.WEATHERVANE_ID),
+                ModBlocks.createBlockItem(ModBlocks.WEATHERVANE_ID, ModBlocks.WEATHERVANE));
+        ModBlocks.BAROMETER_ITEM = Registry.register(BuiltInRegistries.ITEM, ModIds.id(ModBlocks.BAROMETER_ID),
+                ModBlocks.createBlockItem(ModBlocks.BAROMETER_ID, ModBlocks.BAROMETER));
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.INGREDIENTS)
                 .register(entries -> entries.accept(ModItems.LIGHTNING_CRYSTAL));
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(entries -> {
+            entries.accept(ModBlocks.WEATHERVANE_ITEM);
+            entries.accept(ModBlocks.BAROMETER_ITEM);
+        });
         ServerTickEvents.END_SERVER_TICK.register(FrontTicker::onServerTick);
         ServerEntityEvents.ENTITY_LOAD.register(LightningCrystals::onEntityAdded);
         StormrootNetwork.init();

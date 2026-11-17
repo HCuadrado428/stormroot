@@ -1,0 +1,30 @@
+{
+  "size": [
+    16,
+    16
+  ],
+  "palette": {
+    ".": "#8a5a32",
+    "l": "#a8743f",
+    "d": "#6b4426",
+    "k": "#4a2d17"
+  },
+  "rows": [
+    "kkkkkkkkkkkkkkkk",
+    "kllllllllllllldk",
+    "kl............dk",
+    "kl...d........dk",
+    "kl........d...dk",
+    "kl............dk",
+    "kl..d.........dk",
+    "kl.......d....dk",
+    "kl............dk",
+    "kl...d........dk",
+    "kl..........d.dk",
+    "kl............dk",
+    "kl.....d......dk",
+    "kl............dk",
+    "kddddddddddddddk",
+    "kkkkkkkkkkkkkkkk"
+  ]
+}

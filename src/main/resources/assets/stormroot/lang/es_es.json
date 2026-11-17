@@ -1,4 +1,24 @@
 {
     "item.stormroot.lightning_crystal": "Cristal de rayo",
-    "hud.stormroot.weather": "Lluvia %s · Tormenta %s · Niebla %s"
+    "hud.stormroot.weather": "Lluvia %s · Tormenta %s · Niebla %s",
+    "block.stormroot.weathervane": "Veleta",
+    "item.stormroot.weathervane": "Veleta",
+    "block.stormroot.barometer": "Barómetro",
+    "item.stormroot.barometer": "Barómetro",
+    "message.stormroot.weathervane": "El viento sopla hacia el %s (%s°)",
+    "message.stormroot.barometer.clear": "Despejado durante los próximos minutos",
+    "message.stormroot.barometer.incoming": "Llega un %s en ~%s s (hasta %s%%)",
+    "message.stormroot.barometer.here": "Estás bajo un %s (%s%%)",
+    "message.stormroot.instrument.no_weather": "Este instrumento solo funciona en el Overworld",
+    "front.stormroot.rain": "frente de lluvia",
+    "front.stormroot.thunderstorm": "frente de tormenta",
+    "front.stormroot.fog": "banco de niebla",
+    "compass.stormroot.n": "norte",
+    "compass.stormroot.ne": "noreste",
+    "compass.stormroot.e": "este",
+    "compass.stormroot.se": "sureste",
+    "compass.stormroot.s": "sur",
+    "compass.stormroot.sw": "suroeste",
+    "compass.stormroot.w": "oeste",
+    "compass.stormroot.nw": "noroeste"
 }
