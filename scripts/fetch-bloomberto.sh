@@ -13,8 +13,8 @@ REF="$(tr -d '[:space:]' < "$ROOT/bloomberto.ref")"
 REPO="${BLOOMBERTO_REPO:-https://github.com/HCuadrado428/Bloomberto.git}"
 OUT="$ROOT/libs/bloomberto"
 WORK="$ROOT/build/bloomberto-src"
-# Targets de Bloomberto que coinciden con los de Stormroot (Bloomberto no tiene 1.21.11).
-TARGETS=(1.20.1-fabric 1.20.1-forge 1.21.1-fabric 1.21.1-neoforge)
+# Targets de Stormroot. Si el commit de Bloomberto no tiene alguno, se avisa y ese target compila sin integración.
+WANTED=(1.20.1-fabric 1.20.1-forge 1.21.1-fabric 1.21.1-neoforge 1.21.11-fabric 1.21.11-neoforge)
 
 if [ -f "$OUT/.ref" ] && [ "$(cat "$OUT/.ref")" = "$REF" ]; then
     echo "Bloomberto $REF ya está en libs/bloomberto/"
@@ -29,6 +29,15 @@ mkdir -p "$WORK"
 git -C "$WORK" init -q
 git -C "$WORK" fetch -q --depth 1 "$REPO" "$REF"
 git -C "$WORK" checkout -q FETCH_HEAD
+
+TARGETS=()
+for t in "${WANTED[@]}"; do
+    if grep -q "version(\"$t\"" "$WORK/settings.gradle.kts"; then
+        TARGETS+=("$t")
+    else
+        echo "Aviso: Bloomberto $REF no tiene $t; ese target se compila sin la integración"
+    fi
+done
 
 tasks=()
 for t in "${TARGETS[@]}"; do tasks+=(":$t:remapJar"); done

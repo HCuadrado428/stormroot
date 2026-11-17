@@ -59,9 +59,11 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
 - Permisos de comandos: en 1.21.11 `Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)`; antes `source.hasPermission(2)`.
 - Código de cliente: SOLO en `client/`. `ClientFronts` es Java puro (lo llaman los handlers de red en ambos lados).
 - Niebla: evento `ViewportEvent.RenderFog` en Forge 1.20.1 y NeoForge 1.21.1. TODO en Fabric y NeoForge 1.21.11.
+- HUD/texto: colores siempre ARGB (`0xFFFFFFFF`); desde 1.21.6 un color sin alfa no se ve.
 - **Bloomberto** (librería nuestra, opcional): integración en `compat/bloomberto/`, cargada por reflexión desde
   `compat/Compat` solo si el mod está instalado. Solo se compila si existe `libs/bloomberto/bloomberto-*+<target>.jar`
-  (`scripts/fetch-bloomberto.sh`, commit en `bloomberto.ref`); 1.21.11 no tiene Bloomberto y la excluye.
+  (`scripts/fetch-bloomberto.sh`, commit en `bloomberto.ref`). Desde Bloomberto `0e64d37` los 6 targets tienen integración.
+  Si un commit de Bloomberto no tiene algún target, el script avisa y ese target compila sin ella.
   NUNCA importes clases de Bloomberto fuera de `compat/bloomberto/`. Los ajustes se leen siempre de `config/StormrootConfig`.
   API de Bloomberto: `docs/es/uso.md` de su repo; nivel de API probado: 2 (`BloombertoCompat.API_LEVEL`).
 - Filtración v2 hecha: charcos encerrados que crecen, pozas, barro, musgo, grietas (`seep/SeepageTicker`, umbrales
@@ -71,7 +73,7 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   de Stormroot (`place`). Al secarse: charcos, luego pozas, luego barro.
   `getMinY()` desde 1.21.2 (`getMinBuildHeight()` antes).
 - Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 15 comprobaciones; cliente con
-  un jugador en pantalla virtual: 7 más). Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.
+  un jugador en pantalla virtual: 7 más, incluidas las de Bloomberto). Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.
 - **Self-test** (`selftest/SelfTest`, `client/ClientSelfTest`, `scripts/selftest.sh`, job `selftest` de la CI): cuando
   añadas una mecánica, añade su comprobación. Construye su propia zona en el chunk (10,10) de un mundo plano.
   Ya encontró 2 fallos reales de la filtración (charcos que tapaban el barro; bloques que no volvían a su material).

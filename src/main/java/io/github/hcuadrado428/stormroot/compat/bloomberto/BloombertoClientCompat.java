@@ -54,7 +54,7 @@ public final class BloombertoClientCompat {
             }
             Component text = Component.translatable("hud.stormroot.weather",
                     percent(ClientWeather.rain()), percent(ClientWeather.thunder()), percent(ClientWeather.fog()));
-            graphics.drawString(mc.font, text, 4, 4, 0xFFFFFF);
+            graphics.drawString(mc.font, text, 4, 4, 0xFFFFFFFF); // ARGB: desde 1.21.6 sin alfa no se ve
         });
     }
 

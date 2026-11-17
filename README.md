@@ -56,7 +56,7 @@ Los `.jar` aparecen en `build/libs/`. El primer build tarda varios minutos (desc
 
 ## 🌸 Bloomberto (opcional)
 
-[Bloomberto](https://github.com/HCuadrado428/Bloomberto) es una librería nuestra. Stormroot **funciona sin ella**; si está instalada (1.20.1 y 1.21.1; Bloomberto aún no tiene 1.21.11), añade:
+[Bloomberto](https://github.com/HCuadrado428/Bloomberto) es una librería nuestra. Stormroot **funciona sin ella**; si está instalada (en los 6 targets), añade:
 
 - **Config** en `config/stormroot.toml`, con botón *Config* en la lista de mods de Forge/NeoForge (en Fabric, edita el archivo o usa Mod Menu cuando lo integremos).
 - **Efectos de pantalla**: desaturación y viñeta dentro de tormentas y niebla.
@@ -70,7 +70,7 @@ Para compilar con la integración: `scripts/fetch-bloomberto.sh` (compila Bloomb
 La CI arranca **Minecraft de verdad** en los 6 targets en cada push (`scripts/selftest.sh`, job `selftest`):
 
 - **Servidor dedicado** (15 comprobaciones): construye una cueva de pruebas y comprueba registros, guardado de frentes y de filtración, el paquete de red, los comandos, el pronóstico, la veleta y el barómetro (señal de redstone), que las pozas solo llenan hoyos cerrados, que la cueva empapada da charcos, barro y musgo, que **el agua nunca se derrama**, que la raíz de rayo baja hasta la cueva y que **al secarse cada bloque vuelve a ser exactamente el original**.
-- **Un jugador** en una pantalla virtual (7 más): llegan los frentes al cliente, la tormenta se ve y se va, la niebla, la humedad de las cuevas y, con Bloomberto, su config y los efectos de pantalla.
+- **Un jugador** en una pantalla virtual (7 más): llegan los frentes al cliente, la tormenta se ve y se va, la niebla, la humedad de las cuevas y la integración con Bloomberto (su config y los efectos de pantalla).
 
 En local: `scripts/selftest.sh server 1.21.1-fabric` o `scripts/selftest.sh client 1.21.1-fabric` (cliente: necesita `xvfb-run` en Linux). En cualquier lanzador: `-Dstormroot.selfTest=server|client|all` (el juego se cierra al terminar; `-Dstormroot.selfTest.exit=false` lo deja abierto). Sin esa propiedad el self-test no hace nada.
 
