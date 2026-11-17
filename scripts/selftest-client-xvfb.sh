@@ -12,13 +12,21 @@ while kill -0 "$pid" 2>/dev/null; do
   for name in $(grep -oE "\[selftest\] SCREENSHOT [a-z_]+" "$log" 2>/dev/null | awk '{print $3}'); do
     case "$taken" in *" $name "*) continue ;; esac
     taken="$taken$name "
-    # Captura de toda la pantalla virtual y, aparte, sin canal alfa (con alfa 0 los visores la muestran negra).
-    raw="$shots/$t-$name-raw.png"
-    if import -window root "$raw"; then
-      convert "$raw" -alpha off "$shots/$t-$name.png" && rm -f "$raw"
+    # Captura con F2, la tecla de capturas del propio Minecraft (lee lo que dibuja OpenGL; capturar la pantalla
+    # virtual desde fuera sale negro). El juego la guarda en run/screenshots/; se copia con nombre propio.
+    before=$(ls -t run/screenshots/*.png 2>/dev/null | head -n 1)
+    xdotool mousemove 640 360 2>/dev/null
+    xdotool key F2
+    for _ in 1 2 3 4 5 6 7 8 9 10; do
+      sleep 1
+      newest=$(ls -t run/screenshots/*.png 2>/dev/null | head -n 1)
+      [ -n "$newest" ] && [ "$newest" != "$before" ] && break
+    done
+    if [ -n "$newest" ] && [ "$newest" != "$before" ]; then
+      convert "$newest" -alpha off "$shots/$t-$name.png"
       echo "captura: $shots/$t-$name.png brillo=$(convert "$shots/$t-$name.png" -format '%[fx:mean]' info:)"
     else
-      echo "no se pudo capturar $name"
+      echo "no se pudo capturar $name (el juego no guardó ninguna captura con F2)"
     fi
   done
   sleep 1
