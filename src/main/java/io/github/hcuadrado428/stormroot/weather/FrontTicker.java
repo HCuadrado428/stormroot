@@ -11,6 +11,8 @@ import java.util.List;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.storage.ServerLevelData;
+import io.github.hcuadrado428.stormroot.config.WorldSettings;
 
 /**
  * Puente entre Minecraft y {@link FrontSimulation}. Solo usa clases vanilla:
@@ -34,6 +36,10 @@ public final class FrontTicker {
     private static FrontSimulation simulation;
     private static int tickCounter;
     private static boolean controlsWeather = true;
+    /** Stormroot ya ha puesto el clima al menos una vez en esta sesión (para reconocer un /weather posterior). */
+    private static boolean appliedOnce;
+    /** Alguien cambió el clima con /weather (u otro mod): Stormroot no lo toca hasta que ese clima termine. */
+    private static boolean weatherOverridden;
 
     private FrontTicker() {
     }
@@ -79,7 +85,7 @@ public final class FrontTicker {
                 }
             }
             float seep = (float) SeepageTicker.deepAt(server, player.getBlockX(), player.getBlockZ());
-            StormrootNetwork.sendFronts(player, new FrontsSyncPayload(controlsWeather, sim.windAngle(), seep, near));
+            StormrootNetwork.sendFronts(player, new FrontsSyncPayload(controlsWeatherNow(), sim.windAngle(), seep, near));
         }
     }
 
@@ -91,6 +97,9 @@ public final class FrontTicker {
             LightningRoots.clear();
             simulation = new FrontSimulation(server.overworld().getSeed());
             tickCounter = 0;
+            appliedOnce = false;
+            weatherOverridden = false;
+            WorldSettings.reset();
             FrontSavedData data = FrontSavedData.get(server);
             if (data.restoreInto(simulation)) {
                 controlsWeather = data.controlsWeather();
@@ -118,6 +127,19 @@ public final class FrontTicker {
 
     public static void setControlsWeather(boolean enabled) {
         controlsWeather = enabled;
+        // Al volver a activarlo, Stormroot toma el control aunque el clima vanilla tenga tiempos largos.
+        appliedOnce = false;
+        weatherOverridden = false;
+    }
+
+    /** {@code true} si Stormroot está poniendo el clima ahora mismo (activado y sin un /weather encima). */
+    public static boolean controlsWeatherNow() {
+        return controlsWeather && !weatherOverridden;
+    }
+
+    /** {@code true} si hay un /weather (u otro mod) mandando y Stormroot está esperando. */
+    public static boolean weatherOverridden() {
+        return weatherOverridden;
     }
 
     public static boolean controlsWeather() {
@@ -128,6 +150,21 @@ public final class FrontTicker {
         if (!controlsWeather) {
             return;
         }
+        // Stormroot siempre pone duraciones de STEP_TICKS * 2 como mucho. Si el mundo tiene una duración mayor,
+        // alguien ha usado /weather (u otro mod ha cambiado el clima): se respeta hasta que se acabe.
+        int duration = STEP_TICKS * 2;
+        ServerLevelData data = level.getServer().getWorldData().overworldData();
+        boolean external = data.getClearWeatherTime() > duration || data.getRainTime() > duration
+                || data.getThunderTime() > duration;
+        if (appliedOnce && external) {
+            if (!weatherOverridden) {
+                Stormroot.LOGGER.info("[Stormroot] El clima se cambió con /weather: Stormroot espera a que termine");
+            }
+            weatherOverridden = true;
+            return;
+        }
+        weatherOverridden = false;
+        appliedOnce = true;
         FrontType strongest = null;
         for (ServerPlayer player : level.players()) {
             for (WeatherFront front : sim.fronts()) {
@@ -145,7 +182,6 @@ public final class FrontTicker {
 
         // Duración un poco mayor que un paso: así el ciclo vanilla no cambia el clima por su cuenta,
         // y si Stormroot se desactiva, el clima vanilla vuelve solo en unos segundos.
-        int duration = STEP_TICKS * 2;
         if (strongest == FrontType.THUNDERSTORM) {
             level.setWeatherParameters(0, duration, true, true);
         } else if (strongest == FrontType.RAIN) {

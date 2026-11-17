@@ -33,23 +33,54 @@ public final class LightningCrystals {
     private LightningCrystals() {
     }
 
-    public static void onEntityAdded(Entity entity, Level level) {
-        if (!(entity instanceof LightningBolt) || !(level instanceof ServerLevel serverLevel)) {
-            return;
+    /**
+     * Lo llama cada loader cuando una entidad entra en un mundo.
+     *
+     * @return {@code true} si el rayo debe CANCELARSE: es un rayo natural de la tormenta global de vanilla que cae
+     *         fuera de cualquier frente de tormenta de Stormroot (así no caen rayos junto a jugadores que están
+     *         fuera de la tormenta). Forge/NeoForge cancelan el evento; Fabric hace {@code discard()}.
+     */
+    public static boolean onEntityAdded(Entity entity, Level level) {
+        if (!(entity instanceof LightningBolt bolt) || !(level instanceof ServerLevel serverLevel)) {
+            return false;
+        }
+        if (isStrayStormLightning(bolt, serverLevel)) {
+            return true;
         }
         BlockPos impact = entity.blockPosition();
         BlockState struck = serverLevel.getBlockState(impact.below());
         if (LightningRoots.canGrowInto(struck)
-                && serverLevel.getRandom().nextDouble() < StormrootConfig.lightningRootChance.getAsDouble()) {
+                && serverLevel.getRandom().nextDouble() < StormrootConfig.effectiveRootChance()) {
             LightningRoots.start(serverLevel, impact.below());
         }
         if (!struck.is(BlockTags.SAND) && !struck.is(BlockTags.BASE_STONE_OVERWORLD)) {
-            return;
+            return false;
         }
         if (serverLevel.getRandom().nextDouble() >= StormrootConfig.lightningCrystalChance.getAsDouble() || PENDING.size() >= MAX_PENDING) {
-            return;
+            return false;
         }
         PENDING.add(new Pending(serverLevel, impact.immutable(), DROP_DELAY_TICKS));
+        return false;
+    }
+
+    /**
+     * Rayo natural (sin jugador que lo cause, p. ej. sin tridente) en el Overworld, mientras Stormroot pone el clima y
+     * hay tormenta vanilla, en un punto donde ningún frente de tormenta llega al umbral.
+     * Los rayos con el cielo despejado (/summon, otros mods) no se tocan.
+     */
+    public static boolean isStrayStormLightning(LightningBolt bolt, ServerLevel level) {
+        if (level.dimension() != Level.OVERWORLD || bolt.getCause() != null || !level.isThundering()
+                || !FrontTicker.controlsWeatherNow()) {
+            return false;
+        }
+        double x = bolt.getX();
+        double z = bolt.getZ();
+        for (WeatherFront front : FrontTicker.simulation(level.getServer()).fronts()) {
+            if (front.type() == FrontType.THUNDERSTORM && front.intensityAt(x, z) >= FrontTicker.WEATHER_THRESHOLD) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static void tick() {

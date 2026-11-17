@@ -88,9 +88,11 @@ public final class ClientSelfTest {
                 }
             }
             case 4 -> {
-                boolean foggy = ClientWeather.fog() > 0.6f && ClientWeather.fogFarPlane(192f) < 100f;
+                boolean foggy = ClientWeather.fog() > 0.6f && ClientWeather.fogFarPlane(192f) < 100f
+                        && ClientWeather.fogAppliedCount() > 0;
                 if (foggy || waited > TIMEOUT) {
-                    SelfTest.report("fog bank on the client", foggy, "niebla=" + ClientWeather.fog());
+                    SelfTest.report("fog bank on the client", foggy, "niebla=" + ClientWeather.fog()
+                            + ", veces que el enganche de niebla la aplicó=" + ClientWeather.fogAppliedCount());
                     clear(server);
                     int cx = (int) Math.floor(x) >> 4;
                     int cz = (int) Math.floor(z) >> 4;
@@ -107,6 +109,20 @@ public final class ClientSelfTest {
                 boolean wet = ClientFronts.seep() > 0.9f;
                 if (wet || waited > TIMEOUT) {
                     SelfTest.report("cave humidity reaches the client", wet, "humedad=" + ClientFronts.seep());
+                    if (Compat.bloomberto()) {
+                        // Un frente a ~80 bloques de su borde: debe verse de lejos.
+                        spawnAt(server, FrontType.THUNDERSTORM, x + 200, z);
+                        next();
+                    } else {
+                        finish(mc);
+                    }
+                }
+            }
+            case 6 -> {
+                long drawn = bloombertoLong("distantFrontsDrawn");
+                if (drawn > 0 || waited > TIMEOUT) {
+                    SelfTest.report("bloomberto distant fronts are drawn", drawn > 0, "no se dibujó ningún frente lejano");
+                    clear(server);
                     finish(mc);
                 }
             }
@@ -152,8 +168,20 @@ public final class ClientSelfTest {
                     .getMethod("effectsActive").invoke(null);
             SelfTest.report("bloomberto storm screen effects", Boolean.TRUE.equals(active),
                     "los efectos de pantalla no se encendieron en la tormenta");
+            Object screen = Class.forName("io.github.hcuadrado428.stormroot.compat.bloomberto.BloombertoClientCompat")
+                    .getMethod("configScreen", net.minecraft.client.gui.screens.Screen.class).invoke(null, (Object) null);
+            SelfTest.report("bloomberto config screen", screen != null, "la pantalla de config no se pudo crear");
         } catch (ReflectiveOperationException e) {
             SelfTest.report("bloomberto storm screen effects", false, e.toString());
+        }
+    }
+
+    private static long bloombertoLong(String method) {
+        try {
+            return (Long) Class.forName("io.github.hcuadrado428.stormroot.compat.bloomberto.BloombertoClientCompat")
+                    .getMethod(method).invoke(null);
+        } catch (ReflectiveOperationException e) {
+            return -1;
         }
     }
 

@@ -2,6 +2,7 @@ package io.github.hcuadrado428.stormroot.weather;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.hcuadrado428.stormroot.config.WorldSettings;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
@@ -57,7 +58,10 @@ public class FrontSavedData extends SavedData {
             Codec.DOUBLE.fieldOf("wind_angle").forGetter(d -> d.windAngle),
             Codec.LONG.fieldOf("next_id").forGetter(d -> d.nextId),
             Codec.BOOL.fieldOf("controls_weather").forGetter(d -> d.controlsWeather),
-            Codec.BOOL.fieldOf("initialized").forGetter(d -> d.initialized)
+            Codec.BOOL.fieldOf("initialized").forGetter(d -> d.initialized),
+            Codec.BOOL.optionalFieldOf("seepage", true).forGetter(d -> d.seepage),
+            Codec.BOOL.optionalFieldOf("cave_changes", true).forGetter(d -> d.caveChanges),
+            Codec.BOOL.optionalFieldOf("lightning_roots", true).forGetter(d -> d.lightningRoots)
     ).apply(i, FrontSavedData::new));
 
     //? if >=1.21.5 {
@@ -74,18 +78,25 @@ public class FrontSavedData extends SavedData {
     private boolean controlsWeather;
     /** {@code false} hasta que se guarda por primera vez: así sabemos si hay que usar el viento inicial aleatorio. */
     private boolean initialized;
+    /** Ajustes del mundo ({@link WorldSettings}). */
+    private boolean seepage;
+    private boolean caveChanges;
+    private boolean lightningRoots;
 
     public FrontSavedData() {
-        this(new ArrayList<>(), 0.0, 1L, true, false);
+        this(new ArrayList<>(), 0.0, 1L, true, false, true, true, true);
     }
 
-    private FrontSavedData(List<WeatherFront> fronts, double windAngle, long nextId,
-                           boolean controlsWeather, boolean initialized) {
+    private FrontSavedData(List<WeatherFront> fronts, double windAngle, long nextId, boolean controlsWeather,
+                           boolean initialized, boolean seepage, boolean caveChanges, boolean lightningRoots) {
         this.fronts = new ArrayList<>(fronts);
         this.windAngle = windAngle;
         this.nextId = nextId;
         this.controlsWeather = controlsWeather;
         this.initialized = initialized;
+        this.seepage = seepage;
+        this.caveChanges = caveChanges;
+        this.lightningRoots = lightningRoots;
     }
 
     /** Datos guardados del Overworld (los crea vacíos si el mundo aún no tiene). */
@@ -107,6 +118,9 @@ public class FrontSavedData extends SavedData {
         this.nextId = simulation.nextId();
         this.controlsWeather = controlsWeather;
         this.initialized = true;
+        this.seepage = WorldSettings.seepage;
+        this.caveChanges = WorldSettings.caveChanges;
+        this.lightningRoots = WorldSettings.lightningRoots;
         setDirty();
     }
 
@@ -116,6 +130,9 @@ public class FrontSavedData extends SavedData {
             return false;
         }
         simulation.restore(windAngle, nextId, fronts);
+        WorldSettings.seepage = seepage;
+        WorldSettings.caveChanges = caveChanges;
+        WorldSettings.lightningRoots = lightningRoots;
         return true;
     }
 

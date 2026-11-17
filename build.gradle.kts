@@ -45,6 +45,22 @@ extensions.getByType<SourceSetContainer>().named("main") {
     resources.srcDir(rootProject.file("src/versioned/${stonecutter.current.version}/resources"))
 }
 
+// Mod Menu (opcional, solo Fabric): botón de config en la lista de mods. Solo para compilar; no se incluye.
+repositories {
+    maven("https://maven.terraformersmc.com/releases/") {
+        content { includeGroup("com.terraformersmc") }
+    }
+}
+if (mod.isFabric) {
+    dependencies {
+        "modCompileOnly"("com.terraformersmc:modmenu:${project.mod.prop("modmenu_version")}")
+    }
+} else {
+    extensions.getByType<SourceSetContainer>().named("main") {
+        java.exclude("**/client/ModMenuIntegration.java")
+    }
+}
+
 // Bloomberto (opcional). Si existe libs/bloomberto/bloomberto-*+<target>.jar (scripts/fetch-bloomberto.sh),
 // se compila la integración (paquete compat.bloomberto) y Bloomberto se carga en runClient/runServer.
 // Si no existe (p. ej. 1.21.11, que Bloomberto no soporta), esa integración se excluye y el mod compila igual.

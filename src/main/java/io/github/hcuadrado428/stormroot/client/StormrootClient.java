@@ -16,7 +16,7 @@ import net.minecraftforge.event.TickEvent;
 /*import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.common.NeoForge;
 *///?}
-//? if neoforge && <1.21.6 {
+//? if neoforge {
 /*import net.neoforged.neoforge.client.event.ViewportEvent;
 *///?}
 
@@ -24,9 +24,8 @@ import net.neoforged.neoforge.common.NeoForge;
  * Pegamento de CLIENTE de cada loader. Nunca se carga en un servidor dedicado:
  * Fabric lo usa como entrypoint "client"; Forge/NeoForge solo llaman a {@link #register()} si el lado es cliente.
  *
- * <p>Niebla: Forge 1.20.1 y NeoForge 1.21.1 usan el evento de niebla.
- * TODO: Fabric (todas) y NeoForge 1.21.11 necesitan otro enganche (mixin o el nuevo sistema de niebla
- * de 1.21.6+); de momento ahí no hay niebla, solo partículas.
+ * <p>Niebla: Forge y NeoForge usan el evento {@code ViewportEvent.RenderFog} (que desde 1.21.6 ya no se cancela);
+ * Fabric usa {@code client/mixin/FogRendererMixin}.
  */
 public class StormrootClient /*? if fabric {*/ implements ClientModInitializer /*?}*/ {
 
@@ -72,6 +71,7 @@ public class StormrootClient /*? if fabric {*/ implements ClientModInitializer /
             event.setNearPlaneDistance(Math.min(event.getNearPlaneDistance(), far * 0.1f));
             event.setFarPlaneDistance(far);
             event.setCanceled(true);
+            ClientWeather.markFogApplied();
         }
     }
     *///?}
@@ -98,13 +98,24 @@ public class StormrootClient /*? if fabric {*/ implements ClientModInitializer /
             event.setNearPlaneDistance(Math.min(event.getNearPlaneDistance(), far * 0.1f));
             event.setFarPlaneDistance(far);
             event.setCanceled(true);
+            ClientWeather.markFogApplied();
         }
     }
     *///?}
 
     //? if neoforge && >=1.21.6 {
     /*private static void registerFog() {
-        // TODO: niebla en NeoForge 1.21.6+ (el render de niebla cambió).
+        NeoForge.EVENT_BUS.addListener(StormrootClient::onRenderFog);
+    }
+
+    // Desde 1.21.6 el evento no se cancela: cambia directamente FogData (environmentalStart/End).
+    private static void onRenderFog(ViewportEvent.RenderFog event) {
+        float far = ClientWeather.fogFarPlane(event.getFarPlaneDistance());
+        if (far < event.getFarPlaneDistance()) {
+            event.setNearPlaneDistance(Math.min(event.getNearPlaneDistance(), far * 0.1f));
+            event.setFarPlaneDistance(far);
+            ClientWeather.markFogApplied();
+        }
     }
     *///?}
 }

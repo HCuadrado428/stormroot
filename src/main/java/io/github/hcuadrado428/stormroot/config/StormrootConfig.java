@@ -31,9 +31,26 @@ public final class StormrootConfig {
     public static volatile BooleanSupplier stormScreenEffects = () -> true;
     /** Temblor de cámara con los rayos cercanos (solo con Bloomberto). */
     public static volatile BooleanSupplier lightningCameraShake = () -> true;
+    /** Nubes y cortinas de lluvia en los frentes lejanos (solo con Bloomberto). */
+    public static volatile BooleanSupplier distantFronts = () -> true;
     /** Indicador del clima en pantalla (solo con Bloomberto). */
     public static volatile BooleanSupplier weatherHud = () -> false;
 
     private StormrootConfig() {
+    }
+
+    /** Filtración activa: config (Bloomberto) Y ajuste del mundo (/stormroot settings seepage). */
+    public static boolean seepageActive() {
+        return seepageEnabled.getAsBoolean() && WorldSettings.seepage;
+    }
+
+    /** La filtración puede cambiar bloques: config Y ajuste del mundo (cave_changes). */
+    public static boolean caveChangesActive() {
+        return seepageWorldChanges.getAsBoolean() && WorldSettings.caveChanges;
+    }
+
+    /** Probabilidad de raíz de rayo; 0 si el mundo las tiene apagadas (lightning_roots). */
+    public static double effectiveRootChance() {
+        return WorldSettings.lightningRoots ? lightningRootChance.getAsDouble() : 0.0;
     }
 }

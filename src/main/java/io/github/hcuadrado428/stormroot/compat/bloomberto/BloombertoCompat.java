@@ -1,6 +1,7 @@
 package io.github.hcuadrado428.stormroot.compat.bloomberto;
 
 import com.dougg865.bloomberto.api.BloombertoApi;
+import com.dougg865.bloomberto.api.config.Config;
 import com.dougg865.bloomberto.api.config.ConfigBuilder;
 import com.dougg865.bloomberto.api.config.ConfigValue;
 import io.github.hcuadrado428.stormroot.Stormroot;
@@ -17,7 +18,14 @@ public final class BloombertoCompat {
     /** Nivel de API de Bloomberto con el que se ha probado. */
     public static final int API_LEVEL = 2;
 
+    private static Config config;
+
     private BloombertoCompat() {
+    }
+
+    /** La config de Stormroot en Bloomberto ({@code null} hasta {@link #init}). */
+    public static Config config() {
+        return config;
     }
 
     /** @return {@code true} si la integración se ha activado */
@@ -58,10 +66,12 @@ public final class BloombertoCompat {
                 "Oscurece y desatura la pantalla dentro de tormentas y niebla");
         ConfigValue<Boolean> cameraShake = b.defineBoolean("lightning_camera_shake", true,
                 "La cámara tiembla cuando cae un rayo cerca");
+        ConfigValue<Boolean> distant = b.defineBoolean("distant_fronts", true,
+                "Dibuja nubes y cortinas de lluvia en los frentes lejanos para verlos llegar");
         ConfigValue<Boolean> hud = b.defineBoolean("weather_hud", false,
                 "Muestra en pantalla la intensidad de lluvia, tormenta y niebla donde estás");
         b.pop();
-        b.build();
+        config = b.build();
 
         StormrootConfig.maxFronts = maxFronts::get;
         StormrootConfig.frontSpawnChance = spawnChance::get;
@@ -75,6 +85,7 @@ public final class BloombertoCompat {
         StormrootConfig.stormScreenEffects = screenEffects::get;
         StormrootConfig.lightningCameraShake = cameraShake::get;
         StormrootConfig.weatherHud = hud::get;
+        StormrootConfig.distantFronts = distant::get;
 
         if (client) {
             BloombertoClientCompat.init();

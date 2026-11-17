@@ -2,13 +2,14 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "pattern": [
-    "GGG",
     "GCG",
+    "GLG",
     "PRP"
   ],
   "key": {
     "G": "minecraft:glass",
     "C": "minecraft:copper_ingot",
+    "L": "stormroot:lightning_crystal",
     "R": "minecraft:redstone",
     "P": "#minecraft:planks"
   },

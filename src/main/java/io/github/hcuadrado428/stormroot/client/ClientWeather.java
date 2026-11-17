@@ -29,6 +29,9 @@ public final class ClientWeather {
     /** Distancia máxima al borde para las partículas (más allá, Minecraft no las dibuja). Cantidad: config. */
     private static final double EDGE_MAX_DISTANCE = 32;
 
+    /** Veces que un enganche de niebla (evento o mixin) ha aplicado la niebla de Stormroot. Para el self-test. */
+    private static volatile long fogApplied;
+
     private static float rain;
     private static float thunder;
     private static float fog;
@@ -127,6 +130,15 @@ public final class ClientWeather {
             return vanillaFar;
         }
         return vanillaFar + (FOG_MIN_DISTANCE - vanillaFar) * fog;
+    }
+
+    /** Lo llaman los enganches de niebla de cada loader cuando aplican {@link #fogFarPlane}. */
+    public static void markFogApplied() {
+        fogApplied++;
+    }
+
+    public static long fogAppliedCount() {
+        return fogApplied;
     }
 
     private static void spawnEdgeParticles(ClientLevel level, LocalPlayer player) {

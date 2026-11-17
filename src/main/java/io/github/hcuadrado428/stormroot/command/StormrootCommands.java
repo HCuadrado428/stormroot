@@ -3,6 +3,7 @@ package io.github.hcuadrado428.stormroot.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import io.github.hcuadrado428.stormroot.config.WorldSettings;
 import io.github.hcuadrado428.stormroot.seep.SeepageCell;
 import io.github.hcuadrado428.stormroot.seep.SeepageSavedData;
 import io.github.hcuadrado428.stormroot.seep.SeepageTicker;
@@ -25,6 +26,8 @@ import net.minecraft.world.phys.Vec3;
  * /stormroot front clear             borra todos los frentes
  * /stormroot here                    qué frente hay donde estás y el viento
  * /stormroot weather on|off          Stormroot controla (o no) el clima vanilla
+ * /stormroot settings                ajustes del mundo (se guardan con el mundo)
+ * /stormroot settings <ajuste> on|off   seepage, cave_changes, lightning_roots
  * /stormroot seep                    humedad del suelo/subsuelo de tu chunk
  * /stormroot seep set <-1..1>        fija la humedad de tu chunk (para probar charcos y sequía)
  * </pre>
@@ -50,6 +53,7 @@ public final class StormrootCommands {
                         .then(spawn)
                         .then(Commands.literal("clear").executes(ctx -> clear(ctx.getSource()))))
                 .then(Commands.literal("here").executes(ctx -> here(ctx.getSource())))
+                .then(settings())
                 .then(Commands.literal("seep")
                         .executes(ctx -> seep(ctx.getSource()))
                         .then(Commands.literal("set")
@@ -58,6 +62,37 @@ public final class StormrootCommands {
                 .then(Commands.literal("weather")
                         .then(Commands.literal("on").executes(ctx -> setWeatherControl(ctx.getSource(), true)))
                         .then(Commands.literal("off").executes(ctx -> setWeatherControl(ctx.getSource(), false)))));
+    }
+
+    private static LiteralArgumentBuilder<CommandSourceStack> settings() {
+        LiteralArgumentBuilder<CommandSourceStack> node = Commands.literal("settings");
+        node.executes(ctx -> showSettings(ctx.getSource()));
+        for (String name : WorldSettings.all().keySet()) {
+            node.then(Commands.literal(name)
+                    .then(Commands.literal("on").executes(ctx -> setSetting(ctx.getSource(), name, true)))
+                    .then(Commands.literal("off").executes(ctx -> setSetting(ctx.getSource(), name, false))));
+        }
+        return node;
+    }
+
+    private static int showSettings(CommandSourceStack source) {
+        FrontTicker.simulation(source.getServer()); // carga los ajustes guardados
+        reply(source, "Ajustes de este mundo:");
+        for (var entry : WorldSettings.all().entrySet()) {
+            reply(source, " - " + entry.getKey() + ": " + (entry.getValue() ? "on" : "off"));
+        }
+        String weather = !FrontTicker.controlsWeather() ? "off"
+                : FrontTicker.weatherOverridden() ? "en pausa (alguien usó /weather)" : "on";
+        reply(source, " - weather: " + weather);
+        return 1;
+    }
+
+    private static int setSetting(CommandSourceStack source, String name, boolean value) {
+        FrontTicker.simulation(source.getServer());
+        WorldSettings.set(name, value);
+        FrontTicker.save(source.getServer());
+        reply(source, name + ": " + (value ? "on" : "off") + " (guardado en el mundo)");
+        return 1;
     }
 
     private static int list(CommandSourceStack source) {

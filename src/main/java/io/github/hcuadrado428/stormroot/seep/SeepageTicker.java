@@ -62,7 +62,7 @@ public final class SeepageTicker {
     }
 
     public static void step(MinecraftServer server, FrontSimulation simulation, double seconds) {
-        if (!StormrootConfig.seepageEnabled.getAsBoolean()) {
+        if (!StormrootConfig.seepageActive()) {
             return;
         }
         ServerLevel level = server.overworld();
@@ -94,7 +94,7 @@ public final class SeepageTicker {
             }
         }
 
-        if (StormrootConfig.seepageWorldChanges.getAsBoolean()) {
+        if (StormrootConfig.caveChangesActive()) {
             int maxChanges = StormrootConfig.seepageMaxChangesPerChunk.getAsInt();
             for (long key : affected) {
                 int cx = SeepageField.keyX(key);

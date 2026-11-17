@@ -1,6 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "*"
 license = "MIT"
+issueTrackerURL = "https://github.com/HCuadrado428/stormroot/issues"
 
 [[mods]]
 modId = "${id}"
@@ -10,6 +11,7 @@ authors = "HCuadrado428"
 description = '''
 ${description}
 '''
+displayURL = "https://github.com/HCuadrado428/stormroot"
 logoFile = "assets/${id}/icon.png"
 logoBlur = false
 

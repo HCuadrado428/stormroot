@@ -9,6 +9,11 @@
     "HCuadrado428"
   ],
   "license": "MIT",
+  "contact": {
+    "homepage": "https://github.com/HCuadrado428/stormroot",
+    "sources": "https://github.com/HCuadrado428/stormroot",
+    "issues": "https://github.com/HCuadrado428/stormroot/issues"
+  },
   "icon": "assets/${id}/icon.png",
 
   "environment": "*",
@@ -18,8 +23,14 @@
     ],
     "client": [
       "${group}.${id}.client.StormrootClient"
+    ],
+    "modmenu": [
+      "${group}.${id}.client.ModMenuIntegration"
     ]
   },
+  "mixins": [
+    "stormroot.mixins.json"
+  ],
   "depends": {
     "fabricloader": "*",
     "fabric-api": ">=${fabricVersion}",

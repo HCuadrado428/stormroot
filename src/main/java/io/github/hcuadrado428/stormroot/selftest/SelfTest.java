@@ -29,10 +29,16 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+
+//? if >=1.21.2 {
+import net.minecraft.world.entity.EntitySpawnReason;
+//?}
 
 /**
  * Pruebas automáticas dentro del juego. Se activan con {@code -Dstormroot.selfTest=server|client|all}
@@ -130,6 +136,9 @@ public final class SelfTest {
                 run("front codec round trip", () -> checkFrontCodec(server));
                 run("sync packet round trip", SelfTest::checkPacket);
                 run("commands", () -> checkCommands(server));
+                run("world settings", () -> checkSettings(server));
+                run("/weather is respected", () -> checkWeatherCommand(server));
+                run("stray storm lightning is removed", () -> checkStrayLightning(server));
                 run("forecast", SelfTest::checkForecast);
                 run("weathervane", () -> checkWeathervane(server, level));
                 run("barometer", () -> checkBarometer(server, level));
@@ -243,6 +252,62 @@ public final class SelfTest {
         c.set(0);
         check("commands", cleared && spawned && seep && sim.fronts().isEmpty(),
                 "clear=" + cleared + " spawn=" + spawned + " seep=" + seep);
+    }
+
+    private static void checkSettings(MinecraftServer server) {
+        CommandSourceStack source = server.createCommandSourceStack().withSuppressedOutput();
+        server.getCommands().performPrefixedCommand(source, "stormroot settings cave_changes off");
+        server.getCommands().performPrefixedCommand(source, "stormroot settings lightning_roots off");
+        boolean off = !io.github.hcuadrado428.stormroot.config.StormrootConfig.caveChangesActive()
+                && io.github.hcuadrado428.stormroot.config.StormrootConfig.effectiveRootChance() == 0;
+        FrontSavedData data = FrontSavedData.get(server);
+        Tag tag = FrontSavedData.CODEC.encodeStart(NbtOps.INSTANCE, data).result().orElseThrow();
+        boolean saved = tag.toString().contains("cave_changes:0b") || tag.toString().contains("cave_changes:false");
+        server.getCommands().performPrefixedCommand(source, "stormroot settings cave_changes on");
+        server.getCommands().performPrefixedCommand(source, "stormroot settings lightning_roots on");
+        boolean on = io.github.hcuadrado428.stormroot.config.StormrootConfig.caveChangesActive()
+                && io.github.hcuadrado428.stormroot.config.StormrootConfig.effectiveRootChance() > 0;
+        check("world settings", off && saved && on, "apagar=" + off + ", guardado=" + saved + " (" + tag + "), encender=" + on);
+    }
+
+    private static void checkWeatherCommand(MinecraftServer server) {
+        CommandSourceStack source = server.createCommandSourceStack().withSuppressedOutput();
+        ServerLevel level = server.overworld();
+        FrontTicker.simulation(server).clear();
+        FrontTicker.applyNow(server); // Stormroot pone el clima (despejado)
+        server.getCommands().performPrefixedCommand(source, "weather rain 600");
+        FrontTicker.applyNow(server);
+        boolean respected = level.isRaining() && FrontTicker.weatherOverridden() && !FrontTicker.controlsWeatherNow();
+        server.getCommands().performPrefixedCommand(source, "weather clear 1");
+        FrontTicker.applyNow(server);
+        boolean back = !FrontTicker.weatherOverridden() && !level.isRaining();
+        check("/weather is respected", respected && back, "respeta /weather=" + respected + ", retoma el control=" + back);
+    }
+
+    private static void checkStrayLightning(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        FrontSimulation sim = FrontTicker.simulation(server);
+        FrontTicker.setControlsWeather(true);
+        FrontTicker.applyNow(server);
+        sim.clear();
+        sim.add(new WeatherFront(901, FrontType.THUNDERSTORM, 0, 0, 100, 0, 0, 500, 1000));
+        level.setWeatherParameters(0, 100, true, true); // tormenta vanilla corta (no cuenta como /weather)
+        //? if >=1.21.2 {
+        LightningBolt inside = EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.TRIGGERED);
+        LightningBolt outside = EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.TRIGGERED);
+        //?} else {
+        /*LightningBolt inside = EntityType.LIGHTNING_BOLT.create(level);
+        LightningBolt outside = EntityType.LIGHTNING_BOLT.create(level);
+        *///?}
+        inside.setPos(10, 64, 10);
+        outside.setPos(3000, 64, 3000);
+        boolean keepInside = !io.github.hcuadrado428.stormroot.weather.LightningCrystals.isStrayStormLightning(inside, level);
+        boolean removeOutside = io.github.hcuadrado428.stormroot.weather.LightningCrystals.isStrayStormLightning(outside, level);
+        level.setWeatherParameters(100, 0, false, false);
+        boolean keepWhenClear = !io.github.hcuadrado428.stormroot.weather.LightningCrystals.isStrayStormLightning(outside, level);
+        sim.clear();
+        check("stray storm lightning is removed", keepInside && removeOutside && keepWhenClear,
+                "dentro se queda=" + keepInside + ", fuera se quita=" + removeOutside + ", sin tormenta se queda=" + keepWhenClear);
     }
 
     private static void checkForecast() {

@@ -126,7 +126,9 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
     }
 
     private static void onEntityJoin(EntityJoinLevelEvent event) {
-        LightningCrystals.onEntityAdded(event.getEntity(), event.getLevel());
+        if (LightningCrystals.onEntityAdded(event.getEntity(), event.getLevel())) {
+            event.setCanceled(true);
+        }
     }
     *//*?}*/
 
@@ -182,7 +184,9 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
     }
 
     private static void onEntityJoin(EntityJoinLevelEvent event) {
-        LightningCrystals.onEntityAdded(event.getEntity(), event.getLevel());
+        if (LightningCrystals.onEntityAdded(event.getEntity(), event.getLevel())) {
+            event.setCanceled(true);
+        }
     }
     *//*?}*/
 
@@ -213,7 +217,11 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
             entries.accept(ModBlocks.BAROMETER_ITEM);
         });
         ServerTickEvents.END_SERVER_TICK.register(FrontTicker::onServerTick);
-        ServerEntityEvents.ENTITY_LOAD.register(LightningCrystals::onEntityAdded);
+        ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
+            if (LightningCrystals.onEntityAdded(entity, level)) {
+                entity.discard();
+            }
+        });
         StormrootNetwork.init();
         CommandRegistrationCallback.EVENT.register(
                 (dispatcher, registryAccess, environment) -> StormrootCommands.register(dispatcher));
