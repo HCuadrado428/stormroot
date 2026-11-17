@@ -1,0 +1,67 @@
+package io.github.hcuadrado428.stormroot.compat.bloomberto;
+
+import com.dougg865.bloomberto.api.BloombertoApi;
+import com.dougg865.bloomberto.api.config.ConfigBuilder;
+import com.dougg865.bloomberto.api.config.ConfigValue;
+import io.github.hcuadrado428.stormroot.Stormroot;
+import io.github.hcuadrado428.stormroot.config.StormrootConfig;
+
+/**
+ * Integración opcional con Bloomberto (lado común). Solo se compila si existe el jar de Bloomberto para el target
+ * (ver {@code scripts/fetch-bloomberto.sh}) y solo se carga si Bloomberto está instalado ({@code Compat}).
+ *
+ * <p>Usa: {@code ConfigBuilder} (config/stormroot.toml y botón "config" en Forge/NeoForge). En el cliente,
+ * {@link BloombertoClientCompat} añade efectos de pantalla, temblor de cámara e indicador del clima.
+ */
+public final class BloombertoCompat {
+    /** Nivel de API de Bloomberto con el que se ha probado. */
+    public static final int API_LEVEL = 2;
+
+    private BloombertoCompat() {
+    }
+
+    /** @return {@code true} si la integración se ha activado */
+    public static boolean init(boolean client) {
+        if (!BloombertoApi.has(API_LEVEL)) {
+            Stormroot.LOGGER.warn("[Stormroot] Bloomberto es demasiado viejo (nivel de API {} < {}); integración desactivada",
+                    BloombertoApi.level(), API_LEVEL);
+            return false;
+        }
+
+        ConfigBuilder b = ConfigBuilder.create(Stormroot.MOD_ID);
+        b.push("fronts");
+        ConfigValue<Integer> maxFronts = b.defineInt("max_fronts", 8, 0, 64,
+                "Máximo de frentes a la vez en el Overworld");
+        ConfigValue<Double> spawnChance = b.defineDouble("spawn_chance", 0.05, 0.0, 1.0,
+                "Probabilidad de que nazca un frente cada 5 segundos (si hay sitio)");
+        b.pop();
+        b.push("lightning");
+        ConfigValue<Double> crystalChance = b.defineDouble("crystal_chance", 0.25, 0.0, 1.0,
+                "Probabilidad de que un rayo sobre arena o piedra deje un Cristal de rayo");
+        b.pop();
+        b.push("client");
+        ConfigValue<Integer> edgeParticles = b.defineInt("edge_particles_per_tick", 6, 0, 64,
+                "Partículas por tick en el borde de los frentes cercanos (0 = ninguna)");
+        ConfigValue<Boolean> screenEffects = b.defineBoolean("storm_screen_effects", true,
+                "Oscurece y desatura la pantalla dentro de tormentas y niebla");
+        ConfigValue<Boolean> cameraShake = b.defineBoolean("lightning_camera_shake", true,
+                "La cámara tiembla cuando cae un rayo cerca");
+        ConfigValue<Boolean> hud = b.defineBoolean("weather_hud", false,
+                "Muestra en pantalla la intensidad de lluvia, tormenta y niebla donde estás");
+        b.pop();
+        b.build();
+
+        StormrootConfig.maxFronts = maxFronts::get;
+        StormrootConfig.frontSpawnChance = spawnChance::get;
+        StormrootConfig.lightningCrystalChance = crystalChance::get;
+        StormrootConfig.edgeParticlesPerTick = edgeParticles::get;
+        StormrootConfig.stormScreenEffects = screenEffects::get;
+        StormrootConfig.lightningCameraShake = cameraShake::get;
+        StormrootConfig.weatherHud = hud::get;
+
+        if (client) {
+            BloombertoClientCompat.init();
+        }
+        return true;
+    }
+}

@@ -24,5 +24,8 @@
     "fabricloader": "*",
     "fabric-api": ">=${fabricVersion}",
     "minecraft": "${mcRangeFabric}"
+  },
+  "suggests": {
+    "bloomberto": ">=0.2.0"
   }
 }

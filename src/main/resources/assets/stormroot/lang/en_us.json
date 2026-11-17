@@ -1,3 +1,4 @@
 {
-    "item.stormroot.lightning_crystal": "Lightning Crystal"
+    "item.stormroot.lightning_crystal": "Lightning Crystal",
+    "hud.stormroot.weather": "Rain %s · Storm %s · Fog %s"
 }

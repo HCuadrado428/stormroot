@@ -48,3 +48,6 @@ replay_*.log
 
 # texturas (previews de texgen.py)
 build/tex-preview/
+
+# Bloomberto (opcional): jars compilados por scripts/fetch-bloomberto.sh
+libs/bloomberto/

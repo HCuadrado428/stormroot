@@ -33,6 +33,18 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      # Bloomberto (opcional): se compila desde su repo en el commit de bloomberto.ref y se guarda en caché.
+      - name: Caché de Bloomberto
+        uses: actions/cache@v4
+        with:
+          path: libs/bloomberto
+          key: bloomberto-${{ hashFiles('bloomberto.ref') }}
+
+      - name: Compilar Bloomberto
+        run: |
+          chmod +x scripts/fetch-bloomberto.sh
+          scripts/fetch-bloomberto.sh
+
       - name: Build (todas las versiones y loaders)
         run: |
           chmod +x ./gradlew

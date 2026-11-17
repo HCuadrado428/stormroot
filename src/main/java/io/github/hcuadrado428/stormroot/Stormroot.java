@@ -2,6 +2,7 @@ package io.github.hcuadrado428.stormroot;
 
 import io.github.hcuadrado428.stormroot.client.StormrootClient;
 import io.github.hcuadrado428.stormroot.command.StormrootCommands;
+import io.github.hcuadrado428.stormroot.compat.Compat;
 import io.github.hcuadrado428.stormroot.network.StormrootNetwork;
 import io.github.hcuadrado428.stormroot.registry.ModItems;
 import io.github.hcuadrado428.stormroot.weather.FrontTicker;
@@ -10,11 +11,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /*? if fabric {*/
+import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -30,6 +33,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -41,6 +45,7 @@ import net.minecraftforge.registries.RegisterEvent;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
@@ -77,6 +82,7 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
         if (FMLEnvironment.dist == Dist.CLIENT) {
             StormrootClient.register();
         }
+        Compat.initBloomberto(ModList.get().isLoaded("bloomberto"), FMLEnvironment.dist == Dist.CLIENT);
         LOGGER.info("Stormroot cargado en Forge");
     }
 
@@ -117,6 +123,7 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
         if (dist.isClient()) {
             StormrootClient.register();
         }
+        Compat.initBloomberto(ModList.get().isLoaded("bloomberto"), dist.isClient());
         LOGGER.info("Stormroot cargado en NeoForge");
     }
 
@@ -156,6 +163,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
         StormrootNetwork.init();
         CommandRegistrationCallback.EVENT.register(
                 (dispatcher, registryAccess, environment) -> StormrootCommands.register(dispatcher));
+        FabricLoader loader = FabricLoader.getInstance();
+        Compat.initBloomberto(loader.isModLoaded("bloomberto"), loader.getEnvironmentType() == EnvType.CLIENT);
         LOGGER.info("Stormroot cargado en Fabric");
     }
     /*?}*/

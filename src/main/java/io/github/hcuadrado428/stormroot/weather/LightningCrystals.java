@@ -1,5 +1,6 @@
 package io.github.hcuadrado428.stormroot.weather;
 
+import io.github.hcuadrado428.stormroot.config.StormrootConfig;
 import io.github.hcuadrado428.stormroot.registry.ModItems;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -22,8 +23,6 @@ import net.minecraft.world.level.block.state.BlockState;
  * <p>El cristal se suelta con retraso: si apareciera a la vez que el rayo, el propio rayo lo quemaría.
  */
 public final class LightningCrystals {
-    /** Probabilidad de que un rayo sobre un bloque válido deje un cristal (pasará a la config). */
-    public static final float CHANCE = 0.25f;
     /** Ticks de espera antes de soltar el cristal (el rayo dura menos que esto). */
     public static final int DROP_DELAY_TICKS = 40;
     /** Límite de cristales pendientes, por si caen muchísimos rayos a la vez. */
@@ -43,7 +42,7 @@ public final class LightningCrystals {
         if (!struck.is(BlockTags.SAND) && !struck.is(BlockTags.BASE_STONE_OVERWORLD)) {
             return;
         }
-        if (serverLevel.getRandom().nextFloat() >= CHANCE || PENDING.size() >= MAX_PENDING) {
+        if (serverLevel.getRandom().nextDouble() >= StormrootConfig.lightningCrystalChance.getAsDouble() || PENDING.size() >= MAX_PENDING) {
             return;
         }
         PENDING.add(new Pending(serverLevel, impact.immutable(), DROP_DELAY_TICKS));

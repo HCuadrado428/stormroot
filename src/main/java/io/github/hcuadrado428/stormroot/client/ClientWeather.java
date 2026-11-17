@@ -1,5 +1,6 @@
 package io.github.hcuadrado428.stormroot.client;
 
+import io.github.hcuadrado428.stormroot.config.StormrootConfig;
 import io.github.hcuadrado428.stormroot.weather.FrontType;
 import io.github.hcuadrado428.stormroot.weather.WeatherFront;
 import net.minecraft.client.Minecraft;
@@ -24,8 +25,7 @@ public final class ClientWeather {
     private static final float STEP = 0.01f;
     /** Distancia de niebla en el centro de un frente de niebla. */
     private static final float FOG_MIN_DISTANCE = 20f;
-    /** Partículas de borde: máximo por tick y distancia máxima al borde (más allá, Minecraft no las dibuja). */
-    public static final int EDGE_PARTICLES_PER_TICK = 6;
+    /** Distancia máxima al borde para las partículas (más allá, Minecraft no las dibuja). Cantidad: config. */
     private static final double EDGE_MAX_DISTANCE = 32;
 
     private static float rain;
@@ -70,6 +70,21 @@ public final class ClientWeather {
         spawnEdgeParticles(level, player);
     }
 
+    /** Lluvia visible ahora mismo (0–1), ya suavizada. */
+    public static float rain() {
+        return rain;
+    }
+
+    /** Tormenta visible ahora mismo (0–1), ya suavizada. */
+    public static float thunder() {
+        return thunder;
+    }
+
+    /** Niebla de Stormroot ahora mismo (0–1), ya suavizada. */
+    public static float fog() {
+        return fog;
+    }
+
     /**
      * Distancia de niebla a usar, dado la de vanilla. Devuelve la misma si no hay niebla de Stormroot.
      * La usan los eventos de niebla de Forge/NeoForge (y un futuro mixin en Fabric).
@@ -83,7 +98,7 @@ public final class ClientWeather {
 
     private static void spawnEdgeParticles(ClientLevel level, LocalPlayer player) {
         RandomSource random = level.getRandom();
-        int budget = EDGE_PARTICLES_PER_TICK;
+        int budget = StormrootConfig.edgeParticlesPerTick.getAsInt();
         for (WeatherFront front : ClientFronts.snapshot()) {
             if (budget <= 0) {
                 return;

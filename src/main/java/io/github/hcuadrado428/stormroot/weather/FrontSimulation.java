@@ -20,11 +20,14 @@ public final class FrontSimulation {
     private final Random random;
     private long nextId = 1;
 
-    /** Ajustes provisionales; pasarán al fichero de configuración. */
+    /** Valores por defecto (la config puede cambiarlos con {@link #setMaxFronts} y {@link #setSpawnChance}). */
     public static final int MAX_FRONTS = 8;
     public static final double SPAWN_CHANCE_PER_STEP = 0.05;
     public static final int SPAWN_DISTANCE_MIN = 256;
     public static final int SPAWN_DISTANCE_MAX = 512;
+
+    private int maxFronts = MAX_FRONTS;
+    private double spawnChance = SPAWN_CHANCE_PER_STEP;
 
     /** Dirección del viento dominante en radianes (0 = hacia +X). Provisional: fija por mundo. */
     private double windAngle;
@@ -55,7 +58,7 @@ public final class FrontSimulation {
         windAngle += (random.nextDouble() - 0.5) * 0.02 * seconds;
 
         List<WeatherFront> spawned = new ArrayList<>();
-        if (!anchorsXZ.isEmpty() && fronts.size() < MAX_FRONTS && random.nextDouble() < SPAWN_CHANCE_PER_STEP) {
+        if (!anchorsXZ.isEmpty() && fronts.size() < maxFronts && random.nextDouble() < spawnChance) {
             double[] anchor = anchorsXZ.get(random.nextInt(anchorsXZ.size()));
             WeatherFront front = spawnUpwind(anchor[0], anchor[1], randomType());
             fronts.add(front);
@@ -102,6 +105,14 @@ public final class FrontSimulation {
             }
         }
         return best;
+    }
+
+    public void setMaxFronts(int maxFronts) {
+        this.maxFronts = Math.max(0, maxFronts);
+    }
+
+    public void setSpawnChance(double spawnChance) {
+        this.spawnChance = Math.max(0.0, Math.min(1.0, spawnChance));
     }
 
     public void clear() {

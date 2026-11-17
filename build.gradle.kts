@@ -39,6 +39,27 @@ stonecutter {
     }
 }
 
+// Bloomberto (opcional). Si existe libs/bloomberto/bloomberto-*+<target>.jar (scripts/fetch-bloomberto.sh),
+// se compila la integración (paquete compat.bloomberto) y Bloomberto se carga en runClient/runServer.
+// Si no existe (p. ej. 1.21.11, que Bloomberto no soporta), esa integración se excluye y el mod compila igual.
+val bloombertoJar: File? =
+    rootProject
+        .file("libs/bloomberto")
+        .listFiles()
+        ?.firstOrNull { it.name.startsWith("bloomberto-") && it.name.endsWith("+${stonecutter.current.project}.jar") }
+
+if (bloombertoJar != null) {
+    logger.lifecycle("[stormroot] ${stonecutter.current.project}: integración con Bloomberto (${bloombertoJar.name})")
+    dependencies {
+        "modCompileOnly"(files(bloombertoJar))
+        "modLocalRuntime"(files(bloombertoJar))
+    }
+} else {
+    extensions.getByType<SourceSetContainer>().named("main") {
+        java.exclude("**/compat/bloomberto/**")
+    }
+}
+
 publishMods {
     // NeoForge 1.20.1 es un fork de Forge 47.1: el jar de Forge 1.20.1 también funciona ahí.
     // Stonecraft ya añade "forge"; aquí sumamos "neoforge" para que aparezca en ese filtro.

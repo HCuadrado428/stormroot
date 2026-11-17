@@ -26,3 +26,10 @@ mandatory = true
 versionRange = "${mcRangeForge}"
 ordering = "NONE"
 side = "BOTH"
+
+[[dependencies.${id}]]
+modId = "bloomberto"
+mandatory = false
+versionRange = "[0.2.0,)"
+ordering = "NONE"
+side = "BOTH"

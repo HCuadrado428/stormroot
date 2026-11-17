@@ -1,6 +1,7 @@
 package io.github.hcuadrado428.stormroot.weather;
 
 import io.github.hcuadrado428.stormroot.Stormroot;
+import io.github.hcuadrado428.stormroot.config.StormrootConfig;
 import io.github.hcuadrado428.stormroot.network.FrontsSyncPayload;
 import io.github.hcuadrado428.stormroot.network.StormrootNetwork;
 import java.util.ArrayList;
@@ -50,6 +51,8 @@ public final class FrontTicker {
             anchors.add(new double[] {player.getX(), player.getZ()});
         }
 
+        sim.setMaxFronts(StormrootConfig.maxFronts.getAsInt());
+        sim.setSpawnChance(StormrootConfig.frontSpawnChance.getAsDouble());
         for (WeatherFront front : sim.step(STEP_TICKS / 20.0, anchors)) {
             Stormroot.LOGGER.info("[Stormroot] Nuevo frente: {}", front);
         }
