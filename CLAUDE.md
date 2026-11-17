@@ -58,7 +58,16 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   con `acceptMissingOr`; NeoForge `RegisterPayloadHandlersEvent` + `.optional()`.
 - Permisos de comandos: en 1.21.11 `Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)`; antes `source.hasPermission(2)`.
 - Código de cliente: SOLO en `client/`. `ClientFronts` es Java puro (lo llaman los handlers de red en ambos lados).
-- Niebla: evento `ViewportEvent.RenderFog` en Forge 1.20.1 y NeoForge 1.21.1. TODO en Fabric y NeoForge 1.21.11.
+- Niebla: Forge/NeoForge con `ViewportEvent.RenderFog` (cancelado hasta 1.21.5; desde 1.21.6 solo se modifica `FogData`);
+  Fabric con `client/mixin/FogRendererMixin` (`stormroot.mixins.json`, solo lo declara `fabric.mod.json`): TAIL de
+  `FogRenderer.setupFog` + `RenderSystem` hasta 1.21.1; `@Local FogData` antes de `RenderSystem.getDevice()` en 1.21.6+.
+  Todos llaman a `ClientWeather.markFogApplied()` (el self-test lo comprueba).
+- Rayos: `LightningCrystals.onEntityAdded` devuelve `true` para cancelar rayos naturales fuera de los frentes de tormenta
+  (Forge/NeoForge cancelan el evento; Fabric hace `discard()`).
+- `/weather`: Stormroot siempre pone duraciones ≤ `STEP_TICKS*2`; si el mundo tiene una mayor, es un `/weather` y se espera
+  (`FrontTicker.weatherOverridden`). Ajustes del mundo en `config/WorldSettings` (guardados en `FrontSavedData`).
+- Mod Menu (solo Fabric, `modCompileOnly`, versión en `versions/dependencies/*.properties`): `client/ModMenuIntegration`,
+  excluida al compilar Forge/NeoForge.
 - HUD/texto: colores siempre ARGB (`0xFFFFFFFF`); desde 1.21.6 un color sin alfa no se ve.
 - **Bloomberto** (librería nuestra, opcional): integración en `compat/bloomberto/`, cargada por reflexión desde
   `compat/Compat` solo si el mod está instalado. Solo se compila si existe `libs/bloomberto/bloomberto-*+<target>.jar`
@@ -72,8 +81,10 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   Orden: tierra → barro → charco; un bloque tiene como mucho UN cambio apuntado y siempre guarda el material de antes
   de Stormroot (`place`). Al secarse: charcos, luego pozas, luego barro.
   `getMinY()` desde 1.21.2 (`getMinBuildHeight()` antes).
-- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 15 comprobaciones; cliente con
-  un jugador en pantalla virtual: 7 más, incluidas las de Bloomberto). Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.
+- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 18 comprobaciones; cliente con
+  un jugador en pantalla virtual: 9 más, incluidas las de Bloomberto).
+- En el self-test, el clima se lee de `server.getWorldData().overworldData()`: `level.isRaining()/isThundering()` son la
+  intensidad visual, que sube tick a tick. Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.
 - **Self-test** (`selftest/SelfTest`, `client/ClientSelfTest`, `scripts/selftest.sh`, job `selftest` de la CI): cuando
   añadas una mecánica, añade su comprobación. Construye su propia zona en el chunk (10,10) de un mundo plano.
   Ya encontró 2 fallos reales de la filtración (charcos que tapaban el barro; bloques que no volvían a su material).
