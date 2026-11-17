@@ -1,0 +1,107 @@
+{
+ "meta": {
+  "format_version": "4.10",
+  "model_format": "java_block",
+  "box_uv": false
+ },
+ "name": "rainbow_shard",
+ "parent": "",
+ "ambientocclusion": true,
+ "front_gui_light": false,
+ "visible_box": [
+  1,
+  1,
+  0
+ ],
+ "variable_placeholders": "",
+ "variable_placeholder_buttons": [],
+ "timeline_setups": [],
+ "unhandled_root_fields": {},
+ "resolution": {
+  "width": 16,
+  "height": 16
+ },
+ "elements": [
+  {
+   "name": "pieza_1",
+   "box_uv": false,
+   "rescale": false,
+   "locked": false,
+   "render_order": "default",
+   "allow_mirror_modeling": true,
+   "from": [
+    0,
+    0,
+    8
+   ],
+   "to": [
+    16,
+    16,
+    8
+   ],
+   "autouv": 0,
+   "color": 0,
+   "origin": [
+    8,
+    8,
+    8
+   ],
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    }
+   },
+   "type": "cube",
+   "uuid": "2610bd7b-e5a4-48b6-9a15-3da3fa22eaf3"
+  }
+ ],
+ "outliner": [
+  "2610bd7b-e5a4-48b6-9a15-3da3fa22eaf3"
+ ],
+ "textures": [
+  {
+   "path": "",
+   "name": "rainbow_shard.png",
+   "folder": "item",
+   "namespace": "stormroot",
+   "id": "0",
+   "width": 16,
+   "height": 16,
+   "uv_width": 16,
+   "uv_height": 16,
+   "particle": false,
+   "render_mode": "default",
+   "render_sides": "auto",
+   "frame_time": 1,
+   "frame_order_type": "loop",
+   "frame_order": "",
+   "frame_interpolate": false,
+   "visible": true,
+   "internal": true,
+   "saved": true,
+   "uuid": "59178a05-3b1b-47fa-9076-1e8f56170607",
+   "relative_path": "",
+   "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAApklEQVR4XmNgoBewMvD4D8Jk2QfSCAIvHKwwDGEiZCJI89Hz2xleOlozcEd9wVCO1wB0zcxuMsQbgE1zxkcB4gzApfnhtT7CBuDTHL3uHf4gQw7tz7P0/n974PU/7mLUf/vlL/7PCr2GNRoxAhEW2qAAA/kZ5GyQzQtuFzEcu7CDEacTQLaD4plYm2EAxQWgeCbVZhQDSNWMAUDewBdgRAGKMg05AAC9upXI1MZYMQAAAABJRU5ErkJggg=="
+  }
+ ]
+}

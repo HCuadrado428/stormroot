@@ -72,11 +72,11 @@
     }
    },
    "type": "cube",
-   "uuid": "21616665-7902-4cc5-8bc8-c58c84742343"
+   "uuid": "ab5741aa-61e6-41db-b144-f16cf46b1ef3"
   }
  ],
  "outliner": [
-  "21616665-7902-4cc5-8bc8-c58c84742343"
+  "ab5741aa-61e6-41db-b144-f16cf46b1ef3"
  ],
  "textures": [
   {
@@ -99,7 +99,7 @@
    "visible": true,
    "internal": true,
    "saved": true,
-   "uuid": "d00c64ba-70e6-426a-b3ae-709b0a2d948a",
+   "uuid": "a6f8df9f-5ac6-4ac5-baec-14e6e23d9183",
    "relative_path": "",
    "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAzElEQVR4XmNgoDfgt0r7D8Jk2QvS+Ob33/8bXvwl3RBkzaLVd+EGMBHjFJDmuwenMxx5y8Cw9MpfFC0EDQBpXrhuOliT/49MYuxDAJBmkH9B+P+DtP+he36hOB8EcLoAZjPIyTCbV6nkYLgAqwHImkEg7M4UMCYKwJwNci4Mg5x/bL8whvMxAFU1w2zFFnDIgAWZA4vjQmZJhuP3GRj895xiYGB4zPBrfyfDx2OzGLGFAYoBB/Y/Bqs5wADSCAH4NIMAiqnYMgkum6kGAGWHsAp8j0VEAAAAAElFTkSuQmCC"
   }

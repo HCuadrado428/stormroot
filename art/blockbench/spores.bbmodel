@@ -1,0 +1,107 @@
+{
+ "meta": {
+  "format_version": "4.10",
+  "model_format": "java_block",
+  "box_uv": false
+ },
+ "name": "spores",
+ "parent": "",
+ "ambientocclusion": true,
+ "front_gui_light": false,
+ "visible_box": [
+  1,
+  1,
+  0
+ ],
+ "variable_placeholders": "",
+ "variable_placeholder_buttons": [],
+ "timeline_setups": [],
+ "unhandled_root_fields": {},
+ "resolution": {
+  "width": 16,
+  "height": 16
+ },
+ "elements": [
+  {
+   "name": "pieza_1",
+   "box_uv": false,
+   "rescale": false,
+   "locked": false,
+   "render_order": "default",
+   "allow_mirror_modeling": true,
+   "from": [
+    0,
+    0,
+    8
+   ],
+   "to": [
+    16,
+    16,
+    8
+   ],
+   "autouv": 0,
+   "color": 0,
+   "origin": [
+    8,
+    8,
+    8
+   ],
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    }
+   },
+   "type": "cube",
+   "uuid": "e9008b21-f0d8-49f0-a919-958d40be2283"
+  }
+ ],
+ "outliner": [
+  "e9008b21-f0d8-49f0-a919-958d40be2283"
+ ],
+ "textures": [
+  {
+   "path": "",
+   "name": "spores.png",
+   "folder": "item",
+   "namespace": "stormroot",
+   "id": "0",
+   "width": 16,
+   "height": 16,
+   "uv_width": 16,
+   "uv_height": 16,
+   "particle": false,
+   "render_mode": "default",
+   "render_sides": "auto",
+   "frame_time": 1,
+   "frame_order_type": "loop",
+   "frame_order": "",
+   "frame_interpolate": false,
+   "visible": true,
+   "internal": true,
+   "saved": true,
+   "uuid": "d8abdc48-789f-42b9-9eef-443f72fdc3ff",
+   "relative_path": "",
+   "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAvUlEQVR4XmNgoBXQM1b5T7bZIM0vvp74j80Qog3Gpfn8jQ1YDSbaZKwuAAliMxkkDsMEwwPdZBB/5c4usMG4wgMvgLnq+/9nYANAhmFzPhM2U0AKq9vSGCRlJcDSzx+/wFAGMwzDAJBEYKILXOONm6cYbj28xXDt9j24ISA1uw4tAdMsuPyBrAGZDQKXzt5hdLOL+Q+iGXF5ASQOc8n6+XvgGnEGHK6EQ1RqhEUZNsXoAFeaweoCXIAYi4gGAPXrgItjlPLhAAAAAElFTkSuQmCC"
+  }
+ ]
+}

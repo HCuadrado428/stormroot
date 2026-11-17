@@ -72,11 +72,11 @@
     }
    },
    "type": "cube",
-   "uuid": "6110930d-bd24-4731-9109-00c0b7911957"
+   "uuid": "95ae77eb-b28e-4dca-8e6b-87349c029446"
   }
  ],
  "outliner": [
-  "6110930d-bd24-4731-9109-00c0b7911957"
+  "95ae77eb-b28e-4dca-8e6b-87349c029446"
  ],
  "textures": [
   {
@@ -99,7 +99,7 @@
    "visible": true,
    "internal": true,
    "saved": true,
-   "uuid": "3965088b-8218-4ede-ac64-cab88d331468",
+   "uuid": "5d18d0e7-6989-44cd-970b-7de72d9a3ba7",
    "relative_path": "",
    "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA9UlEQVR4Xt2QoQ7CMBiENxQOgcERBKrBgELheQIQGILCoHkL8AsGwxPMowgCEKQKQXAzCBISSBAl9yfXtLDU4Dizdd19d/8fRf+v+8uY0JSF0CXMp+szuCUP8JkG8+588wCdycJr5AFgCFXG3Wza94AeAGms7CaNk62k5jX60iF7GBrwjtRkkwkAZ75TuUtsqqpNpdhouUrlE0cVgFsXY7RqJYFwgTgPel0xqoaSJ0cVABZD4l5fLIQ/1stF2wRgN1AAXB5m10dtf0ayK7ZDC7YTwKhdifEBdFzCiDOTWZftIO4idpcEMyAUQRQAEFqu50Pr/Ulv5vyjLWhAt1MAAAAASUVORK5CYII="
   }

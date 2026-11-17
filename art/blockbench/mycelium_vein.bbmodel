@@ -1,0 +1,107 @@
+{
+ "meta": {
+  "format_version": "4.10",
+  "model_format": "java_block",
+  "box_uv": false
+ },
+ "name": "mycelium_vein",
+ "parent": "",
+ "ambientocclusion": true,
+ "front_gui_light": false,
+ "visible_box": [
+  1,
+  1,
+  0
+ ],
+ "variable_placeholders": "",
+ "variable_placeholder_buttons": [],
+ "timeline_setups": [],
+ "unhandled_root_fields": {},
+ "resolution": {
+  "width": 16,
+  "height": 16
+ },
+ "elements": [
+  {
+   "name": "pieza_1",
+   "box_uv": false,
+   "rescale": false,
+   "locked": false,
+   "render_order": "default",
+   "allow_mirror_modeling": true,
+   "from": [
+    0,
+    0,
+    0.1
+   ],
+   "to": [
+    16,
+    16,
+    0.1
+   ],
+   "autouv": 0,
+   "color": 0,
+   "origin": [
+    8,
+    8,
+    8
+   ],
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      16,
+      0,
+      0,
+      16
+     ],
+     "texture": 0
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": 0
+    }
+   },
+   "type": "cube",
+   "uuid": "95ac555d-7df9-45f3-a7af-875e041c4ff4"
+  }
+ ],
+ "outliner": [
+  "95ac555d-7df9-45f3-a7af-875e041c4ff4"
+ ],
+ "textures": [
+  {
+   "path": "",
+   "name": "mycelium_vein.png",
+   "folder": "block",
+   "namespace": "stormroot",
+   "id": "0",
+   "width": 16,
+   "height": 16,
+   "uv_width": 16,
+   "uv_height": 16,
+   "particle": false,
+   "render_mode": "default",
+   "render_sides": "auto",
+   "frame_time": 1,
+   "frame_order_type": "loop",
+   "frame_order": "",
+   "frame_interpolate": false,
+   "visible": true,
+   "internal": true,
+   "saved": true,
+   "uuid": "97472d2c-49c5-4811-8f25-7578f4a14666",
+   "relative_path": "",
+   "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAmUlEQVR4XmNgwAFW7uz6j0sOGTARowgd1E/JwG84yPbzNzZgVYTTZeimYjOAoLeQFYAMQOcT5V2Y8198PQH2BswQXF7CCpA1gTTi08yELUTD3csYYYZIykqgWAISx9ADEsTlX2RvEBWI2JxLyBsoAJd/0WMFBjBS4q2Ht7AGLEgcFDZ4UyEuP6KLY1WHz2RsGvC6hOTMQwkAAItTlRrguS+JAAAAAElFTkSuQmCC"
+  }
+ ]
+}
