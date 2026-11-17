@@ -275,12 +275,14 @@ public final class SelfTest {
         ServerLevel level = server.overworld();
         FrontTicker.simulation(server).clear();
         FrontTicker.applyNow(server); // Stormroot pone el clima (despejado)
+        // level.isRaining() es la intensidad visual (sube tick a tick); el estado del clima está en los datos del mundo.
+        net.minecraft.world.level.storage.ServerLevelData data = server.getWorldData().overworldData();
         server.getCommands().performPrefixedCommand(source, "weather rain 600");
         FrontTicker.applyNow(server);
-        boolean respected = level.isRaining() && FrontTicker.weatherOverridden() && !FrontTicker.controlsWeatherNow();
+        boolean respected = data.isRaining() && FrontTicker.weatherOverridden() && !FrontTicker.controlsWeatherNow();
         server.getCommands().performPrefixedCommand(source, "weather clear 1");
         FrontTicker.applyNow(server);
-        boolean back = !FrontTicker.weatherOverridden() && !level.isRaining();
+        boolean back = !FrontTicker.weatherOverridden() && !data.isRaining();
         check("/weather is respected", respected && back, "respeta /weather=" + respected + ", retoma el control=" + back);
     }
 
@@ -292,6 +294,8 @@ public final class SelfTest {
         sim.clear();
         sim.add(new WeatherFront(901, FrontType.THUNDERSTORM, 0, 0, 100, 0, 0, 500, 1000));
         level.setWeatherParameters(0, 100, true, true); // tormenta vanilla corta (no cuenta como /weather)
+        level.setRainLevel(1f); // la intensidad visual sube tick a tick: aquí se fija ya
+        level.setThunderLevel(1f);
         //? if >=1.21.2 {
         LightningBolt inside = EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.TRIGGERED);
         LightningBolt outside = EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.TRIGGERED);
@@ -304,6 +308,8 @@ public final class SelfTest {
         boolean keepInside = !io.github.hcuadrado428.stormroot.weather.LightningCrystals.isStrayStormLightning(inside, level);
         boolean removeOutside = io.github.hcuadrado428.stormroot.weather.LightningCrystals.isStrayStormLightning(outside, level);
         level.setWeatherParameters(100, 0, false, false);
+        level.setRainLevel(0f);
+        level.setThunderLevel(0f);
         boolean keepWhenClear = !io.github.hcuadrado428.stormroot.weather.LightningCrystals.isStrayStormLightning(outside, level);
         sim.clear();
         check("stray storm lightning is removed", keepInside && removeOutside && keepWhenClear,
