@@ -65,6 +65,17 @@ Los `.jar` aparecen en `build/libs/`. El primer build tarda varios minutos (desc
 
 Para compilar con la integración: `scripts/fetch-bloomberto.sh` (compila Bloomberto con JDK 21 en el commit de `bloomberto.ref` y deja los jars en `libs/bloomberto/`). Sin esos jars, el mod compila igual pero sin integración. Con ellos, `runClient` carga también Bloomberto. Para usar una versión más nueva de Bloomberto, cambia el commit de `bloomberto.ref`.
 
+## 🧪 Pruebas dentro del juego (self-test)
+
+La CI arranca **Minecraft de verdad** en los 6 targets en cada push (`scripts/selftest.sh`, job `selftest`):
+
+- **Servidor dedicado** (15 comprobaciones): construye una cueva de pruebas y comprueba registros, guardado de frentes y de filtración, el paquete de red, los comandos, el pronóstico, la veleta y el barómetro (señal de redstone), que las pozas solo llenan hoyos cerrados, que la cueva empapada da charcos, barro y musgo, que **el agua nunca se derrama**, que la raíz de rayo baja hasta la cueva y que **al secarse cada bloque vuelve a ser exactamente el original**.
+- **Un jugador** en una pantalla virtual (7 más): llegan los frentes al cliente, la tormenta se ve y se va, la niebla, la humedad de las cuevas y, con Bloomberto, su config y los efectos de pantalla.
+
+En local: `scripts/selftest.sh server 1.21.1-fabric` o `scripts/selftest.sh client 1.21.1-fabric` (cliente: necesita `xvfb-run` en Linux). En cualquier lanzador: `-Dstormroot.selfTest=server|client|all` (el juego se cierra al terminar; `-Dstormroot.selfTest.exit=false` lo deja abierto). Sin esa propiedad el self-test no hace nada.
+
+**No lo cubre** (hay que mirarlo a ojo): que la niebla, las partículas, las texturas y los modelos *se vean* bien, los mensajes al hacer clic derecho en los instrumentos, las recetas, y partidas con varios jugadores.
+
 ## 📁 Estructura del código
 
 Proyecto **Stonecraft + Stonecutter**: un único código fuente con comentarios `//? if ...` para cada versión y loader.
@@ -79,6 +90,7 @@ src/main/java/io/github/hcuadrado428/stormroot/
   config/StormrootConfig.java   → ajustes (valores por defecto o los de Bloomberto)
   compat/Compat.java            → carga las integraciones opcionales por reflexión
   compat/bloomberto/            → integración con Bloomberto (solo se compila si están sus jars)
+  selftest/SelfTest.java  → pruebas dentro del juego (servidor); client/ClientSelfTest.java (cliente)
   network/                → paquete servidor → cliente con los frentes cercanos
   client/                 → clima por zonas, niebla y partículas (solo cliente)
   seep/                   → filtración: SeepageCell/Rates/Field (Java puro), SeepageTicker y SeepageSavedData
@@ -121,7 +133,7 @@ src/versioned/<versión>/  → recetas, loot tables y tags (su formato cambia en
 
 ## 🔜 Siguientes pasos (en orden)
 
-1. **Probar en el juego** los 6 targets (`runClient`) y en servidor dedicado (`runServer`). Nada de lo anterior se ha probado aún dentro del juego.
+1. ~~Probar en el juego~~ ✅ con el self-test de la CI (servidor y cliente en los 6 targets). Falta mirar a ojo lo visual (ver "Pruebas dentro del juego").
 2. **Niebla en Fabric (todas) y NeoForge 1.21.11**: necesita un mixin o el nuevo sistema de niebla de 1.21.6+.
 3. **Lluvia "de juego" por zonas** en el servidor (mixin en `Level#isRainingAt`): ahora, si un jugador está en una tormenta, los rayos y la lluvia afectan también a los demás.
 4. **Frentes visibles de lejos**: las partículas solo se dibujan a menos de 32 bloques; para verlos llegar en el horizonte hace falta render propio (nubes/cortinas).

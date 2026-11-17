@@ -43,7 +43,8 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
 ## Reglas de oro
 1. **Nunca inventes una API.** Antes de usar una clase/método, compruébalo en las fuentes decompiladas de ESA versión (`./gradlew genSources` en Fabric; las fuentes de NeoForge/Forge se adjuntan en el IDE) o en la doc oficial.
 2. Consulta la skill `minecraft-modding:version-matrix` antes de escribir código que dependa de la versión, y la skill temática que toque (`worldgen`, `datagen`, `gui-screens`, `networking`, `geckolib`, `mod-config`, `gametests`, `publishing`).
-3. Un cambio no está terminado hasta que `./gradlew buildAndCollect` pasa en **los 6 targets**. Gradle se ejecuta con Java 25.
+3. Un cambio no está terminado hasta que `./gradlew buildAndCollect` pasa en **los 6 targets** y el self-test de la CI
+   está en verde. Gradle se ejecuta con Java 25.
 4. Lógica nueva → en clases sin imports de loader. Si necesitas algo del loader, crea una interfaz común e impleméntala por loader con bloques Stonecutter.
 5. Texturas: 16×16 PNG RGBA, revisa siempre la preview ampliada antes de darla por buena.
 6. Delega en los subagentes del plugin: compilación rota → `minecraft-modding:build-fixer`; portar → `minecraft-modding:mod-porter`; mixins → `minecraft-modding:mixin-reviewer`; dudas de API → `minecraft-modding:api-researcher`; texturas → `minecraft-modding:texture-artist`; modelos 3D → `minecraft-modding:model-artist`.
@@ -66,8 +67,14 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
 - Filtración v2 hecha: charcos encerrados que crecen, pozas, barro, musgo, grietas (`seep/SeepageTicker`, umbrales
   `MUD_AT`…`DROUGHT_AT`), materiales permitidos y su restauración en `seep/CaveMaterials`; goteo y polvo en el cliente;
   raíces de rayo (`weather/LightningRoots`). El agua solo se coloca si queda encerrada por bloques completos (`isWall`).
+  Orden: tierra → barro → charco; un bloque tiene como mucho UN cambio apuntado y siempre guarda el material de antes
+  de Stormroot (`place`). Al secarse: charcos, luego pozas, luego barro.
   `getMinY()` desde 1.21.2 (`getMinBuildHeight()` antes).
-- Compila en los 6 targets (CI en verde). **Aún no se ha probado dentro del juego.**
+- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 15 comprobaciones; cliente con
+  un jugador en pantalla virtual: 7 más). Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.
+- **Self-test** (`selftest/SelfTest`, `client/ClientSelfTest`, `scripts/selftest.sh`, job `selftest` de la CI): cuando
+  añadas una mecánica, añade su comprobación. Construye su propia zona en el chunk (10,10) de un mundo plano.
+  Ya encontró 2 fallos reales de la filtración (charcos que tapaban el barro; bloques que no volvían a su material).
 - Siguientes pasos: ver "Siguientes pasos" en `README.md`.
 
 ## Mod
