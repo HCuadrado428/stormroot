@@ -35,8 +35,23 @@ public class StormrootClient /*? if fabric {*/ implements ClientModInitializer /
         ClientTickEvents.END_CLIENT_TICK.register(client -> ClientWeather.tick());
         registerReceiver();
         registerWorldRender();
+        registerRenderLayers();
     }
     //?}
+
+    // Fuego del clima con transparencia recortada (en Forge/NeoForge lo dice su modelo: "render_type").
+    //? if fabric && >=1.21.11 {
+    private static void registerRenderLayers() {
+        net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap.putBlock(
+                io.github.hcuadrado428.stormroot.registry.ModBlocks.STORM_FIRE,
+                net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
+    }
+    //?} else if fabric {
+    /*private static void registerRenderLayers() {
+        net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlock(
+                io.github.hcuadrado428.stormroot.registry.ModBlocks.STORM_FIRE, net.minecraft.client.renderer.RenderType.cutout());
+    }
+    *///?}
 
     // Cielo de Stormroot (client/sky/SkyRenderer) desde el evento de render del mundo de cada loader.
     // Mismos eventos y matrices que Bloomberto (WorldRenderBridge), probados en todas las versiones.

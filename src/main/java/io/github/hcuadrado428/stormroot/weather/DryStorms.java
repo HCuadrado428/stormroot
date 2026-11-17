@@ -19,7 +19,8 @@ import net.minecraft.world.entity.EntitySpawnReason;
  * piden que llueva en ese bloque). Aquí Stormroot los echa él mismo, solo bajo el nubarrón de tormenta.
  *
  * <p>Los rayos hacen daño como los de vanilla y dejan cristales y raíces de rayo ({@link LightningCrystals}), pero NO
- * prenden fuego: {@code mixin/LightningBoltFireMixin} cancela su fuego (el fuego del clima, solo en hojas, va aparte).
+ * prenden fuego vanilla: {@code mixin/LightningBoltFireMixin} lo cancela. En su lugar, a veces prenden el fuego del clima
+ * ({@code block/StormFireBlock}) en las hojas del árbol donde caen.
  */
 public final class DryStorms {
     /** Cada cuántos ticks se prueba (por jugador). */
@@ -103,6 +104,11 @@ public final class DryStorms {
         OURS.put(bolt, Boolean.TRUE);
         level.addFreshEntity(bolt);
         bolts++;
+        // Fuego del clima: a veces prende las hojas del árbol donde cae (nunca casas).
+        if (level.getRandom().nextInt(2) == 0 && io.github.hcuadrado428.stormroot.block.StormFireBlock.fireAllowed(level, top)) {
+            io.github.hcuadrado428.stormroot.block.StormFireBlock.igniteNear(level, top,
+                    io.github.hcuadrado428.stormroot.registry.ModBlocks.STORM_FIRE);
+        }
         return true;
     }
 }

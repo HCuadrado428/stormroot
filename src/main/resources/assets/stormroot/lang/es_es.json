@@ -22,5 +22,6 @@
     "compass.stormroot.w": "oeste",
     "compass.stormroot.nw": "noroeste",
     "block.stormroot.lightning_root": "Raíz de rayo",
-    "item.stormroot.lightning_root": "Raíz de rayo"
+    "item.stormroot.lightning_root": "Raíz de rayo",
+    "block.stormroot.storm_fire": "Fuego del clima"
 }

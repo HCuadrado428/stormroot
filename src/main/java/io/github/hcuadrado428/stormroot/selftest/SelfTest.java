@@ -149,12 +149,14 @@ public final class SelfTest {
                 run("seepage floods the cave", () -> floodCave(level));
                 run("lightning root starts", () -> LightningRoots.start(level, new BlockPos(BX + 8, Y_TOP, BZ + 8)));
                 run("dry storm bolts start", () -> strikeFireTest(level));
+                run("storm fire starts", () -> startStormFire(level));
                 stage = 1;
                 waitUntil = ticks + 160;
             }
             case 1 -> {
                 run("water stays contained", () -> checkContained(level));
                 run("dry storm lightning does not burn", () -> checkFireTest(level));
+                run("storm fire only burns tree leaves", () -> checkStormFire(level));
                 run("lightning root grows to the cave", () -> checkRoot(level));
                 run("seepage codec round trip", () -> checkSeepageCodec(server));
                 run("seepage dries and restores every block", () -> dryCave(level));
@@ -413,6 +415,48 @@ public final class SelfTest {
         check("dry storm lightning does not burn", !dryFire && (normalFire || !fireAllowed),
                 "fuego del rayo de tormenta seca=" + dryFire + ", fuego del rayo normal=" + normalFire
                         + ", el fuego puede prender aquí=" + fireAllowed);
+    }
+
+    private static final BlockPos FIRE_CENTER = new BlockPos(BX + 3, Y_TOP + 1, BZ + 13);
+    private static final BlockPos FIRE_PLANKS = new BlockPos(BX + 3, Y_TOP + 1, BZ + 11);
+    private static final BlockPos FIRE_PERSISTENT = new BlockPos(BX + 5, Y_TOP + 1, BZ + 13);
+
+    /** Una copa de hojas 3×3, una hoja puesta por un jugador y una tabla de madera al lado; fuego del clima en el centro. */
+    private static void startStormFire(ServerLevel level) {
+        for (BlockPos pos : BlockPos.betweenClosed(BX + 2, Y_TOP + 1, BZ + 12, BX + 4, Y_TOP + 1, BZ + 14)) {
+            level.setBlock(pos, Blocks.OAK_LEAVES.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        level.setBlock(FIRE_PERSISTENT, Blocks.OAK_LEAVES.defaultBlockState()
+                .setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.PERSISTENT, true), Block.UPDATE_CLIENTS);
+        level.setBlock(FIRE_PLANKS, Blocks.OAK_PLANKS.defaultBlockState(), Block.UPDATE_CLIENTS);
+        level.setBlock(FIRE_CENTER, io.github.hcuadrado428.stormroot.registry.ModBlocks.STORM_FIRE.defaultBlockState(), Block.UPDATE_ALL);
+    }
+
+    /** La madera y la hoja del jugador siguen ahí, no hay fuego vanilla y (si el fuego puede prender) arden más hojas. */
+    private static void checkStormFire(ServerLevel level) {
+        boolean planks = level.getBlockState(FIRE_PLANKS).is(Blocks.OAK_PLANKS);
+        boolean persistent = level.getBlockState(FIRE_PERSISTENT).is(Blocks.OAK_LEAVES);
+        boolean centerBurnt = !level.getBlockState(FIRE_CENTER).is(Blocks.OAK_LEAVES);
+        int vanillaFire = 0;
+        int burnt = 0;
+        for (BlockPos pos : BlockPos.betweenClosed(BX + 1, Y_TOP + 1, BZ + 10, BX + 6, Y_TOP + 3, BZ + 15)) {
+            BlockState state = level.getBlockState(pos);
+            if (state.is(Blocks.FIRE)) {
+                vanillaFire++;
+            }
+            if (pos.getY() == Y_TOP + 1 && pos.getX() >= BX + 2 && pos.getX() <= BX + 4 && pos.getZ() >= BZ + 12
+                    && !pos.equals(FIRE_CENTER) && !state.is(Blocks.OAK_LEAVES)) {
+                burnt++;
+            }
+        }
+        boolean allowed = io.github.hcuadrado428.stormroot.block.StormFireBlock.fireAllowed(level, FIRE_CENTER);
+        for (BlockPos pos : BlockPos.betweenClosed(BX + 1, Y_TOP + 1, BZ + 10, BX + 6, Y_TOP + 3, BZ + 15)) {
+            level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        check("storm fire only burns tree leaves",
+                planks && persistent && centerBurnt && vanillaFire == 0 && (burnt > 0 || !allowed),
+                "madera=" + planks + ", hoja del jugador=" + persistent + ", centro quemado=" + centerBurnt
+                        + ", fuego vanilla=" + vanillaFire + ", hojas quemadas=" + burnt + ", el fuego puede prender=" + allowed);
     }
 
     private static void checkForecast() {

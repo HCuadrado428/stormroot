@@ -16,6 +16,10 @@ Primera versión jugable. Minecraft 1.20.1 (Fabric, Forge; también NeoForge 1.2
 - **Cielo propio**: las nubes vanilla se sustituyen por las de Stormroot (estilo vanilla sombreado): pocas nubes de
   buen tiempo, de pequeñas a enormes, que se forman y se deshacen; nubarrones de lluvia y tormenta que se ven llegar
   desde lejos. Sin necesitar Bloomberto. Opción `custom_clouds` para shader packs.
+- **Solo llueve bajo los nubarrones** (también fuegos, calderos y nieve); aviso de tormenta, sombras de las nubes, capa
+  alta y niebla que rueda. Los frentes nacen según el bioma; la niebla se deshace en el desierto.
+- **Tormenta seca** en desiertos, badlands y sabanas: rayos sin lluvia, el doble de cristales y **fuego del clima**,
+  que solo quema hojas de árbol y nunca casas.
 - Partículas en el borde de los frentes cercanos.
 - `/weather` se respeta: si alguien lo usa, Stormroot espera a que ese clima termine.
 

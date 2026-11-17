@@ -2,6 +2,7 @@ package io.github.hcuadrado428.stormroot.registry;
 
 import io.github.hcuadrado428.stormroot.ModIds;
 import io.github.hcuadrado428.stormroot.block.BarometerBlock;
+import io.github.hcuadrado428.stormroot.block.StormFireBlock;
 import io.github.hcuadrado428.stormroot.block.WeathervaneBlock;
 import java.util.function.Function;
 import net.minecraft.world.item.BlockItem;
@@ -21,6 +22,7 @@ public final class ModBlocks {
     public static final String WEATHERVANE_ID = "weathervane";
     public static final String BAROMETER_ID = "barometer";
     public static final String LIGHTNING_ROOT_ID = "lightning_root";
+    public static final String STORM_FIRE_ID = "storm_fire";
 
     public static Block WEATHERVANE;
     public static Block BAROMETER;
@@ -28,6 +30,8 @@ public final class ModBlocks {
     public static Item BAROMETER_ITEM;
     public static Block LIGHTNING_ROOT;
     public static Item LIGHTNING_ROOT_ITEM;
+    /** Fuego del clima: sin objeto (no se puede coger). */
+    public static Block STORM_FIRE;
 
     private ModBlocks() {
     }
@@ -49,6 +53,19 @@ public final class ModBlocks {
         return create(LIGHTNING_ROOT_ID, Block::new,
                 BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_LIGHT_BLUE).strength(1.5f)
                         .sound(SoundType.AMETHYST).lightLevel(state -> 7));
+    }
+
+    /** Fuego del clima: como el fuego vanilla (sin colisión, se rompe al tocarlo, da luz) pero solo en hojas. */
+    public static Block createStormFire() {
+        BlockBehaviour.Properties properties = BlockBehaviour.Properties.of().mapColor(MapColor.FIRE).replaceable()
+                .instabreak().lightLevel(state -> 12).sound(SoundType.WOOL)
+                .pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY);
+        //? if >=1.21.11 {
+        properties = properties.noCollision();
+        //?} else {
+        /*properties = properties.noCollission();
+        *///?}
+        return create(STORM_FIRE_ID, StormFireBlock::new, properties);
     }
 
     public static Item createBlockItem(String name, Block block) {

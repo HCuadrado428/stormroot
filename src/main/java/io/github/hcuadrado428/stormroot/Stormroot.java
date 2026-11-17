@@ -94,6 +94,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 () -> ModBlocks.BAROMETER = ModBlocks.createBarometer());
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.LIGHTNING_ROOT_ID),
                 () -> ModBlocks.LIGHTNING_ROOT = ModBlocks.createLightningRoot());
+        event.register(Registries.BLOCK, ModIds.id(ModBlocks.STORM_FIRE_ID),
+                () -> ModBlocks.STORM_FIRE = ModBlocks.createStormFire());
         event.register(Registries.ITEM, ModIds.id("lightning_crystal"),
                 () -> ModItems.LIGHTNING_CRYSTAL = ModItems.create("lightning_crystal"));
         event.register(Registries.ITEM, ModIds.id(ModBlocks.WEATHERVANE_ID),
@@ -154,6 +156,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 () -> ModBlocks.BAROMETER = ModBlocks.createBarometer());
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.LIGHTNING_ROOT_ID),
                 () -> ModBlocks.LIGHTNING_ROOT = ModBlocks.createLightningRoot());
+        event.register(Registries.BLOCK, ModIds.id(ModBlocks.STORM_FIRE_ID),
+                () -> ModBlocks.STORM_FIRE = ModBlocks.createStormFire());
         event.register(Registries.ITEM, ModIds.id("lightning_crystal"),
                 () -> ModItems.LIGHTNING_CRYSTAL = ModItems.create("lightning_crystal"));
         event.register(Registries.ITEM, ModIds.id(ModBlocks.WEATHERVANE_ID),
@@ -199,6 +203,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 ModIds.id(ModBlocks.BAROMETER_ID), ModBlocks.createBarometer());
         ModBlocks.LIGHTNING_ROOT = Registry.register(BuiltInRegistries.BLOCK,
                 ModIds.id(ModBlocks.LIGHTNING_ROOT_ID), ModBlocks.createLightningRoot());
+        ModBlocks.STORM_FIRE = Registry.register(BuiltInRegistries.BLOCK,
+                ModIds.id(ModBlocks.STORM_FIRE_ID), ModBlocks.createStormFire());
         ModItems.LIGHTNING_CRYSTAL = Registry.register(BuiltInRegistries.ITEM,
                 ModIds.id("lightning_crystal"), ModItems.create("lightning_crystal"));
         ModBlocks.WEATHERVANE_ITEM = Registry.register(BuiltInRegistries.ITEM, ModIds.id(ModBlocks.WEATHERVANE_ID),

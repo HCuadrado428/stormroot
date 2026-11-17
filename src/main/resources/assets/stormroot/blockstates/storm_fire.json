@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "": [
+      { "model": "stormroot:block/storm_fire_floor0" },
+      { "model": "stormroot:block/storm_fire_floor1" }
+    ]
+  }
+}
