@@ -28,6 +28,9 @@ Primera versión jugable. Minecraft 1.20.1 (Fabric, Forge; también NeoForge 1.2
   vuelve a su sitio al irse.
 - **Aurora** de noche en biomas fríos (polvo de aurora) y **tormenta magnética** (instrumentos locos, roca magnetizada).
 - **Arcoíris** tras la lluvia, con un tesoro en su extremo (fragmento de arcoíris y esmeraldas).
+- **Red de micelio** bajo pantanos, manglares y campos de champiñones: nodos e hilos que crecen con la humedad, se
+  asustan con la luz y mueren si rompes su nodo; hasta 30 chunks por red. Da esporas, setas y el nodo (toque de seda).
+- **Bruma de esporas**: la niebla sobre esos biomas marea si la respiras mucho y hace crecer setas.
 - **Granizo** en el núcleo de algunas tormentas: daña cultivos maduros, cristal a la intemperie y a quien no lleve
   casco; deja granizo (4 = un bloque de hielo).
 - Partículas en el borde de los frentes cercanos.

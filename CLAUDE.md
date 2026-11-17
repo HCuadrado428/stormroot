@@ -112,10 +112,18 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   magnetiza hierro → `block/MagneticRockBlock`, loot = hierro en bruto).
 - **Arcoíris**: `sky/Rainbow` (registro puro, va en el paquete), `weather/Rainbows` (al acabarse una lluvia cerca de un
   jugador, de día, 35 %; recompensa al llegar al extremo; no se guarda), dibujo en `SkyRenderer.drawRainbows`.
+- **Red de micelio** (`mycel/`): `MyceliumRules` y `MyceliumNetworks` son Java puro (reglas; chunks de cada red, máx. 30,
+  guardados en `SeepageSavedData` como `mycelium`). `Mycelium` (mundo): nace con `tick`/`tryBirth`, crece en los ticks
+  aleatorios de `block/MyceliumVeinBlock` (extiende `GlowLichenBlock`: caras con `MultifaceBlock.getFaceProperty`) y
+  `MyceliumNodeBlock`; solo bajo `HostBiomes` (pantano, manglar, champiñones; bioma a y=64) y bajo tierra. Es permanente
+  (no pasa por la filtración ni se apunta en las celdas). Luz de bloque ≥ 7 → el hilo se retira; `killIfOrphan` mata los
+  hilos sin nodo. `SporeMist`: niebla ≥ 0,3 en esos biomas → náusea (`MobEffects.NAUSEA` en 1.21.11, `CONFUSION` antes),
+  setas con `randomTick`. Self-test en `selftest/MyceliumSelfTest` (túnel propio en y -57..-54).
+- `research` también saca JSON de datos y recursos vanilla (loot tables, modelos) de los jars del juego.
 - Fuentes decompiladas desde la CI: `gh api -X POST repos/HCuadrado428/stormroot/actions/workflows/research.yml/dispatches`
   con `inputs[classes]` y `inputs[pattern]` (workflow `research`).
-- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 33 comprobaciones; cliente con
-  un jugador en pantalla virtual: 12 más, incluidas las de Bloomberto y las del cielo).
+- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 41 comprobaciones; cliente con
+  un jugador en pantalla virtual: 13 más, incluidas las de Bloomberto y las del cielo).
 - En el self-test, el clima se lee de `server.getWorldData().overworldData()`: `level.isRaining()/isThundering()` son la
   intensidad visual, que sube tick a tick. Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.
 - **Self-test** (`selftest/SelfTest`, `client/ClientSelfTest`, `scripts/selftest.sh`, job `selftest` de la CI): cuando
