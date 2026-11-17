@@ -94,9 +94,13 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   principales. Tormenta seca: `weather/DryStorms` (rayos con daño; `mixin/LightningBoltFireMixin` cancela su `spawnFire`) y fuego del clima `block/StormFireBlock` (solo hojas no persistentes, `SPREAD` ≤ 4, `AGE` 15; render cutout: Fabric `BlockRenderLayerMap`, Forge/NeoForge `render_type` del modelo). La niebla del cliente se deshace en biomas sin lluvia. Frentes por bioma:
   `weather/ClimateZone` (pesos) + `weather/BiomeClimate`. Niebla: humedece hasta `SeepageCell.FOG_CAP`. Cliente:
   sombras, aviso de tormenta (`CloudCover.approach`), capa alta, niebla que rueda (`ClientWeather.spawnRollingFog`).
+- **Ventisca y cuevas de hielo**: `FrontType.BLIZZARD` (pesos en `ClimateZone`), `weather/BlizzardSnow` (capas hasta 4),
+  `SeepageCell.frost` (guardado; `updateFrost`, deshielo lento/masivo) y efectos en `SeepageTicker.freeze` (tipos
+  `SNOW_FLOOR`, `ICE_FLOOR`, `FROZEN`, `ICICLE`, `ICE_CRYSTAL`, reversibles), bloques `block/IcicleBlock` (cae con luz
+  de bloque ≥ 7) e `IceCrystalBlock`, peligros en `seep/ColdCaves` (congelación vanilla `setTicksFrozen`, strays).
 - Fuentes decompiladas desde la CI: `gh api -X POST repos/HCuadrado428/stormroot/actions/workflows/research.yml/dispatches`
   con `inputs[classes]` y `inputs[pattern]` (workflow `research`).
-- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 24 comprobaciones; cliente con
+- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 27 comprobaciones; cliente con
   un jugador en pantalla virtual: 12 más, incluidas las de Bloomberto y las del cielo).
 - En el self-test, el clima se lee de `server.getWorldData().overworldData()`: `level.isRaining()/isThundering()` son la
   intensidad visual, que sube tick a tick. Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.

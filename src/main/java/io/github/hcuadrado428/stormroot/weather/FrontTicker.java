@@ -51,6 +51,7 @@ public final class FrontTicker {
         if (server == currentServer) {
             DryStorms.tick(server.overworld());
             BlizzardSnow.tick(server.overworld());
+            io.github.hcuadrado428.stormroot.seep.ColdCaves.tick(server);
         }
         if (++tickCounter < STEP_TICKS && server == currentServer) {
             return;

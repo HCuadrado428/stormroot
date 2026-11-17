@@ -27,6 +27,8 @@ public final class CaveMaterials {
         BY_ID.put("rooted_dirt", Blocks.ROOTED_DIRT);
         BY_ID.put("mud", Blocks.MUD);
         BY_ID.put("gravel", Blocks.GRAVEL);
+        // Solo para restaurar el agua natural que heló una cueva (FROZEN); ningún efecto la usa como suelo.
+        BY_ID.put("water", Blocks.WATER);
     }
 
     /** Roca: puede tener charcos y musgo. */

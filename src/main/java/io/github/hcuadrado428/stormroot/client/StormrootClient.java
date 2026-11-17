@@ -42,14 +42,20 @@ public class StormrootClient /*? if fabric {*/ implements ClientModInitializer /
     // Fuego del clima con transparencia recortada (en Forge/NeoForge lo dice su modelo: "render_type").
     //? if fabric && >=1.21.11 {
     private static void registerRenderLayers() {
-        net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap.putBlock(
+        for (net.minecraft.world.level.block.Block block : new net.minecraft.world.level.block.Block[] {
                 io.github.hcuadrado428.stormroot.registry.ModBlocks.STORM_FIRE,
-                net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
+                io.github.hcuadrado428.stormroot.registry.ModBlocks.ICICLE,
+                io.github.hcuadrado428.stormroot.registry.ModBlocks.ICE_CRYSTAL}) {
+            net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap.putBlock(block,
+                    net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
+        }
     }
     //?} else if fabric {
     /*private static void registerRenderLayers() {
-        net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlock(
-                io.github.hcuadrado428.stormroot.registry.ModBlocks.STORM_FIRE, net.minecraft.client.renderer.RenderType.cutout());
+        net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlocks(net.minecraft.client.renderer.RenderType.cutout(),
+                io.github.hcuadrado428.stormroot.registry.ModBlocks.STORM_FIRE,
+                io.github.hcuadrado428.stormroot.registry.ModBlocks.ICICLE,
+                io.github.hcuadrado428.stormroot.registry.ModBlocks.ICE_CRYSTAL);
     }
     *///?}
 

@@ -70,7 +70,7 @@ Para compilar con la integración: `scripts/fetch-bloomberto.sh` (compila Bloomb
 
 La CI arranca **Minecraft de verdad** en los 6 targets en cada push (`scripts/selftest.sh`, job `selftest`):
 
-- **Servidor dedicado** (24 comprobaciones): construye una cueva de pruebas y comprueba registros, guardado de frentes y de filtración, el paquete de red, los comandos, los ajustes del mundo, que `/weather` se respeta, que se quitan los rayos fuera de las tormentas, el pronóstico, la veleta y el barómetro (señal de redstone), que las pozas solo llenan hoyos cerrados, que la cueva empapada da charcos, barro y musgo, que **el agua nunca se derrama**, que la raíz de rayo baja hasta la cueva y que **al secarse cada bloque vuelve a ser exactamente el original**; además, que solo llueve bajo los nubarrones, que los frentes nacen según el bioma, que la niebla humedece sin hacer charcos, que los rayos de tormenta seca no prenden fuego vanilla y que el fuego del clima solo quema hojas de árbol.
+- **Servidor dedicado** (27 comprobaciones): construye una cueva de pruebas y comprueba registros, guardado de frentes y de filtración, el paquete de red, los comandos, los ajustes del mundo, que `/weather` se respeta, que se quitan los rayos fuera de las tormentas, el pronóstico, la veleta y el barómetro (señal de redstone), que las pozas solo llenan hoyos cerrados, que la cueva empapada da charcos, barro y musgo, que **el agua nunca se derrama**, que la raíz de rayo baja hasta la cueva y que **al secarse cada bloque vuelve a ser exactamente el original**; además, que solo llueve bajo los nubarrones, que los frentes nacen según el bioma, que la niebla humedece sin hacer charcos, que los rayos de tormenta seca no prenden fuego vanilla que el fuego del clima solo quema hojas de árbol, que la nieve de la ventisca se apila y que **la cueva helada vuelve a ser la de antes al deshelarse**.
 - **Un jugador** en una pantalla virtual (12 más): llegan los frentes al cliente, la tormenta se ve y se va, la niebla (y que el enganche de cada loader la aplica de verdad al dibujar), la humedad de las cuevas, el cielo de Stormroot (nubes vanilla ocultas, una tormenta lejana dibujada, nubes de buen tiempo sin frentes y sus sombras en el suelo) y la integración con Bloomberto (archivo y pantalla de config, efectos de pantalla). Saca capturas (artefacto `selftest-shots` de la CI).
 
 En local: `scripts/selftest.sh server 1.21.1-fabric` o `scripts/selftest.sh client 1.21.1-fabric` (cliente: necesita `xvfb-run` en Linux). En cualquier lanzador: `-Dstormroot.selfTest=server|client|all` (el juego se cierra al terminar; `-Dstormroot.selfTest.exit=false` lo deja abierto). Sin esa propiedad el self-test no hace nada.
@@ -128,6 +128,11 @@ src/versioned/<versión>/  → recetas, loot tables y tags (su formato cambia en
   - **Sombra de las nubes** en el suelo (opción `cloud_shadows`) y una **capa alta** de velos finos.
 - **Tormenta seca**: en desiertos, badlands y sabanas las tormentas echan rayos sin lluvia, que hacen daño y dan el doble de cristales de rayo. No prenden fuego normal: a veces encienden el **fuego del clima**, que solo arde en hojas de árbol (no en las que pone un jugador), salta como mucho 4 veces, se apaga solo en unos 30 s o con la lluvia y no puede quemar casas.
 - **Frentes según el bioma**: en el desierto solo nacen tormentas (secas); en pantanos, junglas y océanos, más lluvia y niebla.
+- **Ventisca** (biomas fríos y cumbres): nubarrón blanco, poca visibilidad y nieve que se apila hasta 4 capas. Debajo, **todas las cuevas se hielan** poco a poco:
+  - suelo de nieve y hielo compacto mezclados, agua natural congelada, **carámbanos** (hasta 3 bloques; caen y hacen daño si les pones luz cerca) y **cristales de hielo** que brillan;
+  - **congelación** si te quedas mucho rato (como la nieve polvo; la ropa de cuero protege) y más **strays** a oscuras;
+  - se deshielan muy poco a poco; una tormenta fuerte sobre una cueva muy helada provoca un **deshielo masivo**: se derrite en un minuto y se inunda.
+  - Todo se deshace al deshelarse (cada bloque vuelve a su material).
 - **Niebla que rueda** pegada al suelo con el viento; se deshace al entrar en biomas sin lluvia (desierto, badlands, sabana); los bancos de niebla humedecen un poco el subsuelo (barro y musgo, nunca charcos).
 - **Partículas en el borde** de los frentes cercanos (gotas, humo de tormenta, nubes bajas).
 - **Cristales de rayo**: un rayo sobre arena o piedra deja un cristal el 25 % de las veces. Se usan en la receta del barómetro.
@@ -146,7 +151,7 @@ src/versioned/<versión>/  → recetas, loot tables y tags (su formato cambia en
 
 ## 🔜 Siguientes pasos
 
-1. **Ventisca** con sus cuevas de hielo (hielo en el suelo y el techo) y después el **deshielo** (catálogo de fenómenos).
+1. **Ola de calor** (que también desatará deshielos masivos), revisión a ojo de la ventisca y las cuevas de hielo.
 2. **Revisión a ojo** de lo visual (ver "Pruebas dentro del juego") y **publicar la 0.1** (crear los proyectos en Modrinth/CurseForge y los secretos de la CI).
 3. **Texturas definitivas** (encargadas; guía en `stormroot-texturas`).
 4. Del diseño: más frentes (granizo, calor, polvo, ventisca, aurora), corrientes de aire y bolsas de gas, red de micelio, ruinas de los Tempestarios, más instrumentos, muestras y frascos, el jugador y el clima, fauna y flora, eventos raros y progresión.

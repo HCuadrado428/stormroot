@@ -88,7 +88,9 @@ public final class SeepageTicker {
                     if (updated.add(SeepageField.key(cx, cz))) {
                         double rain = rainAt(simulation, (cx << 4) + 8, (cz << 4) + 8);
                         double fog = fogAt(simulation, (cx << 4) + 8, (cz << 4) + 8);
-                        field.getOrCreate(cx, cz).update(rain, fog, seconds, rates);
+                        SeepageCell cell = field.getOrCreate(cx, cz);
+                        cell.update(rain, fog, seconds, rates);
+                        updateFrost(level, simulation, cell, cx, cz, seconds);
                     }
                     if (Math.abs(dx) <= EFFECT_RADIUS && Math.abs(dz) <= EFFECT_RADIUS) {
                         affected.add(SeepageField.key(cx, cz));
@@ -128,6 +130,54 @@ public final class SeepageTicker {
         return best;
     }
 
+    /** Cuevas de hielo: a partir de esta helada, nieve y hielo en el suelo. */
+    public static final double SNOW_AT = 0.2;
+    /** Agua natural congelada. */
+    public static final double FREEZE_WATER_AT = 0.35;
+    /** Carámbanos en el techo (y frío que congela a los jugadores, {@link ColdCaves}). */
+    public static final double ICICLE_AT = 0.45;
+    /** Cristales de hielo. */
+    public static final double CRYSTAL_AT = 0.55;
+    /** Los carámbanos crecen (hasta 3). */
+    public static final double ICICLE_GROW_AT = 0.65;
+    /** Helada mínima para que una tormenta encima la derrita de golpe (deshielo masivo). */
+    public static final double MASSIVE_THAW_FROST = 0.6;
+    /** Intensidad de tormenta que desata el deshielo masivo. */
+    public static final double MASSIVE_THAW_STORM = 0.5;
+
+    /**
+     * Helada del chunk: sube con la ventisca encima (solo en biomas fríos: ahí se hielan todas las cuevas); sin ella
+     * baja muy despacio; una tormenta fuerte sobre una cueva muy helada la derrite de golpe (deshielo masivo).
+     * Más adelante, la ola de calor también.
+     */
+    private static void updateFrost(ServerLevel level, FrontSimulation simulation, SeepageCell cell, int cx, int cz, double seconds) {
+        double x = (cx << 4) + 8;
+        double z = (cz << 4) + 8;
+        double blizzard = intensityAt(simulation, FrontType.BLIZZARD, x, z);
+        if (blizzard > 0.05) {
+            io.github.hcuadrado428.stormroot.weather.ClimateZone zone =
+                    io.github.hcuadrado428.stormroot.weather.BiomeClimate.zoneAt(level, x, z);
+            if (zone != io.github.hcuadrado428.stormroot.weather.ClimateZone.COLD
+                    && zone != io.github.hcuadrado428.stormroot.weather.ClimateZone.MOUNTAIN) {
+                blizzard = 0;
+            }
+        }
+        double storm = intensityAt(simulation, FrontType.THUNDERSTORM, x, z);
+        boolean thaw = storm >= MASSIVE_THAW_STORM && (cell.frost() >= MASSIVE_THAW_FROST || cell.thawing());
+        cell.updateFrost(blizzard, thaw, seconds);
+    }
+
+    /** Intensidad (0–1) del frente más fuerte de ese tipo en un punto. */
+    public static double intensityAt(FrontSimulation simulation, FrontType type, double x, double z) {
+        double best = 0;
+        for (WeatherFront front : simulation.fronts()) {
+            if (front.type() == type) {
+                best = Math.max(best, front.intensityAt(x, z));
+            }
+        }
+        return best;
+    }
+
     /** Intensidad de niebla (0–1) de los frentes en un punto. */
     public static double fogAt(FrontSimulation simulation, double x, double z) {
         double best = 0;
@@ -154,6 +204,29 @@ public final class SeepageTicker {
     private static void applyEffects(ServerLevel level, int cx, int cz, SeepageCell cell, int maxChanges) {
         RandomSource random = level.getRandom();
         double deep = cell.deep();
+
+        // Cuevas de hielo: deshacer lo que ya no toca (deprisa en un deshielo masivo) y, con helada, helar.
+        double frost = cell.frost();
+        double thawChance = cell.thawing() ? Math.min(1, RECEDE_CHANCE * 6) : RECEDE_CHANCE;
+        if (frost < CRYSTAL_AT - 0.1 && random.nextDouble() < thawChance) {
+            undo(level, cell, cell.lastIndexOf(SeepageCell.Kind.ICE_CRYSTAL));
+        }
+        if (frost < ICICLE_AT - 0.1 && random.nextDouble() < thawChance) {
+            undo(level, cell, cell.lastIndexOf(SeepageCell.Kind.ICICLE));
+        }
+        if (frost < SNOW_AT - 0.1 && random.nextDouble() < thawChance) {
+            undo(level, cell, cell.lastIndexOf(SeepageCell.Kind.SNOW_FLOOR, SeepageCell.Kind.ICE_FLOOR));
+        }
+        if (frost < FREEZE_WATER_AT - 0.1 && random.nextDouble() < thawChance) {
+            undo(level, cell, cell.lastIndexOf(SeepageCell.Kind.FROZEN));
+        }
+        if (frost >= SNOW_AT) {
+            // Cueva helada: no se moja (no hay charcos ni barro nuevos), solo se hiela.
+            if (cell.changes().size() < maxChanges) {
+                freeze(level, cx, cz, cell, random, frost);
+            }
+            return;
+        }
 
         // Secado y sequía primero: deshacen cambios.
         if (deep <= RECEDE_AT && random.nextDouble() < RECEDE_CHANCE) {
@@ -211,6 +284,117 @@ public final class SeepageTicker {
                 return;
             }
         }
+    }
+
+    /** Un efecto de cueva helada por llamada: suelo de nieve o hielo, agua congelada, carámbanos o cristales. */
+    private static void freeze(ServerLevel level, int cx, int cz, SeepageCell cell, RandomSource random, double frost) {
+        // Primero hacer crecer carámbanos que ya hay.
+        if (frost >= ICICLE_GROW_AT && cell.count(SeepageCell.Kind.ICICLE) > 0 && random.nextInt(3) == 0 && growIcicle(level, cell, random)) {
+            return;
+        }
+        for (int attempt = 0; attempt < ATTEMPTS_PER_CHUNK; attempt++) {
+            if (frost >= FREEZE_WATER_AT && random.nextInt(4) == 0 && freezeWater(level, cx, cz, cell, random)) {
+                return;
+            }
+            BlockPos air = randomCaveFloor(level, cx, cz, random);
+            if (air == null) {
+                continue;
+            }
+            BlockPos floor = air.below();
+            String material = CaveMaterials.idOf(level.getBlockState(floor));
+            if (material == null || !CaveMaterials.PUDDLE_FLOOR.contains(material) || !isWall(level, floor)) {
+                continue;
+            }
+            int roll = random.nextInt(10);
+            if (frost >= ICICLE_AT && roll < 3) {
+                BlockPos hang = ceilingAbove(level, air);
+                if (hang != null && place(level, cell, hang, io.github.hcuadrado428.stormroot.registry.ModBlocks.ICICLE.defaultBlockState(),
+                        SeepageCell.Kind.ICICLE, "")) {
+                    return;
+                }
+            } else if (frost >= CRYSTAL_AT && roll == 3) {
+                if (place(level, cell, air, io.github.hcuadrado428.stormroot.registry.ModBlocks.ICE_CRYSTAL.defaultBlockState(),
+                        SeepageCell.Kind.ICE_CRYSTAL, "")) {
+                    return;
+                }
+            } else if (roll < 7) {
+                // Nieve y hielo mezclados en el suelo.
+                int layers = 1 + random.nextInt(2);
+                if (place(level, cell, air, Blocks.SNOW.defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.SnowLayerBlock.LAYERS, layers), SeepageCell.Kind.SNOW_FLOOR, "")) {
+                    return;
+                }
+            } else if (place(level, cell, floor, Blocks.PACKED_ICE.defaultBlockState(), SeepageCell.Kind.ICE_FLOOR, material)) {
+                return;
+            }
+        }
+    }
+
+    /** El aire justo bajo el techo encima de {@code air} (techo de roca natural), o {@code null}. */
+    private static BlockPos ceilingAbove(ServerLevel level, BlockPos air) {
+        BlockPos pos = air;
+        for (int i = 0; i < 12; i++) {
+            BlockPos up = pos.above();
+            BlockState state = level.getBlockState(up);
+            if (!state.isAir()) {
+                String material = CaveMaterials.idOf(state);
+                return material != null && CaveMaterials.ROCK.contains(material) && isWall(level, up)
+                        && pos.getY() > air.getY() + 1 ? pos : null;
+            }
+            pos = up;
+        }
+        return null;
+    }
+
+    /** Alarga un carámbano (hasta 3) por debajo de su punta. */
+    private static boolean growIcicle(ServerLevel level, SeepageCell cell, RandomSource random) {
+        List<SeepageCell.Change> icicles = new ArrayList<>();
+        for (SeepageCell.Change change : cell.changes()) {
+            if (change.kind() == SeepageCell.Kind.ICICLE) {
+                icicles.add(change);
+            }
+        }
+        BlockPos tip = BlockPos.of(icicles.get(random.nextInt(icicles.size())).pos());
+        BlockState state = level.getBlockState(tip);
+        if (!level.isLoaded(tip) || !(state.getBlock() instanceof io.github.hcuadrado428.stormroot.block.IcicleBlock)
+                || !state.getValue(io.github.hcuadrado428.stormroot.block.IcicleBlock.TIP)) {
+            return false;
+        }
+        BlockPos below = tip.below();
+        if (io.github.hcuadrado428.stormroot.block.IcicleBlock.lengthAt(level, tip) >= io.github.hcuadrado428.stormroot.block.IcicleBlock.MAX_LENGTH
+                || !level.getBlockState(below).isAir() || !level.getBlockState(below.below()).isAir()) {
+            return false;
+        }
+        // El de arriba deja de ser punta; el nuevo es la punta. El cambio de arriba sigue apuntado (es el mismo bloque).
+        level.setBlock(tip, state.setValue(io.github.hcuadrado428.stormroot.block.IcicleBlock.TIP, false), Block.UPDATE_ALL);
+        return place(level, cell, below, state.setValue(io.github.hcuadrado428.stormroot.block.IcicleBlock.TIP, true),
+                SeepageCell.Kind.ICICLE, "");
+    }
+
+    /** Congela un bloque de agua natural quieta de una cueva del chunk (no el agua que puso Stormroot). */
+    private static boolean freezeWater(ServerLevel level, int cx, int cz, SeepageCell cell, RandomSource random) {
+        BlockPos air = randomCaveFloor(level, cx, cz, random);
+        if (air == null) {
+            return false;
+        }
+        for (Direction side : Direction.Plane.HORIZONTAL) {
+            BlockPos water = air.below().relative(side);
+            if (isStillWater(level, water) && level.getBlockState(water.above()).isAir() && !level.canSeeSky(water.above())
+                    && !hasChange(cell, water)) {
+                return place(level, cell, water, Blocks.ICE.defaultBlockState(), SeepageCell.Kind.FROZEN, "water");
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasChange(SeepageCell cell, BlockPos pos) {
+        long key = pos.asLong();
+        for (SeepageCell.Change change : cell.changes()) {
+            if (change.pos() == key) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Un punto de aire en el suelo de una cueva de ese chunk, o {@code null}. */
@@ -366,6 +550,11 @@ public final class SeepageTicker {
             case MUD -> state.is(Blocks.MUD);
             case MOSS -> state.is(Blocks.MOSS_BLOCK);
             case CRACKED -> state.is(Blocks.COARSE_DIRT);
+            case SNOW_FLOOR -> state.is(Blocks.SNOW);
+            case ICE_FLOOR -> state.is(Blocks.PACKED_ICE);
+            case FROZEN -> state.is(Blocks.ICE);
+            case ICICLE -> state.getBlock() instanceof io.github.hcuadrado428.stormroot.block.IcicleBlock;
+            case ICE_CRYSTAL -> state.getBlock() instanceof io.github.hcuadrado428.stormroot.block.IceCrystalBlock;
         };
         if (unchanged) {
             level.setBlock(pos, CaveMaterials.restore(change.original()), Block.UPDATE_ALL);

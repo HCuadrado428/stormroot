@@ -96,6 +96,10 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 () -> ModBlocks.LIGHTNING_ROOT = ModBlocks.createLightningRoot());
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.STORM_FIRE_ID),
                 () -> ModBlocks.STORM_FIRE = ModBlocks.createStormFire());
+        event.register(Registries.BLOCK, ModIds.id(ModBlocks.ICICLE_ID),
+                () -> ModBlocks.ICICLE = ModBlocks.createIcicle());
+        event.register(Registries.BLOCK, ModIds.id(ModBlocks.ICE_CRYSTAL_ID),
+                () -> ModBlocks.ICE_CRYSTAL = ModBlocks.createIceCrystal());
         event.register(Registries.ITEM, ModIds.id("lightning_crystal"),
                 () -> ModItems.LIGHTNING_CRYSTAL = ModItems.create("lightning_crystal"));
         event.register(Registries.ITEM, ModIds.id(ModBlocks.WEATHERVANE_ID),
@@ -104,12 +108,18 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 () -> ModBlocks.BAROMETER_ITEM = ModBlocks.createBlockItem(ModBlocks.BAROMETER_ID, ModBlocks.BAROMETER));
         event.register(Registries.ITEM, ModIds.id(ModBlocks.LIGHTNING_ROOT_ID),
                 () -> ModBlocks.LIGHTNING_ROOT_ITEM = ModBlocks.createBlockItem(ModBlocks.LIGHTNING_ROOT_ID, ModBlocks.LIGHTNING_ROOT));
+        event.register(Registries.ITEM, ModIds.id(ModBlocks.ICICLE_ID),
+                () -> ModBlocks.ICICLE_ITEM = ModBlocks.createBlockItem(ModBlocks.ICICLE_ID, ModBlocks.ICICLE));
+        event.register(Registries.ITEM, ModIds.id(ModBlocks.ICE_CRYSTAL_ID),
+                () -> ModBlocks.ICE_CRYSTAL_ITEM = ModBlocks.createBlockItem(ModBlocks.ICE_CRYSTAL_ID, ModBlocks.ICE_CRYSTAL));
     }
 
     private static void onCreativeTabs(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.LIGHTNING_CRYSTAL);
             event.accept(ModBlocks.LIGHTNING_ROOT_ITEM);
+            event.accept(ModBlocks.ICICLE_ITEM);
+            event.accept(ModBlocks.ICE_CRYSTAL_ITEM);
         }
         if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
             event.accept(ModBlocks.WEATHERVANE_ITEM);
@@ -158,6 +168,10 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 () -> ModBlocks.LIGHTNING_ROOT = ModBlocks.createLightningRoot());
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.STORM_FIRE_ID),
                 () -> ModBlocks.STORM_FIRE = ModBlocks.createStormFire());
+        event.register(Registries.BLOCK, ModIds.id(ModBlocks.ICICLE_ID),
+                () -> ModBlocks.ICICLE = ModBlocks.createIcicle());
+        event.register(Registries.BLOCK, ModIds.id(ModBlocks.ICE_CRYSTAL_ID),
+                () -> ModBlocks.ICE_CRYSTAL = ModBlocks.createIceCrystal());
         event.register(Registries.ITEM, ModIds.id("lightning_crystal"),
                 () -> ModItems.LIGHTNING_CRYSTAL = ModItems.create("lightning_crystal"));
         event.register(Registries.ITEM, ModIds.id(ModBlocks.WEATHERVANE_ID),
@@ -166,12 +180,18 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 () -> ModBlocks.BAROMETER_ITEM = ModBlocks.createBlockItem(ModBlocks.BAROMETER_ID, ModBlocks.BAROMETER));
         event.register(Registries.ITEM, ModIds.id(ModBlocks.LIGHTNING_ROOT_ID),
                 () -> ModBlocks.LIGHTNING_ROOT_ITEM = ModBlocks.createBlockItem(ModBlocks.LIGHTNING_ROOT_ID, ModBlocks.LIGHTNING_ROOT));
+        event.register(Registries.ITEM, ModIds.id(ModBlocks.ICICLE_ID),
+                () -> ModBlocks.ICICLE_ITEM = ModBlocks.createBlockItem(ModBlocks.ICICLE_ID, ModBlocks.ICICLE));
+        event.register(Registries.ITEM, ModIds.id(ModBlocks.ICE_CRYSTAL_ID),
+                () -> ModBlocks.ICE_CRYSTAL_ITEM = ModBlocks.createBlockItem(ModBlocks.ICE_CRYSTAL_ID, ModBlocks.ICE_CRYSTAL));
     }
 
     private static void onCreativeTabs(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.LIGHTNING_CRYSTAL);
             event.accept(ModBlocks.LIGHTNING_ROOT_ITEM);
+            event.accept(ModBlocks.ICICLE_ITEM);
+            event.accept(ModBlocks.ICE_CRYSTAL_ITEM);
         }
         if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
             event.accept(ModBlocks.WEATHERVANE_ITEM);
@@ -205,6 +225,10 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 ModIds.id(ModBlocks.LIGHTNING_ROOT_ID), ModBlocks.createLightningRoot());
         ModBlocks.STORM_FIRE = Registry.register(BuiltInRegistries.BLOCK,
                 ModIds.id(ModBlocks.STORM_FIRE_ID), ModBlocks.createStormFire());
+        ModBlocks.ICICLE = Registry.register(BuiltInRegistries.BLOCK,
+                ModIds.id(ModBlocks.ICICLE_ID), ModBlocks.createIcicle());
+        ModBlocks.ICE_CRYSTAL = Registry.register(BuiltInRegistries.BLOCK,
+                ModIds.id(ModBlocks.ICE_CRYSTAL_ID), ModBlocks.createIceCrystal());
         ModItems.LIGHTNING_CRYSTAL = Registry.register(BuiltInRegistries.ITEM,
                 ModIds.id("lightning_crystal"), ModItems.create("lightning_crystal"));
         ModBlocks.WEATHERVANE_ITEM = Registry.register(BuiltInRegistries.ITEM, ModIds.id(ModBlocks.WEATHERVANE_ID),
@@ -213,10 +237,16 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 ModBlocks.createBlockItem(ModBlocks.BAROMETER_ID, ModBlocks.BAROMETER));
         ModBlocks.LIGHTNING_ROOT_ITEM = Registry.register(BuiltInRegistries.ITEM, ModIds.id(ModBlocks.LIGHTNING_ROOT_ID),
                 ModBlocks.createBlockItem(ModBlocks.LIGHTNING_ROOT_ID, ModBlocks.LIGHTNING_ROOT));
+        ModBlocks.ICICLE_ITEM = Registry.register(BuiltInRegistries.ITEM, ModIds.id(ModBlocks.ICICLE_ID),
+                ModBlocks.createBlockItem(ModBlocks.ICICLE_ID, ModBlocks.ICICLE));
+        ModBlocks.ICE_CRYSTAL_ITEM = Registry.register(BuiltInRegistries.ITEM, ModIds.id(ModBlocks.ICE_CRYSTAL_ID),
+                ModBlocks.createBlockItem(ModBlocks.ICE_CRYSTAL_ID, ModBlocks.ICE_CRYSTAL));
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.INGREDIENTS)
                 .register(entries -> {
                     entries.accept(ModItems.LIGHTNING_CRYSTAL);
                     entries.accept(ModBlocks.LIGHTNING_ROOT_ITEM);
+                    entries.accept(ModBlocks.ICICLE_ITEM);
+                    entries.accept(ModBlocks.ICE_CRYSTAL_ITEM);
                 });
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(entries -> {
             entries.accept(ModBlocks.WEATHERVANE_ITEM);

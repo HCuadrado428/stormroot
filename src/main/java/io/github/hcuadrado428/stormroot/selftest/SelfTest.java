@@ -161,6 +161,8 @@ public final class SelfTest {
                 run("lightning root grows to the cave", () -> checkRoot(level));
                 run("seepage codec round trip", () -> checkSeepageCodec(server));
                 run("seepage dries and restores every block", () -> dryCave(level));
+                run("ice cave freezes and thaws back", () -> iceCave(level));
+                run("massive thaw floods the cave", SelfTest::checkMassiveThaw);
                 finish(server);
             }
             default -> {
@@ -561,6 +563,7 @@ public final class SelfTest {
                 case MUD -> state.is(Blocks.MUD);
                 case MOSS -> state.is(Blocks.MOSS_BLOCK);
                 case CRACKED -> state.is(Blocks.COARSE_DIRT);
+                default -> true;
             };
             consistent &= match;
         }
@@ -621,6 +624,58 @@ public final class SelfTest {
         check("seepage dries and restores every block", noWater && cell.changes().isEmpty() && different.isEmpty(),
                 "sin agua=" + noWater + ", cambios pendientes=" + cell.changes().size() + ", distintos=" + different);
         cell.set(0);
+    }
+
+    /** Cueva helada: nieve, hielo, carámbanos (hasta 3) y cristales; sin charcos; al deshelarse vuelve todo. */
+    private static void iceCave(ServerLevel level) {
+        cell.set(0);
+        cell.setFrost(1);
+        for (int i = 0; i < 800; i++) {
+            SeepageTicker.applyEffectsForTest(level, CX, CZ, cell, 256);
+        }
+        int floor = cell.count(SeepageCell.Kind.SNOW_FLOOR) + cell.count(SeepageCell.Kind.ICE_FLOOR);
+        int icicles = cell.count(SeepageCell.Kind.ICICLE);
+        int crystals = cell.count(SeepageCell.Kind.ICE_CRYSTAL);
+        boolean dry = cell.count(SeepageCell.Kind.PUDDLE) + cell.count(SeepageCell.Kind.POOL) + cell.count(SeepageCell.Kind.MUD) == 0;
+        int longest = 0;
+        for (SeepageCell.Change change : cell.changes()) {
+            if (change.kind() == SeepageCell.Kind.ICICLE) {
+                longest = Math.max(longest, io.github.hcuadrado428.stormroot.block.IcicleBlock.lengthAt(level, BlockPos.of(change.pos())));
+            }
+        }
+        cell.setFrost(0);
+        for (int i = 0; i < 4000 && !cell.changes().isEmpty(); i++) {
+            cell.set(0.3);
+            SeepageTicker.applyEffectsForTest(level, CX, CZ, cell, 256);
+        }
+        List<String> different = new ArrayList<>();
+        for (Map.Entry<BlockPos, BlockState> entry : snapshot.entrySet()) {
+            BlockState now = level.getBlockState(entry.getKey());
+            if (!now.equals(entry.getValue()) && different.size() < 5) {
+                different.add(entry.getKey().toShortString() + " " + CaveMaterials.idOf(entry.getValue()) + " -> " + now);
+            }
+        }
+        check("ice cave freezes and thaws back",
+                floor > 0 && icicles > 0 && crystals > 0 && dry && longest <= io.github.hcuadrado428.stormroot.block.IcicleBlock.MAX_LENGTH
+                        && cell.changes().isEmpty() && different.isEmpty(),
+                "suelo helado=" + floor + ", carámbanos=" + icicles + " (el más largo " + longest + "), cristales=" + crystals
+                        + ", sin charcos=" + dry + ", cambios pendientes=" + cell.changes().size() + ", distintos=" + different);
+        cell.set(0);
+    }
+
+    /** Deshielo masivo: la helada se va en un minuto y deja el subsuelo empapado (inundación). */
+    private static void checkMassiveThaw() {
+        SeepageCell test = new SeepageCell();
+        test.setFrost(1);
+        for (int i = 0; i < 12; i++) {
+            test.updateFrost(0, true, 5);
+        }
+        check("massive thaw floods the cave", test.frost() == 0 && test.deep() >= SeepageTicker.POOL_AT,
+                "helada=" + test.frost() + ", humedad del subsuelo=" + test.deep());
+        SeepageCell slow = new SeepageCell();
+        slow.setFrost(1);
+        slow.updateFrost(0, false, 600);
+        check("slow thaw keeps the cave frozen", slow.frost() > 0.9, "helada tras 10 min sin ventisca=" + slow.frost());
     }
 
     private static boolean hasWaterOrMud() {

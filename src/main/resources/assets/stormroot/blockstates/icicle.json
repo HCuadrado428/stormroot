@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "tip=false": { "model": "stormroot:block/icicle" },
+    "tip=true": { "model": "stormroot:block/icicle_tip" }
+  }
+}

@@ -32,13 +32,14 @@ public class SeepageSavedData extends SavedData {
             Codec.STRING.optionalFieldOf("original", "").forGetter(SeepageCell.Change::original)
     ).apply(i, SeepageCell.Change::new));
 
-    private record CellEntry(long key, double surface, double deep, List<SeepageCell.Change> changes) {
+    private record CellEntry(long key, double surface, double deep, double frost, List<SeepageCell.Change> changes) {
     }
 
     private static final Codec<CellEntry> CELL_CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.LONG.fieldOf("chunk").forGetter(CellEntry::key),
             Codec.DOUBLE.fieldOf("surface").forGetter(CellEntry::surface),
             Codec.DOUBLE.fieldOf("deep").forGetter(CellEntry::deep),
+            Codec.DOUBLE.optionalFieldOf("frost", 0.0).forGetter(CellEntry::frost),
             CHANGE_CODEC.listOf().fieldOf("changes").forGetter(CellEntry::changes)
     ).apply(i, CellEntry::new));
 
@@ -80,7 +81,7 @@ public class SeepageSavedData extends SavedData {
     private static SeepageSavedData fromEntries(List<CellEntry> entries) {
         SeepageSavedData data = new SeepageSavedData();
         for (CellEntry e : entries) {
-            data.field.put(e.key(), new SeepageCell(e.surface(), e.deep(), e.changes()));
+            data.field.put(e.key(), new SeepageCell(e.surface(), e.deep(), e.frost(), e.changes()));
         }
         return data;
     }
@@ -90,7 +91,7 @@ public class SeepageSavedData extends SavedData {
         List<CellEntry> entries = new ArrayList<>();
         for (Map.Entry<Long, SeepageCell> e : data.field.cells().entrySet()) {
             SeepageCell c = e.getValue();
-            entries.add(new CellEntry(e.getKey(), c.surface(), c.deep(), new ArrayList<>(c.changes())));
+            entries.add(new CellEntry(e.getKey(), c.surface(), c.deep(), c.frost(), new ArrayList<>(c.changes())));
         }
         return entries;
     }

@@ -23,6 +23,8 @@ public final class ModBlocks {
     public static final String BAROMETER_ID = "barometer";
     public static final String LIGHTNING_ROOT_ID = "lightning_root";
     public static final String STORM_FIRE_ID = "storm_fire";
+    public static final String ICICLE_ID = "icicle";
+    public static final String ICE_CRYSTAL_ID = "ice_crystal";
 
     public static Block WEATHERVANE;
     public static Block BAROMETER;
@@ -32,6 +34,11 @@ public final class ModBlocks {
     public static Item LIGHTNING_ROOT_ITEM;
     /** Fuego del clima: sin objeto (no se puede coger). */
     public static Block STORM_FIRE;
+    /** Carámbano y cristal de hielo de las cuevas heladas (con objeto, para el modo creativo). */
+    public static Block ICICLE;
+    public static Item ICICLE_ITEM;
+    public static Block ICE_CRYSTAL;
+    public static Item ICE_CRYSTAL_ITEM;
 
     private ModBlocks() {
     }
@@ -66,6 +73,20 @@ public final class ModBlocks {
         /*properties = properties.noCollission();
         *///?}
         return create(STORM_FIRE_ID, StormFireBlock::new, properties);
+    }
+
+    public static Block createIcicle() {
+        BlockBehaviour.Properties properties = BlockBehaviour.Properties.of().mapColor(MapColor.ICE).strength(0.5F)
+                .sound(SoundType.GLASS).noOcclusion()
+                .pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY);
+        return create(ICICLE_ID, io.github.hcuadrado428.stormroot.block.IcicleBlock::new, properties);
+    }
+
+    public static Block createIceCrystal() {
+        BlockBehaviour.Properties properties = BlockBehaviour.Properties.of().mapColor(MapColor.ICE).strength(0.3F)
+                .sound(SoundType.AMETHYST_CLUSTER).noOcclusion().lightLevel(state -> 4)
+                .pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY);
+        return create(ICE_CRYSTAL_ID, io.github.hcuadrado428.stormroot.block.IceCrystalBlock::new, properties);
     }
 
     public static Item createBlockItem(String name, Block block) {

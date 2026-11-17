@@ -9,6 +9,8 @@ import java.util.List;
  * <ul>
  *   <li>{@code surface}: humedad del suelo, de -1 (sequía) a 1 (empapado). Sube rápido con la lluvia y baja despacio.</li>
  *   <li>{@code deep}: humedad del subsuelo. Sigue a {@code surface} con retraso: es lo que ven las cuevas.</li>
+ *   <li>{@code frost}: helada de las cuevas, de 0 a 1. Sube con la ventisca encima; baja muy despacio sin ella, o de
+ *       golpe en un deshielo masivo ({@link #massiveThaw}).</li>
  *   <li>{@code changes}: bloques que Stormroot ha cambiado en este chunk, con lo que había antes, para deshacerlos.</li>
  * </ul>
  * El agua estancada (charcos y pozas) retiene la humedad: mientras haya, el chunk se seca más despacio.
@@ -19,16 +21,66 @@ public final class SeepageCell {
 
     private double surface;
     private double deep;
+    private double frost;
     private final List<Change> changes;
 
     public SeepageCell(double surface, double deep, List<Change> changes) {
+        this(surface, deep, 0, changes);
+    }
+
+    public SeepageCell(double surface, double deep, double frost, List<Change> changes) {
         this.surface = clamp(surface);
         this.deep = clamp(deep);
+        this.frost = Math.max(0, Math.min(1, frost));
         this.changes = new ArrayList<>(changes);
     }
 
     public SeepageCell() {
-        this(0, 0, List.of());
+        this(0, 0, 0, List.of());
+    }
+
+    /** Ventisca a tope: la cueva se hiela del todo en unos 8 minutos. */
+    public static final double FREEZE_PER_SECOND = 1.0 / 480;
+    /** Sin ventisca: se deshiela MUY despacio (de helada del todo a nada en unas 3 horas de juego). */
+    public static final double SLOW_THAW_PER_SECOND = 1.0 / 10800;
+    /** Deshielo masivo: de helada del todo a nada en un minuto. */
+    public static final double FAST_THAW_PER_SECOND = 1.0 / 60;
+    /** Humedad que deja un deshielo masivo (la nieve derretida baja de golpe al subsuelo). */
+    public static final double THAW_FLOOD = 0.9;
+
+    /**
+     * Helada: {@code blizzard} = intensidad de la ventisca encima (0–1); {@code thaw} = {@code true} si hay un deshielo
+     * masivo encima (una tormenta o, más adelante, una ola de calor sobre una cueva helada).
+     */
+    public void updateFrost(double blizzard, boolean thaw, double seconds) {
+        thawing = thaw && frost > 0;
+        if (thawing) {
+            double melted = Math.min(frost, FAST_THAW_PER_SECOND * seconds);
+            frost -= melted;
+            // La nieve derretida: humedad de golpe (inundación).
+            surface = clamp(surface + melted * THAW_FLOOD * 2);
+            deep = clamp(deep + melted * THAW_FLOOD);
+        } else if (blizzard > 0.05) {
+            frost = Math.min(1, frost + blizzard * FREEZE_PER_SECOND * seconds);
+        } else {
+            frost = Math.max(0, frost - SLOW_THAW_PER_SECOND * seconds);
+        }
+    }
+
+    public double frost() {
+        return frost;
+    }
+
+    /** Deshielo masivo en curso (no se guarda). */
+    private transient boolean thawing;
+
+    public boolean thawing() {
+        return thawing;
+    }
+
+    /** Fija la helada (comando de depuración y self-test). */
+    public void setFrost(double value) {
+        frost = Math.max(0, Math.min(1, value));
     }
 
     /** Avanza {@code seconds} segundos con una lluvia de intensidad {@code rain} (0–1) encima. */
@@ -124,7 +176,7 @@ public final class SeepageCell {
 
     /** {@code true} si no aporta nada y se puede olvidar. */
     public boolean isNeutral() {
-        return Math.abs(surface) < 0.02 && Math.abs(deep) < 0.02 && changes.isEmpty();
+        return Math.abs(surface) < 0.02 && Math.abs(deep) < 0.02 && frost < 0.01 && changes.isEmpty();
     }
 
     private static double clamp(double v) {
@@ -148,7 +200,17 @@ public final class SeepageCell {
         /** Piedra cubierta de musgo tras mucho tiempo húmeda. Solo se deshace con sequía. */
         MOSS("moss", false),
         /** Tierra o barro agrietados por la sequía (tierra gruesa). Se deshace al volver la humedad. */
-        CRACKED("cracked", false);
+        CRACKED("cracked", false),
+        /** Capa de nieve en el suelo de una cueva helada (antes aire). */
+        SNOW_FLOOR("snow_floor", false),
+        /** Suelo de roca cubierto de hielo compacto. */
+        ICE_FLOOR("ice_floor", false),
+        /** Agua natural quieta congelada (se restaura el agua). */
+        FROZEN("frozen", false),
+        /** Carámbano colgando del techo (antes aire). */
+        ICICLE("icicle", false),
+        /** Cristal de hielo en el suelo (antes aire). */
+        ICE_CRYSTAL("ice_crystal", false);
 
         private final String id;
         private final boolean water;
