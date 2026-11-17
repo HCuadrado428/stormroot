@@ -553,7 +553,8 @@ public final class SelfTest {
     }
 
     private static void floodCave(ServerLevel level) {
-        for (int i = 0; i < 400; i++) {
+        // 400 rondas; si el azar no ha dado musgo (1 de cada 6 intentos en roca), hasta 400 más.
+        for (int i = 0; i < 800 && (i < 400 || cell.count(SeepageCell.Kind.MOSS) == 0); i++) {
             cell.set(1);
             SeepageTicker.applyEffectsForTest(level, CX, CZ, cell, 256);
         }
