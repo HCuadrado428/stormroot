@@ -40,7 +40,7 @@ for t in "$@"; do
     if [ -n "${CI:-}" ] && command -v convert > /dev/null; then
       for shot in build/selftest-shots/"$t"-*.png; do
         [ -f "$shot" ] || continue
-        echo "SHOT-B64 $(basename "$shot" .png) $(convert "$shot" -resize 640x -quality 70 jpg:- | base64 -w0)"
+        echo "SHOT-B64 $(basename "$shot" .png) $(convert "$shot" -alpha off -resize 640x -quality 70 jpg:- | base64 -w0)"
       done
     fi
   fi

@@ -129,7 +129,7 @@ jobs:
           scripts/fetch-bloomberto.sh
 
       - name: Pantalla virtual y OpenGL por software
-        run: sudo apt-get update && sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0 mesa-utils imagemagick
+        run: sudo apt-get update && sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0 mesa-utils imagemagick x11-utils
 
       - name: Self-test servidor (${{ matrix.target }})
         run: |
