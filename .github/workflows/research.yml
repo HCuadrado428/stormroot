@@ -1,0 +1,55 @@
+name: research
+
+# Consulta de fuentes decompiladas de Minecraft (regla de oro 1: nunca inventar una API).
+# Uso: gh workflow run research.yml -f classes="net/minecraft/world/level/biome/Biome.java ..." -f pattern="hasPrecipitation|getPrecipitationAt"
+# Para cada target: genSources de Fabric (mappings de Mojang) y, de cada clase pedida, las líneas que casan con el
+# patrón (con contexto) o la clase entera si el patrón está vacío.
+on:
+  workflow_dispatch:
+    inputs:
+      targets:
+        description: Targets de Fabric
+        default: "1.20.1-fabric 1.21.1-fabric 1.21.11-fabric"
+      classes:
+        description: Rutas de clase dentro del jar de fuentes, separadas por espacios
+        required: true
+      pattern:
+        description: Expresión regular (grep -E); vacío = clase entera
+        default: ""
+      context:
+        description: Líneas de contexto
+        default: "3"
+
+jobs:
+  sources:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: |
+            17
+            21
+            25
+          cache: gradle
+      - uses: gradle/actions/setup-gradle@v4
+      - name: genSources y consulta
+        env:
+          TARGETS: ${{ inputs.targets }}
+          CLASSES: ${{ inputs.classes }}
+          PATTERN: ${{ inputs.pattern }}
+          CONTEXT: ${{ inputs.context }}
+        run: |
+          chmod +x ./gradlew
+          for t in $TARGETS; do
+            ./gradlew ":$t:genSources" -q > /dev/null 2>&1 || ./gradlew ":$t:genSources" --stacktrace | tail -40
+            jar=$(find ~/.gradle .gradle "versions/$t" -name "*sources.jar" -path "*minecraft*" 2>/dev/null | grep -v "/stormroot" | head -1)
+            echo "################ $t ($jar)"
+            rm -rf /tmp/src && mkdir /tmp/src
+            for c in $CLASSES; do
+              unzip -o -q "$jar" "$c" -d /tmp/src 2>/dev/null || { echo "== $c: NO EXISTE"; continue; }
+              echo "== $c"
+              if [ -z "$PATTERN" ]; then cat -n "/tmp/src/$c"; else grep -n -E -C "$CONTEXT" "$PATTERN" "/tmp/src/$c" || echo "(sin coincidencias)"; fi
+            done
+          done
