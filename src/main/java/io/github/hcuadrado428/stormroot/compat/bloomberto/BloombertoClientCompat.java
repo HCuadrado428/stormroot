@@ -58,6 +58,11 @@ public final class BloombertoClientCompat {
         });
     }
 
+    /** Para el self-test: {@code true} si algún efecto de pantalla de Stormroot está encendido. */
+    public static boolean effectsActive() {
+        return (desaturate != null && desaturate.isEnabled()) || (vignette != null && vignette.isEnabled());
+    }
+
     private static void tick() {
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;

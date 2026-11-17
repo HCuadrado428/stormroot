@@ -113,7 +113,7 @@ src/versioned/<versión>/  → recetas, loot tables y tags (su formato cambia en
   - **Charcos**: bloques del suelo pasan a ser agua, siempre encerrados (nunca se derrama), y crecen con la humedad.
   - **Pozas**: si está muy empapado, los hoyos cerrados del suelo se llenan de agua.
   - **Musgo** en la roca tras mucho tiempo húmedo; **goteo** del techo en el cliente.
-  - **Secado lento**: el agua estancada retiene la humedad y el agua se retira bloque a bloque (pozas, charcos, barro).
+  - **Secado lento**: el agua estancada retiene la humedad y el agua se retira bloque a bloque (charcos, pozas, barro).
   - **Sequía**: la tierra se agrieta, el musgo se seca y flota polvo. Todo vuelve a su estado al cambiar el clima.
   - Solo se tocan bloques naturales de cueva y cada cambio se deshace solo si el bloque sigue como lo dejó el mod.
 - **Raíces de rayo**: un rayo sobre piedra, tierra o arena puede hacer crecer hacia abajo una columna de cristal luminoso hasta llegar a una cueva. Al picarla puede soltar Cristales de rayo.

@@ -5,6 +5,7 @@ import io.github.hcuadrado428.stormroot.config.StormrootConfig;
 import io.github.hcuadrado428.stormroot.network.FrontsSyncPayload;
 import io.github.hcuadrado428.stormroot.network.StormrootNetwork;
 import io.github.hcuadrado428.stormroot.seep.SeepageTicker;
+import io.github.hcuadrado428.stormroot.selftest.SelfTest;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
@@ -38,6 +39,7 @@ public final class FrontTicker {
     }
 
     public static void onServerTick(MinecraftServer server) {
+        SelfTest.tick(server);
         LightningCrystals.tick();
         LightningRoots.tick();
         if (++tickCounter < STEP_TICKS && server == currentServer) {

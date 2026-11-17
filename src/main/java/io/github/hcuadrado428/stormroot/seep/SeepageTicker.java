@@ -29,7 +29,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
  *   <li>≥ {@link #PUDDLE_AT}: aparecen charcos (un bloque del suelo pasa a ser agua, encerrado) y los que hay crecen.</li>
  *   <li>≥ {@link #POOL_AT}: los hoyos naturales cerrados se llenan de agua (pozas).</li>
  *   <li>≥ {@link #MOSS_AT}: a veces sale musgo en la roca.</li>
- *   <li>≤ {@link #RECEDE_AT}: el agua se retira poco a poco (primero pozas, luego charcos, luego barro).</li>
+ *   <li>≤ {@link #RECEDE_AT}: el agua se retira poco a poco (primero charcos, luego pozas, luego barro).</li>
  *   <li>≤ {@link #DROUGHT_AT}: la tierra y el barro se agrietan; el musgo se seca. Se deshace al volver la humedad.</li>
  * </ul>
  * Solo se tocan bloques de {@link CaveMaterials} (o aire, en las pozas), siempre se apunta qué había y solo se
@@ -123,6 +123,16 @@ public final class SeepageTicker {
         return best;
     }
 
+    /** Solo para {@code selftest/SelfTest}: aplica los efectos a una celda concreta, sin esperar a los jugadores. */
+    public static void applyEffectsForTest(ServerLevel level, int cx, int cz, SeepageCell cell, int maxChanges) {
+        applyEffects(level, cx, cz, cell, maxChanges);
+    }
+
+    /** Solo para {@code selftest/SelfTest}: intenta rellenar la poza que contiene {@code start}. */
+    public static boolean fillPoolForTest(ServerLevel level, SeepageCell cell, BlockPos start, int maxChanges) {
+        return fillPool(level, cell, start, maxChanges);
+    }
+
     // ------------------------------------------------------------------ efectos
 
     private static void applyEffects(ServerLevel level, int cx, int cz, SeepageCell cell, int maxChanges) {
@@ -131,7 +141,9 @@ public final class SeepageTicker {
 
         // Secado y sequía primero: deshacen cambios.
         if (deep <= RECEDE_AT && random.nextDouble() < RECEDE_CHANCE) {
-            undo(level, cell, cell.lastIndexOf(SeepageCell.Kind.POOL, SeepageCell.Kind.PUDDLE, SeepageCell.Kind.MUD));
+            // Primero los charcos (vuelven a ser piedra: nunca abren hueco) y luego las pozas; si se vaciara antes una poza
+            // con un charco al lado, el charco se derramaría hacia ella.
+            undo(level, cell, cell.lastIndexOf(SeepageCell.Kind.PUDDLE, SeepageCell.Kind.POOL, SeepageCell.Kind.MUD));
         }
         if (deep <= DROUGHT_AT && random.nextDouble() < RECEDE_CHANCE) {
             undo(level, cell, cell.lastIndexOf(SeepageCell.Kind.MOSS));

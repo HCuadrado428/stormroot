@@ -37,6 +37,7 @@ public final class ClientWeather {
     }
 
     public static void tick() {
+        ClientSelfTest.tick();
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
         LocalPlayer player = mc.player;
