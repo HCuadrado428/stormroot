@@ -326,8 +326,14 @@ public final class SkyRenderer {
             if (fade <= 0.01f) {
                 continue;
             }
-            double dirX = Math.cos(rainbow.angle());
-            double dirZ = Math.sin(rainbow.angle());
+            // Como uno de verdad, el arco siempre se ve de frente: va de lado respecto a la cámara (hacia la izquierda o la
+            // derecha según su ángulo), con el extremo fijo en el suelo.
+            double toX = rainbow.x() - cam.x;
+            double toZ = rainbow.z() - cam.z;
+            double len = Math.max(1e-6, Math.sqrt(toX * toX + toZ * toZ));
+            double side = Math.cos(rainbow.angle()) >= 0 ? 1 : -1;
+            double dirX = -toZ / len * side;
+            double dirZ = toX / len * side;
             double radius = io.github.hcuadrado428.stormroot.sky.Rainbow.RADIUS;
             double cx = rainbow.x() + dirX * radius;
             double cz = rainbow.z() + dirZ * radius;
