@@ -34,12 +34,15 @@ public final class FrontsSyncPayload /*? if >=1.20.5 {*/ implements CustomPacket
     private final double windAngle;
     /** Humedad del subsuelo en el chunk del jugador (-1 sequía … 1 empapado). */
     private final float seep;
+    /** Semilla del cielo de este mundo (sale de la semilla del mundo por una función de un solo sentido). */
+    private final long skySeed;
     private final List<WeatherFront> fronts;
 
-    public FrontsSyncPayload(boolean controlsWeather, double windAngle, float seep, List<WeatherFront> fronts) {
+    public FrontsSyncPayload(boolean controlsWeather, double windAngle, float seep, long skySeed, List<WeatherFront> fronts) {
         this.controlsWeather = controlsWeather;
         this.windAngle = windAngle;
         this.seep = seep;
+        this.skySeed = skySeed;
         // Copias: en un solo jugador el paquete no se serializa y no hay que compartir objetos con el servidor.
         this.fronts = new ArrayList<>();
         for (WeatherFront front : fronts) {
@@ -54,6 +57,7 @@ public final class FrontsSyncPayload /*? if >=1.20.5 {*/ implements CustomPacket
         this.controlsWeather = buf.readBoolean();
         this.windAngle = buf.readDouble();
         this.seep = buf.readFloat();
+        this.skySeed = buf.readLong();
         int count = Math.min(buf.readVarInt(), MAX_FRONTS);
         this.fronts = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
@@ -70,6 +74,7 @@ public final class FrontsSyncPayload /*? if >=1.20.5 {*/ implements CustomPacket
         buf.writeBoolean(controlsWeather);
         buf.writeDouble(windAngle);
         buf.writeFloat(seep);
+        buf.writeLong(skySeed);
         buf.writeVarInt(fronts.size());
         for (WeatherFront front : fronts) {
             buf.writeLong(front.id());
@@ -84,9 +89,13 @@ public final class FrontsSyncPayload /*? if >=1.20.5 {*/ implements CustomPacket
         }
     }
 
+    public long skySeed() {
+        return skySeed;
+    }
+
     /** Se ejecuta en el hilo principal del cliente. Solo toca {@link ClientFronts} (Java puro). */
     public static void handleOnClient(FrontsSyncPayload payload) {
-        ClientFronts.accept(payload.controlsWeather, payload.windAngle, payload.seep, payload.fronts);
+        ClientFronts.accept(payload.controlsWeather, payload.windAngle, payload.seep, payload.skySeed, payload.fronts);
     }
 
     //? if >=1.20.5 {

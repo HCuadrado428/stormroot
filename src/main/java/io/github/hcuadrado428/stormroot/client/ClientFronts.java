@@ -17,14 +17,16 @@ public final class ClientFronts {
     private static boolean active;
     private static double windAngle;
     private static float seep;
+    private static long skySeed = io.github.hcuadrado428.stormroot.sky.CloudCover.SKY_SEED;
 
     private ClientFronts() {
     }
 
     /** Llamado al recibir un paquete del servidor (en el hilo principal del cliente). */
-    public static synchronized void accept(boolean serverControlsWeather, double wind, float seepage,
+    public static synchronized void accept(boolean serverControlsWeather, double wind, float seepage, long sky,
                                            List<WeatherFront> fronts) {
         active = serverControlsWeather;
+        skySeed = sky;
         windAngle = wind;
         seep = seepage;
         FRONTS.clear();
@@ -51,6 +53,14 @@ public final class ClientFronts {
         return best;
     }
 
+    /**
+     * La lista viva, sin copiar. Solo desde el hilo principal del cliente (el mismo que la cambia): la usa la lluvia
+     * de cada columna, que se pregunta cientos de veces por fotograma.
+     */
+    public static List<WeatherFront> live() {
+        return Collections.unmodifiableList(FRONTS);
+    }
+
     public static synchronized List<WeatherFront> snapshot() {
         return Collections.unmodifiableList(new ArrayList<>(FRONTS));
     }
@@ -62,6 +72,11 @@ public final class ClientFronts {
 
     public static synchronized double windAngle() {
         return windAngle;
+    }
+
+    /** Semilla del cielo del mundo actual (la manda el servidor). */
+    public static synchronized long skySeed() {
+        return skySeed;
     }
 
     /** Humedad del subsuelo donde está el jugador (-1 sequía … 1 empapado). */

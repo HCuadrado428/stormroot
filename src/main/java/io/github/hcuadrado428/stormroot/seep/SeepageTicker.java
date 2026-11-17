@@ -44,6 +44,8 @@ public final class SeepageTicker {
     public static final double MUD_AT = 0.4;
     public static final double PUDDLE_AT = 0.55;
     public static final double MOSS_AT = 0.75;
+    /** Musgo bajo la niebla (que no pasa de {@link SeepageCell#FOG_CAP}). */
+    public static final double FOG_MOSS_AT = 0.45;
     public static final double POOL_AT = 0.8;
     public static final double RECEDE_AT = 0.1;
     public static final double DROUGHT_AT = -0.55;
@@ -85,7 +87,8 @@ public final class SeepageTicker {
                     int cz = pcz + dz;
                     if (updated.add(SeepageField.key(cx, cz))) {
                         double rain = rainAt(simulation, (cx << 4) + 8, (cz << 4) + 8);
-                        field.getOrCreate(cx, cz).update(rain, seconds, rates);
+                        double fog = fogAt(simulation, (cx << 4) + 8, (cz << 4) + 8);
+                        field.getOrCreate(cx, cz).update(rain, fog, seconds, rates);
                     }
                     if (Math.abs(dx) <= EFFECT_RADIUS && Math.abs(dz) <= EFFECT_RADIUS) {
                         affected.add(SeepageField.key(cx, cz));
@@ -119,6 +122,17 @@ public final class SeepageTicker {
         double best = 0;
         for (WeatherFront front : simulation.fronts()) {
             if (front.type() == FrontType.RAIN || front.type() == FrontType.THUNDERSTORM) {
+                best = Math.max(best, front.intensityAt(x, z));
+            }
+        }
+        return best;
+    }
+
+    /** Intensidad de niebla (0–1) de los frentes en un punto. */
+    public static double fogAt(FrontSimulation simulation, double x, double z) {
+        double best = 0;
+        for (WeatherFront front : simulation.fronts()) {
+            if (front.type() == FrontType.FOG) {
                 best = Math.max(best, front.intensityAt(x, z));
             }
         }
@@ -182,7 +196,8 @@ public final class SeepageTicker {
                     && place(level, cell, floor, Blocks.MUD.defaultBlockState(), SeepageCell.Kind.MUD, material)) {
                 return;
             }
-            if (deep >= MOSS_AT && random.nextInt(6) == 0 && CaveMaterials.ROCK.contains(material)
+            // Musgo: con mucha humedad, o con la niebla encima aunque no llegue a haber charcos.
+            if ((deep >= MOSS_AT || (cell.foggy() && deep >= FOG_MOSS_AT)) && random.nextInt(6) == 0 && CaveMaterials.ROCK.contains(material)
                     && place(level, cell, floor, Blocks.MOSS_BLOCK.defaultBlockState(), SeepageCell.Kind.MOSS, material)) {
                 return;
             }

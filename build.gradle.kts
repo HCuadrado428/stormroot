@@ -82,10 +82,11 @@ if (bloombertoJar != null) {
     }
 }
 
-// Mixins comunes a los 3 loaders (stormroot-sky.mixins.json: ocultar las nubes vanilla).
-// Fabric: fabric.mod.json; NeoForge: [[mixins]] de neoforge.mods.toml; Forge 1.20.1: aquí (dev + manifiesto del jar).
+// Mixins de los 3 loaders: stormroot-sky (cliente: ocultar las nubes vanilla) y stormroot-common (lluvia solo bajo
+// los nubarrones). Fabric: fabric.mod.json; NeoForge: [[mixins]] de neoforge.mods.toml; Forge 1.20.1: aquí.
 if (mod.isForge) {
-    extensions.getByType<net.fabricmc.loom.api.LoomGradleExtensionAPI>().forge.mixinConfig("stormroot-sky.mixins.json")
+    extensions.getByType<net.fabricmc.loom.api.LoomGradleExtensionAPI>().forge
+        .mixinConfig("stormroot-sky.mixins.json", "stormroot-common.mixins.json")
 }
 
 publishMods {

@@ -56,7 +56,12 @@ public final class LightningCrystals {
         if (!struck.is(BlockTags.SAND) && !struck.is(BlockTags.BASE_STONE_OVERWORLD)) {
             return false;
         }
-        if (serverLevel.getRandom().nextDouble() >= StormrootConfig.lightningCrystalChance.getAsDouble() || PENDING.size() >= MAX_PENDING) {
+        // Tormenta seca (bioma sin lluvia): el doble de cristales, hasta un 60 %.
+        double chance = StormrootConfig.lightningCrystalChance.getAsDouble();
+        if (BiomeClimate.isDry(serverLevel, impact)) {
+            chance = Math.min(0.6, chance * 2);
+        }
+        if (serverLevel.getRandom().nextDouble() >= chance || PENDING.size() >= MAX_PENDING) {
             return false;
         }
         PENDING.add(new Pending(serverLevel, impact.immutable(), DROP_DELAY_TICKS));

@@ -13,7 +13,7 @@ import java.util.Random;
  * de los jugadores, para que los frentes nazcan cerca de donde hay alguien.
  *
  * <p>Se guarda con {@code FrontSavedData} (exportando/restaurando su estado con {@link #restore}).
- * Pendiente: viento dominante por bioma y choques de frentes.
+ * El tipo de cada frente nuevo depende del bioma donde nace ({@link ClimateZone}). Pendiente: choques de frentes.
  */
 public final class FrontSimulation {
     private final List<WeatherFront> fronts = new ArrayList<>();
@@ -45,6 +45,15 @@ public final class FrontSimulation {
      * @return frentes nuevos creados en este paso (útil para logs y depuración)
      */
     public List<WeatherFront> step(double seconds, List<double[]> anchorsXZ) {
+        return step(seconds, anchorsXZ, (x, z) -> ClimateZone.TEMPERATE);
+    }
+
+    /**
+     * Como {@link #step(double, List)}, pero el tipo de frente nuevo depende del bioma donde nace
+     * ({@link ClimateZone#weight}). Si en ese sitio no puede nacer ninguno (p. ej. niebla en el desierto), este paso no
+     * nace nada.
+     */
+    public List<WeatherFront> step(double seconds, List<double[]> anchorsXZ, ClimateZone.Lookup climate) {
         Iterator<WeatherFront> it = fronts.iterator();
         while (it.hasNext()) {
             WeatherFront front = it.next();
@@ -60,21 +69,47 @@ public final class FrontSimulation {
         List<WeatherFront> spawned = new ArrayList<>();
         if (!anchorsXZ.isEmpty() && fronts.size() < maxFronts && random.nextDouble() < spawnChance) {
             double[] anchor = anchorsXZ.get(random.nextInt(anchorsXZ.size()));
-            WeatherFront front = spawnUpwind(anchor[0], anchor[1], randomType());
-            fronts.add(front);
-            spawned.add(front);
+            double[] at = upwindPoint(anchor[0], anchor[1]);
+            FrontType type = typeFor(climate.at(at[0], at[1]));
+            if (type != null) {
+                WeatherFront front = create(type, at[0], at[1]);
+                fronts.add(front);
+                spawned.add(front);
+            }
         }
         return spawned;
     }
 
     /** Crea un frente "a favor de viento" del punto dado, para que el jugador lo vea llegar. */
     public WeatherFront spawnUpwind(double x, double z, FrontType type) {
+        double[] at = upwindPoint(x, z);
+        return create(type, at[0], at[1]);
+    }
+
+    private double[] upwindPoint(double x, double z) {
         double distance = SPAWN_DISTANCE_MIN + random.nextDouble() * (SPAWN_DISTANCE_MAX - SPAWN_DISTANCE_MIN);
         double spread = (random.nextDouble() - 0.5) * 0.8;
         double fromAngle = windAngle + Math.PI + spread;
-        double fx = x + Math.cos(fromAngle) * distance;
-        double fz = z + Math.sin(fromAngle) * distance;
-        return create(type, fx, fz);
+        return new double[] {x + Math.cos(fromAngle) * distance, z + Math.sin(fromAngle) * distance};
+    }
+
+    /** Tipo al azar según los pesos de la zona, o {@code null} si en esa zona no nace ninguno. */
+    public FrontType typeFor(ClimateZone zone) {
+        double total = 0;
+        for (FrontType type : FrontType.values()) {
+            total += zone.weight(type);
+        }
+        if (total <= 0) {
+            return null;
+        }
+        double pick = random.nextDouble() * total;
+        for (FrontType type : FrontType.values()) {
+            pick -= zone.weight(type);
+            if (pick < 0) {
+                return type;
+            }
+        }
+        return FrontType.values()[FrontType.values().length - 1];
     }
 
     /** Crea un frente en un punto concreto (también para comandos de depuración). */
@@ -180,8 +215,4 @@ public final class FrontSimulation {
         this.nextId = Math.max(nextId, maxId + 1);
     }
 
-    private FrontType randomType() {
-        FrontType[] types = FrontType.values();
-        return types[random.nextInt(types.length)];
-    }
 }

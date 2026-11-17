@@ -18,6 +18,9 @@ logoBlur = false
 [[mixins]]
 config = "stormroot-sky.mixins.json"
 
+[[mixins]]
+config = "stormroot-common.mixins.json"
+
 [[dependencies.${id}]]
 modId = "minecraft"
 type = "required"

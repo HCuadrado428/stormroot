@@ -48,6 +48,9 @@ public final class FrontTicker {
         SelfTest.tick(server);
         LightningCrystals.tick();
         LightningRoots.tick();
+        if (server == currentServer) {
+            DryStorms.tick(server.overworld());
+        }
         if (++tickCounter < STEP_TICKS && server == currentServer) {
             return;
         }
@@ -63,7 +66,7 @@ public final class FrontTicker {
 
         sim.setMaxFronts(StormrootConfig.maxFronts.getAsInt());
         sim.setSpawnChance(StormrootConfig.frontSpawnChance.getAsDouble());
-        for (WeatherFront front : sim.step(STEP_TICKS / 20.0, anchors)) {
+        for (WeatherFront front : sim.step(STEP_TICKS / 20.0, anchors, (x, z) -> BiomeClimate.zoneAt(overworld, x, z))) {
             Stormroot.LOGGER.info("[Stormroot] Nuevo frente: {}", front);
         }
         applyWeather(overworld, sim);
@@ -85,8 +88,13 @@ public final class FrontTicker {
                 }
             }
             float seep = (float) SeepageTicker.deepAt(server, player.getBlockX(), player.getBlockZ());
-            StormrootNetwork.sendFronts(player, new FrontsSyncPayload(controlsWeatherNow(), sim.windAngle(), seep, near));
+            StormrootNetwork.sendFronts(player, new FrontsSyncPayload(controlsWeatherNow(), sim.windAngle(), seep,
+                    skySeed(server), near));
         }
+    }
+
+    private static long skySeed(MinecraftServer server) {
+        return io.github.hcuadrado428.stormroot.sky.SkySeed.fromWorldSeed(server.overworld().getSeed());
     }
 
     /** Simulación del Overworld de este servidor; la crea si hace falta (mundo nuevo o recién abierto). */
@@ -107,8 +115,42 @@ public final class FrontTicker {
             } else {
                 controlsWeather = true;
             }
+            registerSky(server);
         }
         return simulation;
+    }
+
+    /** Fuente del cielo del servidor para {@link io.github.hcuadrado428.stormroot.sky.SkyWeather} (lluvia solo bajo los nubarrones). */
+    private static void registerSky(MinecraftServer server) {
+        long seed = io.github.hcuadrado428.stormroot.sky.SkySeed.fromWorldSeed(server.overworld().getSeed());
+        FrontSimulation sim = simulation;
+        io.github.hcuadrado428.stormroot.sky.SkyWeather.setServer(Thread.currentThread(),
+                new io.github.hcuadrado428.stormroot.sky.SkyWeather.Source() {
+                    @Override
+                    public boolean active() {
+                        return controlsWeatherNow();
+                    }
+
+                    @Override
+                    public long seed() {
+                        return seed;
+                    }
+
+                    @Override
+                    public double windAngle() {
+                        return sim.windAngle();
+                    }
+
+                    @Override
+                    public double seconds() {
+                        return server.overworld().getGameTime() / 20.0;
+                    }
+
+                    @Override
+                    public List<WeatherFront> fronts() {
+                        return sim.fronts();
+                    }
+                });
     }
 
     /**

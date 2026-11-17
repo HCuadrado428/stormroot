@@ -33,9 +33,22 @@ public final class SeepageCell {
 
     /** Avanza {@code seconds} segundos con una lluvia de intensidad {@code rain} (0–1) encima. */
     public void update(double rain, double seconds, SeepageRates rates) {
+        update(rain, 0, seconds, rates);
+    }
+
+    /**
+     * Como {@link #update(double, double, SeepageRates)}, con niebla de intensidad {@code fog} (0–1): humedece a la
+     * mitad que la lluvia y como mucho hasta {@link #FOG_CAP} (barro y musgo sí; charcos y pozas no).
+     */
+    public void update(double rain, double fog, double seconds, SeepageRates rates) {
         double retention = hasStandingWater() ? STANDING_WATER_RETENTION : 1.0;
+        foggy = fog > 0.05;
         if (rain > 0.05) {
             surface += rain * rates.wetPerSecond() * seconds;
+        } else if (foggy && surface < FOG_CAP) {
+            surface = Math.min(FOG_CAP, surface + fog * 0.5 * rates.wetPerSecond() * seconds);
+        } else if (foggy) {
+            // Con niebla no sube más, pero tampoco se seca.
         } else if (surface > 0) {
             surface -= rates.dryPerSecond() * retention * seconds;
         } else {
@@ -45,6 +58,16 @@ public final class SeepageCell {
         surface = clamp(surface);
         double follow = Math.min(1.0, seconds / rates.deepLagSeconds());
         deep = clamp(deep + (surface - deep) * follow);
+    }
+
+    /** Humedad máxima que da la niebla sola (por debajo de los charcos, {@code SeepageTicker.PUDDLE_AT} = 0,55). */
+    public static final double FOG_CAP = 0.5;
+
+    /** Hubo niebla encima en la última actualización (no se guarda). */
+    private transient boolean foggy;
+
+    public boolean foggy() {
+        return foggy;
     }
 
     public double surface() {

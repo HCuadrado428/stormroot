@@ -18,10 +18,7 @@ import java.util.List;
  * </ul>
  */
 public final class CloudCover {
-    /**
-     * Semilla del cielo. Fija por ahora (todos los mundos tienen el mismo patrón de nubes de buen tiempo); en la fase 2,
-     * cuando el servidor tenga que saber dónde llueve, la mandará en el paquete de frentes.
-     */
+    /** Semilla del cielo por defecto (hasta que llega el primer paquete del servidor). La de cada mundo: {@link SkySeed}. */
     public static final long SKY_SEED = 0x5707_4D20_0C10_D5L;
     /** Tamaño de una celda de nube (como en vanilla). */
     public static final int CELL = 12;

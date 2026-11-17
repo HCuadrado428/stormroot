@@ -140,6 +140,9 @@ public final class SelfTest {
                 run("/weather is respected", () -> checkWeatherCommand(server));
                 run("stray storm lightning is removed", () -> checkStrayLightning(server));
                 run("forecast", SelfTest::checkForecast);
+                run("rain falls only under rain clouds", () -> checkRainUnderClouds(server));
+                run("fronts are born by biome", () -> checkFrontsByBiome(level));
+                run("fog dampens without puddles", SelfTest::checkFogDamp);
                 run("weathervane", () -> checkWeathervane(server, level));
                 run("barometer", () -> checkBarometer(server, level));
                 run("pool fills a closed hole only", () -> checkPool(level));
@@ -215,14 +218,14 @@ public final class SelfTest {
 
     private static void checkPacket() {
         List<WeatherFront> fronts = List.of(new WeatherFront(5, FrontType.RAIN, 1, 2, 90, 0.5, -0.25, 10, 600));
-        FrontsSyncPayload payload = new FrontsSyncPayload(true, 1.25, 0.75f, fronts);
+        FrontsSyncPayload payload = new FrontsSyncPayload(true, 1.25, 0.75f, 0x5EED_CAFEL, fronts);
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         payload.write(buf);
         FrontsSyncPayload back = new FrontsSyncPayload(buf);
         FriendlyByteBuf again = new FriendlyByteBuf(Unpooled.buffer());
         back.write(again);
         boolean ok = buf.writerIndex() == again.writerIndex() && buf.readerIndex() == buf.writerIndex()
-                && again.writerIndex() > 0 && equalBytes(buf, again);
+                && again.writerIndex() > 0 && equalBytes(buf, again) && back.skySeed() == 0x5EED_CAFEL;
         check("sync packet round trip", ok, "el paquete no se lee igual que se escribe");
     }
 
@@ -314,6 +317,60 @@ public final class SelfTest {
         sim.clear();
         check("stray storm lightning is removed", keepInside && removeOutside && keepWhenClear,
                 "dentro se queda=" + keepInside + ", fuera se quita=" + removeOutside + ", sin tormenta se queda=" + keepWhenClear);
+    }
+
+    /** Lluvia solo bajo el nubarrón: la precipitación del bioma (lo que usan fuegos, calderos y gotas) se apaga fuera. */
+    private static void checkRainUnderClouds(MinecraftServer server) {
+        ServerLevel level = server.overworld();
+        FrontSimulation sim = FrontTicker.simulation(server);
+        FrontTicker.setControlsWeather(true);
+        sim.clear();
+        sim.add(new WeatherFront(902, FrontType.RAIN, 0, 0, 120, 0, 0, 500, 1000));
+        BlockPos under = new BlockPos(0, 70, 0);
+        BlockPos away = new BlockPos(3000, 70, 3000);
+        net.minecraft.world.level.biome.Biome.Precipitation atUnder = precipitation(level, under);
+        net.minecraft.world.level.biome.Biome.Precipitation atAway = precipitation(level, away);
+        sim.clear();
+        check("rain falls only under rain clouds",
+                atUnder == net.minecraft.world.level.biome.Biome.Precipitation.RAIN
+                        && atAway == net.minecraft.world.level.biome.Biome.Precipitation.NONE,
+                "bajo la nube=" + atUnder + ", lejos=" + atAway);
+    }
+
+    private static net.minecraft.world.level.biome.Biome.Precipitation precipitation(ServerLevel level, BlockPos pos) {
+        //? if >=1.21.11 {
+        return level.getBiome(pos).value().getPrecipitationAt(pos, level.getSeaLevel());
+        //?} else {
+        /*return level.getBiome(pos).value().getPrecipitationAt(pos);
+        *///?}
+    }
+
+    /** El mundo plano es de llanuras (templado); en zona seca solo nacen tormentas (secas); nunca niebla en el desierto. */
+    private static void checkFrontsByBiome(ServerLevel level) {
+        io.github.hcuadrado428.stormroot.weather.ClimateZone here =
+                io.github.hcuadrado428.stormroot.weather.BiomeClimate.zoneAt(level, BX + 8, BZ + 8);
+        FrontSimulation sim = new FrontSimulation(7);
+        boolean dryOnlyStorms = true;
+        boolean temperateHasRain = false;
+        for (int i = 0; i < 200; i++) {
+            dryOnlyStorms &= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.DRY) == FrontType.THUNDERSTORM;
+            temperateHasRain |= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE) == FrontType.RAIN;
+        }
+        check("fronts are born by biome",
+                here == io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE && dryOnlyStorms && temperateHasRain,
+                "zona del mundo plano=" + here + ", en seco solo tormentas=" + dryOnlyStorms + ", lluvia en templado=" + temperateHasRain);
+    }
+
+    /** La niebla humedece hasta FOG_CAP (barro y musgo sí, charcos no) y no seca mientras está encima. */
+    private static void checkFogDamp() {
+        SeepageCell cell = new SeepageCell();
+        io.github.hcuadrado428.stormroot.seep.SeepageRates rates = io.github.hcuadrado428.stormroot.seep.SeepageRates.DEFAULT;
+        for (int i = 0; i < 400; i++) {
+            cell.update(0, 1.0, 60, rates);
+        }
+        boolean ok = cell.foggy() && cell.surface() <= SeepageCell.FOG_CAP + 1e-9
+                && cell.deep() >= SeepageTicker.FOG_MOSS_AT && cell.deep() < SeepageTicker.PUDDLE_AT;
+        check("fog dampens without puddles", ok, "superficie=" + cell.surface() + ", subsuelo=" + cell.deep());
     }
 
     private static void checkForecast() {

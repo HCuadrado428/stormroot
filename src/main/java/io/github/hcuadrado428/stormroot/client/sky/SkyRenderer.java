@@ -92,7 +92,7 @@ public final class SkyRenderer {
         //?} else {
         /*Vec3 cam = camera.getPosition();
         *///?}
-        long seed = CloudCover.SKY_SEED;
+        long seed = ClientFronts.skySeed();
         double wind = ClientFronts.windAngle();
         long tick = level.getGameTime();
         double seconds = (tick + partialTick) / 20.0;

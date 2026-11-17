@@ -40,6 +40,7 @@ public final class ClientWeather {
     }
 
     public static void tick() {
+        io.github.hcuadrado428.stormroot.client.sky.ClientSkySource.ensureRegistered();
         ClientSelfTest.tick();
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
