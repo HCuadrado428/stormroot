@@ -35,6 +35,8 @@ public final class StormrootConfig {
      * Nubes de Stormroot en vez de las vanilla. Desactívalo con un shader pack que dibuje sus propias nubes.
      * Sin Bloomberto se lee de {@code config/stormroot-client.properties} ({@link ClientSettingsFile}).
      */
+    /** El granizo puede romper cristal y paneles de cristal normales a la intemperie. */
+    public static volatile BooleanSupplier hailBreaksGlass = () -> true;
     public static volatile BooleanSupplier customClouds = ClientSettingsFile::customClouds;
     /** Sombra de las nubes en el suelo. Sin Bloomberto: {@code cloud_shadows} en {@code config/stormroot-client.properties}. */
     public static volatile BooleanSupplier cloudShadows = ClientSettingsFile::cloudShadows;
@@ -50,6 +52,11 @@ public final class StormrootConfig {
     }
 
     /** La filtración puede cambiar bloques: config Y ajuste del mundo (cave_changes). */
+    /** El granizo rompe cristal: lo permiten la config (Bloomberto) y el ajuste del mundo. */
+    public static boolean hailBreaksGlassActive() {
+        return hailBreaksGlass.getAsBoolean() && WorldSettings.hailBreaksGlass;
+    }
+
     public static boolean caveChangesActive() {
         return seepageWorldChanges.getAsBoolean() && WorldSettings.caveChanges;
     }

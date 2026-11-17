@@ -81,6 +81,7 @@ public final class ClientWeather {
 
         spawnEdgeParticles(level, player);
         spawnRollingFog(level, player);
+        spawnHail(level, player);
         spawnCaveParticles(level, player);
     }
 
@@ -174,6 +175,32 @@ public final class ClientWeather {
                 double pz = front.z() + nz * front.radius() + nx * along;
                 spawnFor(level, front.type(), random, px, player.getY(), pz);
             }
+        }
+    }
+
+    /** {@code true} mientras cae granizo sobre el jugador (para el self-test). */
+    private static boolean hailHere;
+
+    public static boolean hailHere() {
+        return hailHere;
+    }
+
+    /** Granizo: piedrecitas blancas que caen rápido alrededor del jugador, en el núcleo de una tormenta de granizo. */
+    private static void spawnHail(ClientLevel level, LocalPlayer player) {
+        io.github.hcuadrado428.stormroot.client.sky.ClientSkySource sky = io.github.hcuadrado428.stormroot.client.sky.ClientSkySource.get();
+        hailHere = sky.active() && io.github.hcuadrado428.stormroot.sky.SkyWeather.rainCloudAt(sky, player.getX(), player.getZ())
+                == io.github.hcuadrado428.stormroot.sky.CloudCover.Kind.HAIL
+                && level.getBiome(player.blockPosition()).value().hasPrecipitation()
+                && level.getBiome(player.blockPosition()).value().getBaseTemperature() >= 0.15f;
+        if (!hailHere) {
+            return;
+        }
+        RandomSource random = level.getRandom();
+        for (int i = 0; i < 8; i++) {
+            double x = player.getX() + (random.nextDouble() - 0.5) * 24;
+            double z = player.getZ() + (random.nextDouble() - 0.5) * 24;
+            double y = player.getY() + 6 + random.nextDouble() * 8;
+            level.addParticle(ParticleTypes.SNOWFLAKE, x, y, z, 0, -0.8, 0);
         }
     }
 

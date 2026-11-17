@@ -177,6 +177,15 @@ public final class SkyRenderer {
                         b = (int) (140 - 26 * amount);
                         alpha = 248;
                     }
+                    case HAIL -> {
+                        // Granizo: el núcleo de la tormenta, con un tono verdoso.
+                        bottom = FAIR_Y - 16;
+                        height = heightOf(kind, amount);
+                        r = (int) (98 - 24 * amount);
+                        g = (int) (124 - 20 * amount);
+                        b = (int) (118 - 22 * amount);
+                        alpha = 250;
+                    }
                     case SNOW -> {
                         // Ventisca: nubarrón blanco grisáceo, bajo y espeso.
                         bottom = FAIR_Y - 10;
@@ -252,7 +261,7 @@ public final class SkyRenderer {
     /** Grosor de una nube: las de buen tiempo, fijo; los nubarrones crecen con la intensidad del frente. */
     private static double heightOf(CloudCover.Kind kind, float amount) {
         return switch (kind) {
-            case STORM -> 5 + 9 * amount;
+            case STORM, HAIL -> 5 + 9 * amount;
             case SNOW -> 6 + 6 * amount;
             case RAIN -> 4 + 3 * amount;
             default -> 4;
@@ -283,7 +292,7 @@ public final class SkyRenderer {
                 }
                 CloudCover.Kind kind = CloudCover.Kind.values()[k];
                 double darkness = switch (kind) {
-                    case STORM -> 0.42;
+                    case STORM, HAIL -> 0.42;
                     case RAIN, SNOW -> 0.32;
                     default -> 0.2 + 0.12 * SHADE[i + 1][j + 1];
                 };
@@ -356,7 +365,7 @@ public final class SkyRenderer {
                     }
                 }
                 GRID[i][j] = (byte) kind.ordinal();
-                if (kind == CloudCover.Kind.STORM) {
+                if (kind == CloudCover.Kind.STORM || kind == CloudCover.Kind.HAIL) {
                     storms++;
                 }
                 HIGH[i][j] = CloudCover.highCloud(seed, u, v, seconds);

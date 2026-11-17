@@ -12,6 +12,8 @@ import net.minecraft.resources.ResourceKey;
 public final class ModItems {
     /** Cristal que se forma donde cae un rayo (MVP: de momento solo existe como item). */
     public static Item LIGHTNING_CRYSTAL;
+    /** Granizo: lo deja una granizada en el suelo; 4 hacen un bloque de hielo (refrigerante). */
+    public static Item HAILSTONE;
 
     private ModItems() {
     }

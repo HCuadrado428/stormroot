@@ -81,7 +81,8 @@ public final class DryStorms {
      */
     public static boolean strikeIfDryStorm(ServerLevel level, int x, int z) {
         SkyWeather.Source sky = SkyWeather.serverSource();
-        if (sky == null || SkyWeather.rainCloudAt(sky, x + 0.5, z + 0.5) != CloudCover.Kind.STORM) {
+        CloudCover.Kind cloud = sky == null ? CloudCover.Kind.NONE : SkyWeather.rainCloudAt(sky, x + 0.5, z + 0.5);
+        if (cloud != CloudCover.Kind.STORM && cloud != CloudCover.Kind.HAIL) {
             return false;
         }
         BlockPos column = new BlockPos(x, 0, z);

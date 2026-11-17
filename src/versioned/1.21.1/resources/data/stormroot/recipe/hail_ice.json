@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "stormroot:hailstone"
+    },
+    {
+      "item": "stormroot:hailstone"
+    },
+    {
+      "item": "stormroot:hailstone"
+    },
+    {
+      "item": "stormroot:hailstone"
+    }
+  ],
+  "result": {
+    "id": "minecraft:ice",
+    "count": 1
+  }
+}

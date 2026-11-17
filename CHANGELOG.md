@@ -24,6 +24,8 @@ Primera versión jugable. Minecraft 1.20.1 (Fabric, Forge; también NeoForge 1.2
   cristales de hielo, congelación, strays) que se deshielan poco a poco o de golpe con una tormenta fuerte.
 - **Ola de calor**: cielo despejado, más hambre al sol, fuego del clima en las hojas a mediodía, suelo que se
   seca mucho antes y deshielo masivo de las cuevas heladas.
+- **Granizo** en el núcleo de algunas tormentas: daña cultivos maduros, cristal a la intemperie y a quien no lleve
+  casco; deja granizo (4 = un bloque de hielo).
 - Partículas en el borde de los frentes cercanos.
 - `/weather` se respeta: si alguien lo usa, Stormroot espera a que ese clima termine.
 

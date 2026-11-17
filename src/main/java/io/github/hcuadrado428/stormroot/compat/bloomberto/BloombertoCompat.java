@@ -68,6 +68,8 @@ public final class BloombertoCompat {
                 "La cámara tiembla cuando cae un rayo cerca");
         ConfigValue<Boolean> clouds = b.defineBoolean("custom_clouds", true,
                 "Nubes de Stormroot en vez de las vanilla (desactívalo si tu shader pack dibuja sus propias nubes)");
+        ConfigValue<Boolean> hailGlass = b.defineBoolean("hail_breaks_glass", true,
+                "El granizo puede romper cristal y paneles de cristal normales a la intemperie");
         ConfigValue<Boolean> shadows = b.defineBoolean("cloud_shadows", true,
                 "Sombra de las nubes de Stormroot en el suelo");
         ConfigValue<Boolean> hud = b.defineBoolean("weather_hud", false,
@@ -89,6 +91,7 @@ public final class BloombertoCompat {
         StormrootConfig.weatherHud = hud::get;
         StormrootConfig.customClouds = clouds::get;
         StormrootConfig.cloudShadows = shadows::get;
+        StormrootConfig.hailBreaksGlass = hailGlass::get;
 
         if (client) {
             BloombertoClientCompat.init();

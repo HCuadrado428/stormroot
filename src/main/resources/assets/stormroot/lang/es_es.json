@@ -25,5 +25,6 @@
     "item.stormroot.lightning_root": "Raíz de rayo",
     "block.stormroot.storm_fire": "Fuego del clima",
     "block.stormroot.icicle": "Carámbano",
-    "block.stormroot.ice_crystal": "Cristal de hielo"
+    "block.stormroot.ice_crystal": "Cristal de hielo",
+    "item.stormroot.hailstone": "Granizo"
 }

@@ -27,7 +27,7 @@ import net.minecraft.world.phys.Vec3;
  * /stormroot here                    qué frente hay donde estás y el viento
  * /stormroot weather on|off          Stormroot controla (o no) el clima vanilla
  * /stormroot settings                ajustes del mundo (se guardan con el mundo)
- * /stormroot settings <ajuste> on|off   seepage, cave_changes, lightning_roots
+ * /stormroot settings <ajuste> on|off   seepage, cave_changes, lightning_roots, hail_breaks_glass
  * /stormroot seep                    humedad del suelo/subsuelo de tu chunk
  * /stormroot seep set <-1..1>        fija la humedad de tu chunk (para probar charcos y sequía)
  * </pre>

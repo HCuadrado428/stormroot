@@ -101,9 +101,12 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
 - **Ola de calor**: `FrontType.HEAT_WAVE` (no precipita; `CloudCover.heat`/`fairBias` despejan el cielo),
   `SeepageCell.applyHeat` (seca más rápido), deshielo masivo también con calor, `weather/HeatWaves` (hambre al sol de
   día con `causeFoodExhaustion`, fuego del clima a mediodía).
+- **Granizo**: `CloudCover.isHailStorm` (tormentas con id múltiplo de 3; núcleo con intensidad ≥ `HAIL_CORE` → `Kind.HAIL`),
+  `weather/Hail` (daño sin casco con `hurt`/`hurtServer`, cultivos `CropBlock`, cristal según `WorldSettings.hailBreaksGlass`,
+  item `hailstone` y receta 4 → hielo), partículas en `ClientWeather.spawnHail`.
 - Fuentes decompiladas desde la CI: `gh api -X POST repos/HCuadrado428/stormroot/actions/workflows/research.yml/dispatches`
   con `inputs[classes]` y `inputs[pattern]` (workflow `research`).
-- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 28 comprobaciones; cliente con
+- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 30 comprobaciones; cliente con
   un jugador en pantalla virtual: 12 más, incluidas las de Bloomberto y las del cielo).
 - En el self-test, el clima se lee de `server.getWorldData().overworldData()`: `level.isRaining()/isThundering()` son la
   intensidad visual, que sube tick a tick. Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.

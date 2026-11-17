@@ -17,6 +17,8 @@ public final class WorldSettings {
     public static volatile boolean caveChanges = true;
     /** Los rayos pueden hacer crecer raíces de rayo. */
     public static volatile boolean lightningRoots = true;
+    /** El granizo puede romper cristal a la intemperie. */
+    public static volatile boolean hailBreaksGlass = true;
 
     private WorldSettings() {
     }
@@ -27,6 +29,7 @@ public final class WorldSettings {
         map.put("seepage", seepage);
         map.put("cave_changes", caveChanges);
         map.put("lightning_roots", lightningRoots);
+        map.put("hail_breaks_glass", hailBreaksGlass);
         return map;
     }
 
@@ -36,6 +39,7 @@ public final class WorldSettings {
             case "seepage" -> seepage = value;
             case "cave_changes" -> caveChanges = value;
             case "lightning_roots" -> lightningRoots = value;
+            case "hail_breaks_glass" -> hailBreaksGlass = value;
             default -> {
                 return false;
             }
@@ -47,5 +51,6 @@ public final class WorldSettings {
         seepage = true;
         caveChanges = true;
         lightningRoots = true;
+        hailBreaksGlass = true;
     }
 }

@@ -164,6 +164,8 @@ public final class SelfTest {
                 run("ice cave freezes and thaws back", () -> iceCave(level));
                 run("massive thaw floods the cave", SelfTest::checkMassiveThaw);
                 run("heat waves dry the ground and clear the sky", SelfTest::checkHeatWave);
+                run("one in three storms brings hail", SelfTest::checkHailClouds);
+                run("hail hurts crops and glass and leaves hailstones", () -> checkHailGround(level));
                 finish(server);
             }
             default -> {
@@ -697,6 +699,58 @@ public final class SelfTest {
         check("heat waves dry the ground and clear the sky", drier && clear <= calm / 3,
                 "humedad tras 10 min: normal=" + normal.surface() + ", con calor=" + hot.surface()
                         + "; nubes de buen tiempo sin/con calor=" + calm + "/" + clear);
+    }
+
+    /** El núcleo de las tormentas con id múltiplo de 3 es de granizo; el resto, tormenta normal; el borde, sin granizo. */
+    private static void checkHailClouds() {
+        long seed = io.github.hcuadrado428.stormroot.sky.CloudCover.SKY_SEED;
+        WeatherFront hail = new WeatherFront(3, FrontType.THUNDERSTORM, 0, 0, 100, 0, 0, 500, 1000);
+        WeatherFront plain = new WeatherFront(4, FrontType.THUNDERSTORM, 0, 0, 100, 0, 0, 500, 1000);
+        io.github.hcuadrado428.stormroot.sky.CloudCover.Kind core =
+                io.github.hcuadrado428.stormroot.sky.CloudCover.frontCloud(seed, 0, 0, 0, 0, 100, List.of(hail));
+        io.github.hcuadrado428.stormroot.sky.CloudCover.Kind other =
+                io.github.hcuadrado428.stormroot.sky.CloudCover.frontCloud(seed, 0, 0, 0, 0, 100, List.of(plain));
+        io.github.hcuadrado428.stormroot.sky.CloudCover.Kind edge =
+                io.github.hcuadrado428.stormroot.sky.CloudCover.frontCloud(seed, 80, 0, 80, 0, 100, List.of(hail));
+        check("one in three storms brings hail",
+                core == io.github.hcuadrado428.stormroot.sky.CloudCover.Kind.HAIL
+                        && other == io.github.hcuadrado428.stormroot.sky.CloudCover.Kind.STORM
+                        && edge != io.github.hcuadrado428.stormroot.sky.CloudCover.Kind.HAIL,
+                "núcleo de granizo=" + core + ", tormenta normal=" + other + ", borde=" + edge);
+    }
+
+    /** En la superficie del mundo plano: trigo maduro que retrocede, cristal que se rompe y granizo en el suelo. */
+    private static void checkHailGround(ServerLevel level) {
+        BlockPos cropAbove = level.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,
+                new BlockPos(BX + 1, 0, BZ + 1));
+        BlockPos glassAbove = level.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,
+                new BlockPos(BX + 3, 0, BZ + 1));
+        BlockState soil = level.getBlockState(cropAbove.below());
+        BlockState glassGround = level.getBlockState(glassAbove.below());
+        level.setBlock(cropAbove.below(), Blocks.FARMLAND.defaultBlockState(), Block.UPDATE_CLIENTS);
+        net.minecraft.world.level.block.CropBlock wheat = (net.minecraft.world.level.block.CropBlock) Blocks.WHEAT;
+        level.setBlock(cropAbove, wheat.getStateForAge(wheat.getMaxAge()), Block.UPDATE_CLIENTS);
+        level.setBlock(glassAbove.below(), Blocks.GLASS.defaultBlockState(), Block.UPDATE_CLIENTS);
+        net.minecraft.util.RandomSource random = level.getRandom();
+        io.github.hcuadrado428.stormroot.weather.Hail.strike(level, cropAbove, random, 1.0, 1.0);
+        io.github.hcuadrado428.stormroot.weather.Hail.strike(level, glassAbove, random, 1.0, 0.0);
+        BlockState crop = level.getBlockState(cropAbove);
+        int age = crop.getBlock() instanceof net.minecraft.world.level.block.CropBlock c ? c.getAge(crop) : -1;
+        boolean glassBroken = !level.getBlockState(glassAbove.below()).is(Blocks.GLASS);
+        net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(cropAbove).inflate(2);
+        List<net.minecraft.world.entity.item.ItemEntity> stones = level.getEntitiesOfClass(
+                net.minecraft.world.entity.item.ItemEntity.class, box,
+                e -> e.getItem().is(io.github.hcuadrado428.stormroot.registry.ModItems.HAILSTONE));
+        int count = stones.size();
+        for (net.minecraft.world.entity.item.ItemEntity stone : stones) {
+            stone.discard();
+        }
+        level.setBlock(cropAbove, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+        level.setBlock(cropAbove.below(), soil, Block.UPDATE_CLIENTS);
+        level.setBlock(glassAbove.below(), glassGround, Block.UPDATE_CLIENTS);
+        check("hail hurts crops and glass and leaves hailstones",
+                age == wheat.getMaxAge() - 2 && glassBroken && count == 1,
+                "edad del trigo=" + age + " (máx " + wheat.getMaxAge() + "), cristal roto=" + glassBroken + ", granizo en el suelo=" + count);
     }
 
     /** Deshielo masivo: la helada se va en un minuto y deja el subsuelo empapado (inundación). */

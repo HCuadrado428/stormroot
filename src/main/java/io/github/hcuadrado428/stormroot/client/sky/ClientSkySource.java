@@ -16,6 +16,10 @@ public final class ClientSkySource implements SkyWeather.Source {
     private ClientSkySource() {
     }
 
+    public static ClientSkySource get() {
+        return INSTANCE;
+    }
+
     /** Lo llama {@code ClientWeather.tick()}; registra la fuente una vez. */
     public static void ensureRegistered() {
         if (!registered) {

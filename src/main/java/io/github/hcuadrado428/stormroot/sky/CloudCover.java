@@ -30,7 +30,17 @@ public final class CloudCover {
     /** Tipo de nube de una celda. */
     public enum Kind {
         /** Orden = fuerza: cuando dos frentes se tapan, se ve el de más abajo en la lista. */
-        NONE, FAIR, RAIN, SNOW, STORM
+        NONE, FAIR, RAIN, SNOW, STORM,
+        /** Centro de una tormenta de granizo ({@link #isHailStorm}): nubarrón verdoso. */
+        HAIL
+    }
+
+    /** Intensidad a partir de la cual una tormenta de granizo suelta granizo (el núcleo). */
+    public static final double HAIL_CORE = 0.55;
+
+    /** Una de cada tres tormentas es de granizo (por su id: el servidor y el cliente lo saben igual). */
+    public static boolean isHailStorm(WeatherFront front) {
+        return front.type() == FrontType.THUNDERSTORM && Math.floorMod(front.id(), 3L) == 0;
     }
 
     private CloudCover() {
@@ -98,7 +108,7 @@ public final class CloudCover {
                 continue;
             }
             Kind kind = switch (front.type()) {
-                case THUNDERSTORM -> Kind.STORM;
+                case THUNDERSTORM -> isHailStorm(front) && intensity >= HAIL_CORE ? Kind.HAIL : Kind.STORM;
                 case BLIZZARD -> Kind.SNOW;
                 default -> Kind.RAIN;
             };

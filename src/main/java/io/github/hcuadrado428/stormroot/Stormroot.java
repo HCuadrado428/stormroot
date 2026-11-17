@@ -102,6 +102,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 () -> ModBlocks.ICE_CRYSTAL = ModBlocks.createIceCrystal());
         event.register(Registries.ITEM, ModIds.id("lightning_crystal"),
                 () -> ModItems.LIGHTNING_CRYSTAL = ModItems.create("lightning_crystal"));
+        event.register(Registries.ITEM, ModIds.id("hailstone"),
+                () -> ModItems.HAILSTONE = ModItems.create("hailstone"));
         event.register(Registries.ITEM, ModIds.id(ModBlocks.WEATHERVANE_ID),
                 () -> ModBlocks.WEATHERVANE_ITEM = ModBlocks.createBlockItem(ModBlocks.WEATHERVANE_ID, ModBlocks.WEATHERVANE));
         event.register(Registries.ITEM, ModIds.id(ModBlocks.BAROMETER_ID),
@@ -117,6 +119,7 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
     private static void onCreativeTabs(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.LIGHTNING_CRYSTAL);
+            event.accept(ModItems.HAILSTONE);
             event.accept(ModBlocks.LIGHTNING_ROOT_ITEM);
             event.accept(ModBlocks.ICICLE_ITEM);
             event.accept(ModBlocks.ICE_CRYSTAL_ITEM);
@@ -174,6 +177,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 () -> ModBlocks.ICE_CRYSTAL = ModBlocks.createIceCrystal());
         event.register(Registries.ITEM, ModIds.id("lightning_crystal"),
                 () -> ModItems.LIGHTNING_CRYSTAL = ModItems.create("lightning_crystal"));
+        event.register(Registries.ITEM, ModIds.id("hailstone"),
+                () -> ModItems.HAILSTONE = ModItems.create("hailstone"));
         event.register(Registries.ITEM, ModIds.id(ModBlocks.WEATHERVANE_ID),
                 () -> ModBlocks.WEATHERVANE_ITEM = ModBlocks.createBlockItem(ModBlocks.WEATHERVANE_ID, ModBlocks.WEATHERVANE));
         event.register(Registries.ITEM, ModIds.id(ModBlocks.BAROMETER_ID),
@@ -189,6 +194,7 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
     private static void onCreativeTabs(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.LIGHTNING_CRYSTAL);
+            event.accept(ModItems.HAILSTONE);
             event.accept(ModBlocks.LIGHTNING_ROOT_ITEM);
             event.accept(ModBlocks.ICICLE_ITEM);
             event.accept(ModBlocks.ICE_CRYSTAL_ITEM);
@@ -231,6 +237,7 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 ModIds.id(ModBlocks.ICE_CRYSTAL_ID), ModBlocks.createIceCrystal());
         ModItems.LIGHTNING_CRYSTAL = Registry.register(BuiltInRegistries.ITEM,
                 ModIds.id("lightning_crystal"), ModItems.create("lightning_crystal"));
+        ModItems.HAILSTONE = Registry.register(BuiltInRegistries.ITEM, ModIds.id("hailstone"), ModItems.create("hailstone"));
         ModBlocks.WEATHERVANE_ITEM = Registry.register(BuiltInRegistries.ITEM, ModIds.id(ModBlocks.WEATHERVANE_ID),
                 ModBlocks.createBlockItem(ModBlocks.WEATHERVANE_ID, ModBlocks.WEATHERVANE));
         ModBlocks.BAROMETER_ITEM = Registry.register(BuiltInRegistries.ITEM, ModIds.id(ModBlocks.BAROMETER_ID),
@@ -244,6 +251,7 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.INGREDIENTS)
                 .register(entries -> {
                     entries.accept(ModItems.LIGHTNING_CRYSTAL);
+                    entries.accept(ModItems.HAILSTONE);
                     entries.accept(ModBlocks.LIGHTNING_ROOT_ITEM);
                     entries.accept(ModBlocks.ICICLE_ITEM);
                     entries.accept(ModBlocks.ICE_CRYSTAL_ITEM);

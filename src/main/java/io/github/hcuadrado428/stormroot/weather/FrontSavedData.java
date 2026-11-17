@@ -61,7 +61,8 @@ public class FrontSavedData extends SavedData {
             Codec.BOOL.fieldOf("initialized").forGetter(d -> d.initialized),
             Codec.BOOL.optionalFieldOf("seepage", true).forGetter(d -> d.seepage),
             Codec.BOOL.optionalFieldOf("cave_changes", true).forGetter(d -> d.caveChanges),
-            Codec.BOOL.optionalFieldOf("lightning_roots", true).forGetter(d -> d.lightningRoots)
+            Codec.BOOL.optionalFieldOf("lightning_roots", true).forGetter(d -> d.lightningRoots),
+            Codec.BOOL.optionalFieldOf("hail_breaks_glass", true).forGetter(d -> d.hailBreaksGlass)
     ).apply(i, FrontSavedData::new));
 
     //? if >=1.21.5 {
@@ -82,13 +83,15 @@ public class FrontSavedData extends SavedData {
     private boolean seepage;
     private boolean caveChanges;
     private boolean lightningRoots;
+    private boolean hailBreaksGlass;
 
     public FrontSavedData() {
-        this(new ArrayList<>(), 0.0, 1L, true, false, true, true, true);
+        this(new ArrayList<>(), 0.0, 1L, true, false, true, true, true, true);
     }
 
     private FrontSavedData(List<WeatherFront> fronts, double windAngle, long nextId, boolean controlsWeather,
-                           boolean initialized, boolean seepage, boolean caveChanges, boolean lightningRoots) {
+                           boolean initialized, boolean seepage, boolean caveChanges, boolean lightningRoots,
+                           boolean hailBreaksGlass) {
         this.fronts = new ArrayList<>(fronts);
         this.windAngle = windAngle;
         this.nextId = nextId;
@@ -97,6 +100,7 @@ public class FrontSavedData extends SavedData {
         this.seepage = seepage;
         this.caveChanges = caveChanges;
         this.lightningRoots = lightningRoots;
+        this.hailBreaksGlass = hailBreaksGlass;
     }
 
     /** Datos guardados del Overworld (los crea vacíos si el mundo aún no tiene). */
@@ -121,6 +125,7 @@ public class FrontSavedData extends SavedData {
         this.seepage = WorldSettings.seepage;
         this.caveChanges = WorldSettings.caveChanges;
         this.lightningRoots = WorldSettings.lightningRoots;
+        this.hailBreaksGlass = WorldSettings.hailBreaksGlass;
         setDirty();
     }
 
@@ -133,6 +138,7 @@ public class FrontSavedData extends SavedData {
         WorldSettings.seepage = seepage;
         WorldSettings.caveChanges = caveChanges;
         WorldSettings.lightningRoots = lightningRoots;
+        WorldSettings.hailBreaksGlass = hailBreaksGlass;
         return true;
     }
 

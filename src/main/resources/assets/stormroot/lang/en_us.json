@@ -25,5 +25,6 @@
     "item.stormroot.lightning_root": "Lightning Root",
     "block.stormroot.storm_fire": "Storm Fire",
     "block.stormroot.icicle": "Icicle",
-    "block.stormroot.ice_crystal": "Ice Crystal"
+    "block.stormroot.ice_crystal": "Ice Crystal",
+    "item.stormroot.hailstone": "Hailstone"
 }
