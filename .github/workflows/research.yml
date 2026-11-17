@@ -49,7 +49,14 @@ jobs:
             echo "################ $t ($jar)"
             rm -rf /tmp/src && mkdir /tmp/src
             for c in $CLASSES; do
-              unzip -o -q "$jar" "$c" -d /tmp/src 2>/dev/null || { echo "== $c: NO EXISTE"; continue; }
+              if ! unzip -o -q "$jar" "$c" -d /tmp/src 2>/dev/null; then
+                # Datos y recursos (json de loot, modelos...): no están en el jar de fuentes, sí en el del juego.
+                found=""
+                for other in $(find ~/.gradle .gradle "versions/$t" -name "*.jar" -path "*minecraft*" 2>/dev/null | grep -- "$v" | grep -v sources); do
+                  if unzip -o -q "$other" "$c" -d /tmp/src 2>/dev/null; then found="$other"; break; fi
+                done
+                [ -n "$found" ] || { echo "== $c: NO EXISTE"; continue; }
+              fi
               echo "== $c"
               if [ -z "$PATTERN" ]; then cat -n "/tmp/src/$c"; else grep -n -E -C "$CONTEXT" "$PATTERN" "/tmp/src/$c" || echo "(sin coincidencias)"; fi
             done
