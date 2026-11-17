@@ -74,6 +74,8 @@ src/main/java/io/github/hcuadrado428/stormroot/
   Stormroot.java          → entrada del mod: registro y eventos de cada loader
   ModIds.java             → construye ids "stormroot:algo" (ResourceLocation / Identifier)
   registry/ModItems.java  → items
+  registry/ModBlocks.java → bloques (veleta, barómetro)
+  block/                  → InstrumentBlock (base con redstone) y los instrumentos
   config/StormrootConfig.java   → ajustes (valores por defecto o los de Bloomberto)
   compat/Compat.java            → carga las integraciones opcionales por reflexión
   compat/bloomberto/            → integración con Bloomberto (solo se compila si están sus jars)
@@ -87,6 +89,7 @@ src/main/java/io/github/hcuadrado428/stormroot/
 src/main/resources/assets/stormroot/  → texturas, modelos, idiomas
 art/textures/             → "fuentes" de las texturas (specs de texgen.py)
 versions/dependencies/    → versiones de Minecraft, loaders y rangos de cada target
+src/versioned/<versión>/  → recetas, loot tables y tags (su formato cambia entre 1.20.1, 1.21.1 y 1.21.11)
 ```
 
 **Regla:** la lógica va en clases sin imports de ningún loader (como `weather/`). En `Stormroot.java` solo va el "pegamento" de cada loader.
@@ -103,6 +106,8 @@ versions/dependencies/    → versiones de Minecraft, loaders y rangos de cada t
 - **Partículas en el borde** de los frentes cercanos (gotas, humo de tormenta, nubes bajas).
 - **Cristales de rayo**: un rayo sobre arena o piedra deja un cristal el 25 % de las veces.
 - **Comandos de depuración** `/stormroot ...`.
+- **Veleta**: la flecha apunta hacia donde la colocas; da señal de redstone máxima cuando el viento sopla hacia ahí. Clic derecho: rumbo del viento.
+- **Barómetro**: pronostica el próximo frente en los próximos 3 minutos; la señal de redstone sube cuanto más fuerte y cercano. Clic derecho: qué llega y en cuánto.
 
 ## 🔜 Siguientes pasos (en orden)
 
@@ -111,7 +116,7 @@ versions/dependencies/    → versiones de Minecraft, loaders y rangos de cada t
 3. **Lluvia "de juego" por zonas** en el servidor (mixin en `Level#isRainingAt`): ahora, si un jugador está en una tormenta, los rayos y la lluvia afectan también a los demás.
 4. **Frentes visibles de lejos**: las partículas solo se dibujan a menos de 32 bloques; para verlos llegar en el horizonte hace falta render propio (nubes/cortinas).
 5. ~~Config del mod~~ ✅ con Bloomberto. Falta la pantalla de config en Fabric (Mod Menu).
-6. **Veleta y barómetro** (bloques con señal de redstone).
+6. ~~Veleta y barómetro~~ ✅. Siguientes instrumentos: pluviómetro, campana de niebla, pararrayos tempestario.
 7. **Filtración**: registro climático por chunk e inundación de cuevas.
 
 ## 🧰 Comandos de depuración

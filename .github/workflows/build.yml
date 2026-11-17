@@ -50,6 +50,19 @@ jobs:
           chmod +x ./gradlew
           ./gradlew buildAndCollect --stacktrace
 
+      - name: Comprobar datos por versión dentro de los jars
+        run: |
+          set -e
+          for jar in build/libs/*.jar; do
+            case "$jar" in *-sources.jar|*-dev.jar) continue;; esac
+            echo "== $jar"
+            unzip -l "$jar" | grep -E "data/stormroot/(recipes?|loot_tables?)/" || { echo "Faltan recetas/loot tables en $jar"; exit 1; }
+            case "$jar" in
+              *1.20.1*) unzip -l "$jar" | grep -q "data/stormroot/recipes/" || { echo "1.20.1 debe usar recipes/"; exit 1; } ;;
+              *)        unzip -l "$jar" | grep -q "data/stormroot/recipe/"  || { echo "1.21+ debe usar recipe/"; exit 1; } ;;
+            esac
+          done
+
       - name: Subir jars
         if: always()
         uses: actions/upload-artifact@v4

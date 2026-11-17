@@ -24,6 +24,11 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   - `weather/FrontType`, `WeatherFront`, `FrontSimulation`: **Java puro**, sin imports de Minecraft ni de loaders. Mantenerlo así.
   - `weather/FrontTicker`: puente vanilla entre Minecraft y la simulación.
   - `registry/`: creación de items/bloques (común); el registro lo hace cada loader en `Stormroot.java`.
+- Datos con formato distinto por versión (recetas, loot tables, tags) → `src/versioned/<1.20.1|1.21.1|1.21.11>/resources`
+  (1.20.1: carpetas en plural y `{"item": ...}`; 1.21.1: singular y resultado `{"id": ...}`; 1.21.11: ingredientes como texto `"minecraft:x"` / `"#tag"`).
+  La CI comprueba que cada jar los lleva. El validador del plugin avisa del plural en 1.20.1: es correcto ahí.
+- Bloques: `registry/ModBlocks` + `block/`. `FACING` es `EnumProperty<Direction>` desde 1.21.2 (`DirectionProperty` antes);
+  interacción con `useWithoutItem` desde 1.20.5 (`use` en 1.20.1).
 - Texturas: spec en `art/textures/<nombre>.json` → PNG en `src/main/resources/assets/stormroot/textures/...` con `texgen.py`.
 - Mappings: **Mojang (official)** en todos los loaders. No usar Yarn.
 
