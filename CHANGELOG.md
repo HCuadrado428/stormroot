@@ -13,7 +13,10 @@ Primera versión jugable. Minecraft 1.20.1 (Fabric, Forge; también NeoForge 1.2
 - **Clima por zonas**: cada jugador ve la lluvia y los truenos de su zona, con transición suave.
 - Los rayos naturales solo caen dentro de los frentes de tormenta (no junto a jugadores que están fuera).
 - **Niebla** dentro de los bancos de niebla.
-- Partículas en el borde de los frentes cercanos; con Bloomberto, los frentes se ven también de lejos.
+- **Cielo propio**: las nubes vanilla se sustituyen por las de Stormroot (estilo vanilla sombreado): pocas nubes de
+  buen tiempo, de pequeñas a enormes, que se forman y se deshacen; nubarrones de lluvia y tormenta que se ven llegar
+  desde lejos. Sin necesitar Bloomberto. Opción `custom_clouds` para shader packs.
+- Partículas en el borde de los frentes cercanos.
 - `/weather` se respeta: si alguien lo usa, Stormroot espera a que ese clima termine.
 
 ### Bajo tierra

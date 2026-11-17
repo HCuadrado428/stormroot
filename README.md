@@ -71,7 +71,7 @@ Para compilar con la integración: `scripts/fetch-bloomberto.sh` (compila Bloomb
 La CI arranca **Minecraft de verdad** en los 6 targets en cada push (`scripts/selftest.sh`, job `selftest`):
 
 - **Servidor dedicado** (18 comprobaciones): construye una cueva de pruebas y comprueba registros, guardado de frentes y de filtración, el paquete de red, los comandos, los ajustes del mundo, que `/weather` se respeta, que se quitan los rayos fuera de las tormentas, el pronóstico, la veleta y el barómetro (señal de redstone), que las pozas solo llenan hoyos cerrados, que la cueva empapada da charcos, barro y musgo, que **el agua nunca se derrama**, que la raíz de rayo baja hasta la cueva y que **al secarse cada bloque vuelve a ser exactamente el original**.
-- **Un jugador** en una pantalla virtual (9 más): llegan los frentes al cliente, la tormenta se ve y se va, la niebla (y que el enganche de cada loader la aplica de verdad al dibujar), la humedad de las cuevas y la integración con Bloomberto (archivo y pantalla de config, efectos de pantalla y frentes lejanos).
+- **Un jugador** en una pantalla virtual (11 más): llegan los frentes al cliente, la tormenta se ve y se va, la niebla (y que el enganche de cada loader la aplica de verdad al dibujar), la humedad de las cuevas, el cielo de Stormroot (nubes vanilla ocultas, una tormenta lejana dibujada y nubes de buen tiempo sin frentes) y la integración con Bloomberto (archivo y pantalla de config, efectos de pantalla). Saca capturas (artefacto `selftest-shots` de la CI).
 
 En local: `scripts/selftest.sh server 1.21.1-fabric` o `scripts/selftest.sh client 1.21.1-fabric` (cliente: necesita `xvfb-run` en Linux). En cualquier lanzador: `-Dstormroot.selfTest=server|client|all` (el juego se cierra al terminar; `-Dstormroot.selfTest.exit=false` lo deja abierto). Sin esa propiedad el self-test no hace nada.
 
@@ -119,7 +119,11 @@ src/versioned/<versión>/  → recetas, loot tables y tags (su formato cambia en
 - **`/weather` se respeta**: si alguien cambia el clima con `/weather`, Stormroot espera a que ese clima termine y luego retoma el control.
 - **Clima por zonas en el cliente**: el servidor manda a cada jugador los frentes cercanos y cada uno **ve** la lluvia y los truenos de su zona, con transición suave al entrar y salir. Si el servidor o el cliente no tienen el mod, no se rompe nada.
 - **Niebla** dentro de los frentes de niebla, en todos los loaders y versiones (evento en Forge/NeoForge, mixin en Fabric).
-- **Partículas en el borde** de los frentes cercanos (gotas, humo de tormenta, nubes bajas) y, con Bloomberto, **nubes y cortinas de lluvia en los frentes lejanos** (hasta 400 bloques) para verlos llegar.
+- **Cielo propio** (con o sin Bloomberto): Stormroot quita las nubes vanilla y dibuja las suyas, bloques planos sombreados al estilo vanilla:
+  - con buen tiempo, **pocas nubes sueltas**, de pequeñas a **enormes** según la zona, que se forman y se deshacen poco a poco y derivan con el viento;
+  - en los frentes, **nubarrones** grises (lluvia) o gris azulado, más bajos y gruesos (tormenta), que aparecen y desaparecen con el frente; se ven llegar desde casi 400 bloques.
+  - Respeta el ajuste de nubes del jugador (Rápidas, Detalladas, No). Para shader packs con nubes propias: `custom_clouds = false` (en `config/stormroot.toml` con Bloomberto, o en `config/stormroot-client.properties` sin él) vuelve a las vanilla.
+- **Partículas en el borde** de los frentes cercanos (gotas, humo de tormenta, nubes bajas).
 - **Cristales de rayo**: un rayo sobre arena o piedra deja un cristal el 25 % de las veces. Se usan en la receta del barómetro.
 - **Comandos de depuración** `/stormroot ...`.
 - **Veleta**: la flecha apunta hacia donde la colocas; da señal de redstone máxima cuando el viento sopla hacia ahí. Clic derecho: rumbo del viento.
@@ -136,14 +140,15 @@ src/versioned/<versión>/  → recetas, loot tables y tags (su formato cambia en
 
 ## 🔜 Siguientes pasos
 
-1. **Revisión a ojo** de lo visual (ver "Pruebas dentro del juego") y **publicar la 0.1** (crear los proyectos en Modrinth/CurseForge y los secretos de la CI).
-2. **Texturas definitivas** (encargadas; guía en `stormroot-texturas`).
-3. Del diseño: más frentes (granizo, calor, polvo, ventisca, aurora), corrientes de aire y bolsas de gas, red de micelio, ruinas de los Tempestarios, más instrumentos, muestras y frascos, el jugador y el clima, fauna y flora, eventos raros y progresión.
+1. **Cielo, fase 2**: sombra de las nubes en el suelo, que solo llueva bajo los nubarrones (y nunca en biomas muy cálidos como el desierto), rayos que salen de la nube, aviso de tormenta (nubes que crecen y se oscurecen a contraviento), capas a varias alturas y niebla que rueda.
+2. **Revisión a ojo** de lo visual (ver "Pruebas dentro del juego") y **publicar la 0.1** (crear los proyectos en Modrinth/CurseForge y los secretos de la CI).
+3. **Texturas definitivas** (encargadas; guía en `stormroot-texturas`).
+4. Del diseño: más frentes (granizo, calor, polvo, ventisca, aurora), corrientes de aire y bolsas de gas, red de micelio, ruinas de los Tempestarios, más instrumentos, muestras y frascos, el jugador y el clima, fauna y flora, eventos raros y progresión.
 
 ### Limitaciones conocidas de la 0.1
 - Los frentes solo existen en el **Overworld** (decisión de diseño: el Nether y el End no tienen clima).
 - Fuera de los rayos, la lluvia "de juego" sigue siendo global en el servidor (fuego que se apaga, calderos que se llenan...) mientras algún jugador esté en un frente.
-- Sin Bloomberto no hay frentes visibles de lejos (solo partículas a menos de 32 bloques), ni pantalla de config: los ajustes del mundo se cambian con `/stormroot settings`.
+- Sin Bloomberto no hay pantalla de config: los ajustes del mundo se cambian con `/stormroot settings` y los del cliente en `config/stormroot-client.properties`.
 - En Fabric, la pantalla de config necesita Bloomberto **y** Mod Menu.
 
 ## 🧰 Comandos de depuración

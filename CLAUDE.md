@@ -81,8 +81,15 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   Orden: tierra → barro → charco; un bloque tiene como mucho UN cambio apuntado y siempre guarda el material de antes
   de Stormroot (`place`). Al secarse: charcos, luego pozas, luego barro.
   `getMinY()` desde 1.21.2 (`getMinBuildHeight()` antes).
+- **Cielo propio (fase 1 hecha)**: `sky/CloudCover` + `sky/ValueNoise` (Java puro y deterministas: el servidor podrá
+  usarlos en la fase 2) deciden la nube de cada celda de 12 bloques; `client/sky/SkyRenderer` la dibuja desde
+  `client/render/WorldRenderHook` (eventos de render de cada loader en `StormrootClient`, igual que `WorldRenderBridge`
+  de Bloomberto). Las vanilla se ocultan con `client/mixin/clouds/OptionsCloudsMixin` (`Options#getCloudsType` → OFF),
+  en `stormroot-sky.mixins.json`, que cargan los 3 loaders (Fabric `fabric.mod.json`, NeoForge `[[mixins]]`, Forge
+  `loom.forge.mixinConfig` en `build.gradle.kts`). Opción `custom_clouds` (Bloomberto) o `config/stormroot-client.properties`
+  (`config/ClientSettingsFile`). Fase 2 pendiente: ver "Siguientes pasos" en `README.md`.
 - Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 18 comprobaciones; cliente con
-  un jugador en pantalla virtual: 9 más, incluidas las de Bloomberto).
+  un jugador en pantalla virtual: 11 más, incluidas las de Bloomberto y las del cielo).
 - En el self-test, el clima se lee de `server.getWorldData().overworldData()`: `level.isRaining()/isThundering()` son la
   intensidad visual, que sube tick a tick. Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.
 - **Self-test** (`selftest/SelfTest`, `client/ClientSelfTest`, `scripts/selftest.sh`, job `selftest` de la CI): cuando
