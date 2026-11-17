@@ -10,6 +10,7 @@ import io.github.hcuadrado428.stormroot.weather.FrontType;
 import io.github.hcuadrado428.stormroot.weather.WeatherFront;
 import java.io.File;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.Screenshot;
 import net.minecraft.server.MinecraftServer;
 
 /**
@@ -46,7 +47,8 @@ public final class ClientSelfTest {
         ticks++;
         if (pendingShot != null) {
             if (ticks >= shotAt) {
-                // scripts/selftest.sh ve esta línea y captura la pantalla virtual.
+                // Captura del propio juego (screenshots/); scripts/selftest-client-xvfb.sh la copia con este nombre.
+                Screenshot.grab(mc.gameDirectory, mc.getMainRenderTarget(), message -> { });
                 Stormroot.LOGGER.info("[selftest] SCREENSHOT {}", pendingShot);
                 pendingShot = null;
                 holdUntil = ticks + 80;
