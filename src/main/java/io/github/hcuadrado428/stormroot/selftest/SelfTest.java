@@ -763,7 +763,17 @@ public final class SelfTest {
         BlockPos above = level.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,
                 new BlockPos(BX + 8, 0, BZ + 12));
         BlockPos lake = above.below();
-        BlockState ground = level.getBlockState(lake);
+        // Un lago de 1 bloque rodeado de hierba (la zona de pruebas es de piedra): se restaura al final.
+        Map<BlockPos, BlockState> saved = new HashMap<>();
+        List<BlockPos> banks = new ArrayList<>(List.of(lake, lake.east(2), lake.east(3)));
+        for (Direction side : Direction.Plane.HORIZONTAL) {
+            banks.add(lake.relative(side));
+        }
+        for (BlockPos pos : banks) {
+            saved.put(pos, level.getBlockState(pos));
+            level.setBlock(pos, Blocks.GRASS_BLOCK.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        BlockState ground = Blocks.GRASS_BLOCK.defaultBlockState();
         level.setBlock(lake, Blocks.WATER.defaultBlockState(), Block.UPDATE_CLIENTS);
         cell.set(0.95);
         int flooded = 0;
@@ -794,7 +804,9 @@ public final class SelfTest {
         }
         banksBack &= level.getBlockState(lake.east(2)).equals(ground);
         boolean spoutGone = spout == null || level.getBlockState(spout).isAir();
-        level.setBlock(lake, ground, Block.UPDATE_CLIENTS);
+        for (Map.Entry<BlockPos, BlockState> entry : saved.entrySet()) {
+            level.setBlock(entry.getKey(), entry.getValue(), Block.UPDATE_CLIENTS);
+        }
         check("monsoon floods banks and caves and recedes",
                 flooded == 4 && second && !third && cascades > 0 && banksBack && spoutGone,
                 "orillas inundadas=" + flooded + ", a 2 bloques=" + second + ", a 3 bloques=" + third + ", cascadas=" + cascades
