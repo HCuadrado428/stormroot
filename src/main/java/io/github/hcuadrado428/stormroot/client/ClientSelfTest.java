@@ -194,7 +194,26 @@ public final class ClientSelfTest {
                 stageStart = ticks;
                 requestShot(mc, "sombras_en_el_suelo", 0f, 80f);
             }
-            case 63 -> finish(mc);
+            case 63 -> {
+                // Un arcoíris con su extremo a 60 bloques al este del jugador.
+                server.execute(() -> io.github.hcuadrado428.stormroot.weather.Rainbows.spawn(server.overworld(), x + 60, z, 0));
+                stage = 64;
+                stageStart = ticks;
+            }
+            case 64 -> {
+                // Esperar a que aparezca del todo (tarda 20 s en hacerse visible del todo).
+                if ((SkyRenderer.rainbowFrames() > 0 && waited > 400) || waited > 900) {
+                    SelfTest.report("rainbow drawn in the sky", SkyRenderer.rainbowFrames() > 0,
+                            "fotogramas con arcoíris=" + SkyRenderer.rainbowFrames());
+                    stage = 65;
+                    stageStart = ticks;
+                    requestShot(mc, "arcoiris", -90f, 20f);
+                }
+            }
+            case 65 -> {
+                server.execute(io.github.hcuadrado428.stormroot.weather.Rainbows::clear);
+                finish(mc);
+            }
             case 20 -> {
                 clear(server);
                 mc.options.hideGui = false;

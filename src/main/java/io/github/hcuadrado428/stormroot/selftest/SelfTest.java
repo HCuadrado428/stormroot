@@ -167,6 +167,7 @@ public final class SelfTest {
                 run("heat waves dry the ground and clear the sky", SelfTest::checkHeatWave);
                 run("one in three storms brings hail", SelfTest::checkHailClouds);
                 run("magnetic storms magnetize iron and auroras leave dust", () -> checkRareSkies(level));
+                run("the end of the rainbow has a treasure", () -> checkRainbowTreasure(level));
                 run("hail hurts crops and glass and leaves hailstones", () -> checkHailGround(level));
                 finish(server);
             }
@@ -230,14 +231,16 @@ public final class SelfTest {
 
     private static void checkPacket() {
         List<WeatherFront> fronts = List.of(new WeatherFront(5, FrontType.RAIN, 1, 2, 90, 0.5, -0.25, 10, 600));
-        FrontsSyncPayload payload = new FrontsSyncPayload(true, 1.25, 0.75f, 0x5EED_CAFEL, fronts);
+        FrontsSyncPayload payload = new FrontsSyncPayload(true, 1.25, 0.75f, 0x5EED_CAFEL, fronts,
+                List.of(new io.github.hcuadrado428.stormroot.sky.Rainbow(7, 10.5, 64, -3.5, 1.0, 100, 3100)));
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         payload.write(buf);
         FrontsSyncPayload back = new FrontsSyncPayload(buf);
         FriendlyByteBuf again = new FriendlyByteBuf(Unpooled.buffer());
         back.write(again);
         boolean ok = buf.writerIndex() == again.writerIndex() && buf.readerIndex() == buf.writerIndex()
-                && again.writerIndex() > 0 && equalBytes(buf, again) && back.skySeed() == 0x5EED_CAFEL;
+                && again.writerIndex() > 0 && equalBytes(buf, again) && back.skySeed() == 0x5EED_CAFEL
+                && back.rainbows().size() == 1 && back.rainbows().get(0).endTick() == 3100;
         check("sync packet round trip", ok, "el paquete no se lee igual que se escribe");
     }
 
@@ -708,6 +711,26 @@ public final class SelfTest {
         check("heat waves dry the ground and clear the sky", drier && clear <= calm / 3,
                 "humedad tras 10 min: normal=" + normal.surface() + ", con calor=" + hot.surface()
                         + "; nubes de buen tiempo sin/con calor=" + calm + "/" + clear);
+    }
+
+    /** El final del arcoíris: un fragmento de arcoíris y de 1 a 3 esmeraldas. */
+    private static void checkRainbowTreasure(ServerLevel level) {
+        BlockPos pos = new BlockPos(BX + 13, Y_TOP + 1, BZ + 3);
+        io.github.hcuadrado428.stormroot.weather.Rainbows.reward(level, pos);
+        List<net.minecraft.world.entity.item.ItemEntity> items = level.getEntitiesOfClass(
+                net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(pos).inflate(3), e -> true);
+        int shards = 0;
+        int emeralds = 0;
+        for (net.minecraft.world.entity.item.ItemEntity item : items) {
+            if (item.getItem().is(io.github.hcuadrado428.stormroot.registry.ModItems.RAINBOW_SHARD)) {
+                shards += item.getItem().getCount();
+            } else if (item.getItem().is(net.minecraft.world.item.Items.EMERALD)) {
+                emeralds += item.getItem().getCount();
+            }
+            item.discard();
+        }
+        check("the end of the rainbow has a treasure", shards == 1 && emeralds >= 1 && emeralds <= 3,
+                "fragmentos=" + shards + ", esmeraldas=" + emeralds);
     }
 
     /** El hierro se magnetiza (y nada más); la aurora deja polvo en el suelo. */

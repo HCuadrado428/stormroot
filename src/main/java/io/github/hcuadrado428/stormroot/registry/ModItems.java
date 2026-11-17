@@ -16,6 +16,8 @@ public final class ModItems {
     public static Item HAILSTONE;
     /** Polvo de aurora: cae del cielo durante una aurora, de noche (ingrediente de final de juego, más adelante). */
     public static Item AURORA_DUST;
+    /** Fragmento de arcoíris: el tesoro del final del arcoíris (ingrediente, más adelante). */
+    public static Item RAINBOW_SHARD;
 
     private ModItems() {
     }

@@ -251,6 +251,7 @@ public final class SkyRenderer {
             }
         }
         drawAurora(vc, pose, level, cam, seconds, day);
+        drawRainbows(vc, pose, level, cam, day);
         if (StormrootConfig.cloudShadows.getAsBoolean()) {
             drawShadows(vc, pose, level, cam, camCellX, camCellZ, driftX, driftZ, day);
         }
@@ -300,6 +301,58 @@ public final class SkyRenderer {
     }
 
     private static long auroraFrames;
+    private static long rainbowFrames;
+
+    /** Para el self-test: fotogramas con algún arcoíris dibujado. */
+    public static long rainbowFrames() {
+        return rainbowFrames;
+    }
+
+    /** Colores del arcoíris, de fuera (rojo) a dentro (violeta). */
+    private static final int[] RAINBOW = {0xE8403A, 0xF39A2E, 0xF6E04A, 0x5ED15A, 0x3FA7E8, 0x4A5ADB, 0x9A55D6};
+
+    /**
+     * Arcoíris: un arco de 7 bandas que sale del suelo en su extremo ({@link io.github.hcuadrado428.stormroot.sky.Rainbow}),
+     * sube hasta {@code RADIUS} bloques y baja al otro lado. Solo de día; aparece y se desvanece poco a poco.
+     */
+    private static void drawRainbows(VertexConsumer vc, PoseStack.Pose pose, ClientLevel level, Vec3 cam, float day) {
+        if (day < 0.5f) {
+            return;
+        }
+        long now = level.getGameTime();
+        boolean drew = false;
+        for (io.github.hcuadrado428.stormroot.sky.Rainbow rainbow : ClientFronts.rainbows()) {
+            float fade = (float) rainbow.fade(now);
+            if (fade <= 0.01f) {
+                continue;
+            }
+            double dirX = Math.cos(rainbow.angle());
+            double dirZ = Math.sin(rainbow.angle());
+            double radius = io.github.hcuadrado428.stormroot.sky.Rainbow.RADIUS;
+            double cx = rainbow.x() + dirX * radius;
+            double cz = rainbow.z() + dirZ * radius;
+            int segments = 40;
+            for (int band = 0; band < RAINBOW.length; band++) {
+                double outer = radius + 3 - band * 2.2;
+                double inner = outer - 2.2;
+                int argb = ((int) (110 * fade * day) << 24) | RAINBOW[band];
+                for (int k = 0; k < segments; k++) {
+                    double t0 = Math.PI * k / segments;
+                    double t1 = Math.PI * (k + 1) / segments;
+                    quad(vc, pose,
+                            (float) (cx - dirX * outer * Math.cos(t0) - cam.x), (float) (rainbow.y() + outer * Math.sin(t0) - cam.y), (float) (cz - dirZ * outer * Math.cos(t0) - cam.z),
+                            (float) (cx - dirX * outer * Math.cos(t1) - cam.x), (float) (rainbow.y() + outer * Math.sin(t1) - cam.y), (float) (cz - dirZ * outer * Math.cos(t1) - cam.z),
+                            (float) (cx - dirX * inner * Math.cos(t1) - cam.x), (float) (rainbow.y() + inner * Math.sin(t1) - cam.y), (float) (cz - dirZ * inner * Math.cos(t1) - cam.z),
+                            (float) (cx - dirX * inner * Math.cos(t0) - cam.x), (float) (rainbow.y() + inner * Math.sin(t0) - cam.y), (float) (cz - dirZ * inner * Math.cos(t0) - cam.z),
+                            argb);
+                }
+            }
+            drew = true;
+        }
+        if (drew) {
+            rainbowFrames++;
+        }
+    }
 
     /** Para el self-test: fotogramas con aurora dibujada. */
     public static long auroraFrames() {

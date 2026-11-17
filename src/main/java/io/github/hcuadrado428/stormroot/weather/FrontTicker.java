@@ -56,6 +56,7 @@ public final class FrontTicker {
             Hail.tick(server.overworld());
             Monsoons.tick(server.overworld());
             RareSkies.tick(server.overworld());
+            Rainbows.tick(server.overworld());
         }
         if (++tickCounter < STEP_TICKS && server == currentServer) {
             return;
@@ -72,8 +73,24 @@ public final class FrontTicker {
 
         sim.setMaxFronts(StormrootConfig.maxFronts.getAsInt());
         sim.setSpawnChance(StormrootConfig.frontSpawnChance.getAsDouble());
+        List<WeatherFront> rainy = new ArrayList<>();
+        for (WeatherFront front : sim.fronts()) {
+            if (front.type() == FrontType.RAIN || front.type() == FrontType.THUNDERSTORM || front.type() == FrontType.MONSOON) {
+                rainy.add(front.copy());
+            }
+        }
         for (WeatherFront front : sim.step(STEP_TICKS / 20.0, anchors, (x, z) -> BiomeClimate.zoneAt(overworld, x, z))) {
             Stormroot.LOGGER.info("[Stormroot] Nuevo frente: {}", front);
+        }
+        // Lluvias que se han acabado en este paso: quizá un arcoíris.
+        for (WeatherFront ended : rainy) {
+            boolean alive = false;
+            for (WeatherFront front : sim.fronts()) {
+                alive |= front.id() == ended.id();
+            }
+            if (!alive && controlsWeatherNow()) {
+                Rainbows.onRainEnded(overworld, ended);
+            }
         }
         applyWeather(overworld, sim);
         SeepageTicker.step(server, sim, STEP_TICKS / 20.0);
@@ -94,8 +111,16 @@ public final class FrontTicker {
                 }
             }
             float seep = (float) SeepageTicker.deepAt(server, player.getBlockX(), player.getBlockZ());
+            List<io.github.hcuadrado428.stormroot.sky.Rainbow> rainbows = new ArrayList<>();
+            for (io.github.hcuadrado428.stormroot.sky.Rainbow rainbow : Rainbows.active()) {
+                double rx = rainbow.x() - player.getX();
+                double rz = rainbow.z() - player.getZ();
+                if (rx * rx + rz * rz <= 512 * 512) {
+                    rainbows.add(rainbow);
+                }
+            }
             StormrootNetwork.sendFronts(player, new FrontsSyncPayload(controlsWeatherNow(), sim.windAngle(), seep,
-                    skySeed(server), near));
+                    skySeed(server), near, rainbows));
         }
     }
 

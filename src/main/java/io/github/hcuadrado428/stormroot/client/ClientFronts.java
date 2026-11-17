@@ -35,6 +35,18 @@ public final class ClientFronts {
         }
     }
 
+    private static final List<io.github.hcuadrado428.stormroot.sky.Rainbow> RAINBOWS = new ArrayList<>();
+
+    public static synchronized void acceptRainbows(List<io.github.hcuadrado428.stormroot.sky.Rainbow> rainbows) {
+        RAINBOWS.clear();
+        RAINBOWS.addAll(rainbows);
+    }
+
+    /** Arcoíris que manda el servidor (los que hay cerca). */
+    public static synchronized List<io.github.hcuadrado428.stormroot.sky.Rainbow> rainbows() {
+        return new ArrayList<>(RAINBOWS);
+    }
+
     public static synchronized void advance(double seconds) {
         for (WeatherFront front : FRONTS) {
             front.advance(seconds);
@@ -89,5 +101,6 @@ public final class ClientFronts {
         active = false;
         seep = 0;
         FRONTS.clear();
+        RAINBOWS.clear();
     }
 }

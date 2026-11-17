@@ -28,5 +28,6 @@
     "block.stormroot.ice_crystal": "Cristal de hielo",
     "item.stormroot.hailstone": "Granizo",
     "block.stormroot.magnetic_rock": "Roca magnetizada",
-    "item.stormroot.aurora_dust": "Polvo de aurora"
+    "item.stormroot.aurora_dust": "Polvo de aurora",
+    "item.stormroot.rainbow_shard": "Fragmento de arcoíris"
 }
