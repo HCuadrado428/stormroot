@@ -72,7 +72,7 @@
     }
    },
    "type": "cube",
-   "uuid": "ec5a8270-cb1c-4469-9359-0a3e84be3ef0"
+   "uuid": "ece71d74-c8d3-45be-a459-fb6f4a556377"
   },
   {
    "name": "pieza_2",
@@ -124,12 +124,12 @@
     }
    },
    "type": "cube",
-   "uuid": "87338716-13b3-4a47-832e-bc6ea2425485"
+   "uuid": "866a3217-2179-46cb-8bf4-7759acf6283b"
   }
  ],
  "outliner": [
-  "ec5a8270-cb1c-4469-9359-0a3e84be3ef0",
-  "87338716-13b3-4a47-832e-bc6ea2425485"
+  "ece71d74-c8d3-45be-a459-fb6f4a556377",
+  "866a3217-2179-46cb-8bf4-7759acf6283b"
  ],
  "textures": [
   {
@@ -152,7 +152,7 @@
    "visible": true,
    "internal": true,
    "saved": true,
-   "uuid": "32b698f7-b504-42fb-89ea-59fef59c5c58",
+   "uuid": "b83db111-d657-4bd7-ac6a-4d4a06a45edb",
    "relative_path": "",
    "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAkElEQVR4XmNgwAHs8+f9n3P8xf/zL77///L7P5gNEkNXzoTLAG1dbQwpbGJYDcBmEwygy+F0ATK4/fYHLodiN+DgxCRGZB2qwhxwLrocThdcvXwVw1ZsYkQFIswLZAcishfICkR8AKsX0AMKORbICkSYF8gORBggOxCRvUBWICLHAlGZCT2gkAFZgQgD2AIRAO2ESOP6OLqQAAAAAElFTkSuQmCC"
   }

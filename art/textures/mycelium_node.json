@@ -1,22 +1,35 @@
 {
-  "size": [16, 16],
-  "palette": {"d": "#3b2f3a", "e": "#4a3b47", "f": "#2e252d", "a": "#cfd8b0", "b": "#a9b98a", "g": "#e8f5c8", "w": "#f7ffe6", "c": "#7f9468"},
+  "size": [
+    16,
+    16
+  ],
+  "palette": {
+    ".": "transparent",
+    "e": "#3d2f3f",
+    "d": "#2f2431",
+    "f": "#4f3e4f",
+    "o": "#1d161e",
+    "L": "#e9f7c7",
+    "w": "#ffffff",
+    "G": "#b9d98a",
+    "g": "#7ea860"
+  },
   "rows": [
-    "dedfdbedeedfdeed",
-    "edbadedcdedeabde",
-    "dbgwbdeddedbgabd",
-    "eagwadedfdeawgae",
-    "dbaabcdeedecbaed",
-    "fdbcdedbdedfdcde",
-    "dedfdebgadedfdbd",
-    "edeedcawgbdeedad",
-    "deddfbgwgadedbge",
-    "fdedecbabcdfedad",
-    "dcbdedfcdeddedce",
-    "babadedededbcdfd",
-    "agwbdfdeedcagbde",
-    "dbgadedfdeawgade",
-    "edbcdedeedcbabed",
-    "deedfdedfdedcdde"
+    "eeffeeeeddeeefee",
+    "edoooedeeeooeefe",
+    "eoLwLoeefoGLoeee",
+    "eoLLGgofeoGgoede",
+    "edoGgoeeedoodeee",
+    "feeooeeddeeeeffe",
+    "eedeeeooooeedeee",
+    "efeeeoLwLGoeeefe",
+    "eeedoLLGGgoeooee",
+    "edeeoLGGggooLwoe",
+    "eeeeedggggooGgoe",
+    "fedeeeooooeeoode",
+    "eeeooeeeddeeeeee",
+    "eeoGLoefeeeoooee",
+    "edoggoeeeedoLgoe",
+    "eeeooeedeeeeooee"
   ]
 }

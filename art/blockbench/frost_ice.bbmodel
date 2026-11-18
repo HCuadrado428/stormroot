@@ -1,0 +1,118 @@
+{
+ "meta": {
+  "format_version": "4.10",
+  "model_format": "java_block",
+  "box_uv": false
+ },
+ "name": "frost_ice",
+ "parent": "",
+ "ambientocclusion": true,
+ "front_gui_light": false,
+ "visible_box": [
+  1,
+  1,
+  0
+ ],
+ "variable_placeholders": "",
+ "variable_placeholder_buttons": [],
+ "timeline_setups": [],
+ "unhandled_root_fields": {},
+ "resolution": {
+  "width": 16,
+  "height": 16
+ },
+ "elements": [
+  {
+   "name": "pieza_1",
+   "box_uv": false,
+   "rescale": false,
+   "locked": false,
+   "render_order": "default",
+   "allow_mirror_modeling": true,
+   "from": [
+    0,
+    0,
+    0
+   ],
+   "to": [
+    16,
+    16,
+    16
+   ],
+   "autouv": 0,
+   "color": 0,
+   "origin": [
+    8,
+    8,
+    8
+   ],
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": null
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": null
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": null
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": null
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": null
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": null
+    }
+   },
+   "type": "cube",
+   "uuid": "2571270d-c1c6-4dfb-b1aa-b96adee0c4fb"
+  }
+ ],
+ "outliner": [
+  "2571270d-c1c6-4dfb-b1aa-b96adee0c4fb"
+ ],
+ "textures": []
+}

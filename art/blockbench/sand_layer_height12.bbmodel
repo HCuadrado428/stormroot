@@ -1,0 +1,118 @@
+{
+ "meta": {
+  "format_version": "4.10",
+  "model_format": "java_block",
+  "box_uv": false
+ },
+ "name": "sand_layer_height12",
+ "parent": "",
+ "ambientocclusion": true,
+ "front_gui_light": false,
+ "visible_box": [
+  1,
+  1,
+  0
+ ],
+ "variable_placeholders": "",
+ "variable_placeholder_buttons": [],
+ "timeline_setups": [],
+ "unhandled_root_fields": {},
+ "resolution": {
+  "width": 16,
+  "height": 16
+ },
+ "elements": [
+  {
+   "name": "pieza_1",
+   "box_uv": false,
+   "rescale": false,
+   "locked": false,
+   "render_order": "default",
+   "allow_mirror_modeling": true,
+   "from": [
+    0,
+    0,
+    0
+   ],
+   "to": [
+    16,
+    12,
+    16
+   ],
+   "autouv": 0,
+   "color": 0,
+   "origin": [
+    8,
+    8,
+    8
+   ],
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "faces": {
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": null
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": null
+    },
+    "north": {
+     "uv": [
+      0,
+      4,
+      16,
+      16
+     ],
+     "texture": null
+    },
+    "south": {
+     "uv": [
+      0,
+      4,
+      16,
+      16
+     ],
+     "texture": null
+    },
+    "west": {
+     "uv": [
+      0,
+      4,
+      16,
+      16
+     ],
+     "texture": null
+    },
+    "east": {
+     "uv": [
+      0,
+      4,
+      16,
+      16
+     ],
+     "texture": null
+    }
+   },
+   "type": "cube",
+   "uuid": "7a38ae50-1d4c-4186-8c55-aee781497a54"
+  }
+ ],
+ "outliner": [
+  "7a38ae50-1d4c-4186-8c55-aee781497a54"
+ ],
+ "textures": []
+}

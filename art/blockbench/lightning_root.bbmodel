@@ -108,11 +108,11 @@
     }
    },
    "type": "cube",
-   "uuid": "f72bc004-bdb1-495e-855b-fc69676b21f2"
+   "uuid": "bc0dc7ad-73cd-4e83-a47f-2e59e8ea599e"
   }
  ],
  "outliner": [
-  "f72bc004-bdb1-495e-855b-fc69676b21f2"
+  "bc0dc7ad-73cd-4e83-a47f-2e59e8ea599e"
  ],
  "textures": [
   {
@@ -135,7 +135,7 @@
    "visible": true,
    "internal": true,
    "saved": true,
-   "uuid": "20937ae1-ec91-48f0-ab14-08a23293c0a2",
+   "uuid": "9e841b0a-f0c4-4c07-9105-a9c4247c59ee",
    "relative_path": "",
    "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABaUlEQVR4Xm1TsUrDUBQ9DZkc7Bfo4BzIZDp1LEiho0jNJ+giZHTI0PGBi78gRRwcBBEcMyVboLODg846uFbOy7uv9zU50OX23vPuOfdkdHR6sT2cLJFOMxBt1eC3XkPXFukYq/v3Xr0yN4ilkU0dMrSAJWTt7OQAV8/f9p9pcef7Xtof+0isG98+/hzJDkM1kspjsbSykawigVtwGy1L1wQxB/YbP5/GyOss8IPrC1lldh7FNKxjhjcJeMXDpESOMvBDeyRz3kTL7sxLDLApOpKkmvt1tXbp9SZ6dnfGxCwtCX/H52vASdCwZ5TCELtsQk8S0/eKZxxdPn5tJQNyhf0MUAqRmHkvTBFX5qA+oT6tDBKUo4PHhyPrZtUEJyNIyPhSJ5HX3RYk0bIjYby9nvlbc6jLRwhKICiJDzB8QZT1nf3Hpb6LRTrzAdsUpd1qMMqBiS7OhL4ULwQ0w1GWzIuxspk2mtLp3z/C4/ptKBLk+QAAAABJRU5ErkJggg=="
   }

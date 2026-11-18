@@ -108,7 +108,7 @@
     }
    },
    "type": "cube",
-   "uuid": "d389d157-500e-4af7-bb37-0f00da908ca8"
+   "uuid": "d3c25f4c-8b12-492e-b534-39dadc9c2ef3"
   },
   {
    "name": "pieza_2",
@@ -196,7 +196,7 @@
     }
    },
    "type": "cube",
-   "uuid": "5c0e0ac5-6609-4b50-93b1-06a23743d20a"
+   "uuid": "89c97252-ada0-4fea-b1d7-8d8eb2a1cc99"
   },
   {
    "name": "pieza_3",
@@ -284,7 +284,7 @@
     }
    },
    "type": "cube",
-   "uuid": "0ebe6eae-80ce-43d6-bb68-b80335df0420"
+   "uuid": "40dc287c-4aa3-4018-9611-e5fa43e013f4"
   },
   {
    "name": "pieza_4",
@@ -372,7 +372,7 @@
     }
    },
    "type": "cube",
-   "uuid": "f6de676a-0840-4476-962f-0305324209c4"
+   "uuid": "0e5cc4c5-1cbe-43ee-9e25-6f3c56af89ff"
   },
   {
    "name": "pieza_5",
@@ -460,15 +460,15 @@
     }
    },
    "type": "cube",
-   "uuid": "2cf43f7f-bd57-4b47-b1e4-54ca226a3974"
+   "uuid": "6cb3e213-c9d8-4198-8892-6ce2cbfb23bf"
   }
  ],
  "outliner": [
-  "d389d157-500e-4af7-bb37-0f00da908ca8",
-  "5c0e0ac5-6609-4b50-93b1-06a23743d20a",
-  "0ebe6eae-80ce-43d6-bb68-b80335df0420",
-  "f6de676a-0840-4476-962f-0305324209c4",
-  "2cf43f7f-bd57-4b47-b1e4-54ca226a3974"
+  "d3c25f4c-8b12-492e-b534-39dadc9c2ef3",
+  "89c97252-ada0-4fea-b1d7-8d8eb2a1cc99",
+  "40dc287c-4aa3-4018-9611-e5fa43e013f4",
+  "0e5cc4c5-1cbe-43ee-9e25-6f3c56af89ff",
+  "6cb3e213-c9d8-4198-8892-6ce2cbfb23bf"
  ],
  "textures": [
   {
@@ -491,7 +491,7 @@
    "visible": true,
    "internal": true,
    "saved": true,
-   "uuid": "34c50b41-b78c-4f9f-a3e1-a1068b5e448c",
+   "uuid": "859120ac-5fd9-44c7-b730-0c82f6ad6b65",
    "relative_path": "",
    "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAvUlEQVR4XmN8UO3/n4FMsOfULQYWkN6H95+TaQQDAxNMp7yiJIYh8zxDsBqMrBZuADZXPLj1AKsByGrhBoAAuiua7p4h6CoUA2Am3379GavNIJC0fQ2KHIoBMKAqykvQ7zAANwBXgCG7Bls4wQ1AdxosTNBdU6dsgt8LyAqw2YgesBhhgC3kQQDZi1jTAbZoRAbIXsSZDtCdjB6d2FIr3lhAD0CYBcjhxAjKjdgCixgAciELKEuSCy6++swAABOVTPrE/p6BAAAAAElFTkSuQmCC"
   }
