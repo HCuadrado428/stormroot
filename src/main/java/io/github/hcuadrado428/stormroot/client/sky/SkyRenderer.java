@@ -45,6 +45,8 @@ public final class SkyRenderer {
     private static final int RADIUS = 32;
     private static final int SIZE = RADIUS * 2 + 1;
     private static final double FAIR_Y = 192;
+    /** Base del muro de una tormenta de arena (casi el nivel del mar: la arena sube desde el suelo). */
+    private static final double DUST_Y = 60;
 
     /** Capa alta (velos finos, solo decorativa). */
     private static final double HIGH_Y = 262;
@@ -55,6 +57,8 @@ public final class SkyRenderer {
     private static final byte[][] GRID = new byte[SIZE + 2][SIZE + 2];
     /** Por celda: intensidad del frente (nubarrones) o aviso de tormenta (buen tiempo), 0–1. */
     private static final float[][] SHADE = new float[SIZE + 2][SIZE + 2];
+    /** Calima (0–1) de cada celda: tiñe de naranja las nubes de buen tiempo cerca de una tormenta de arena. */
+    private static final float[][] CALIMA = new float[SIZE + 2][SIZE + 2];
     private static final boolean[][] HIGH = new boolean[SIZE + 2][SIZE + 2];
     private static long shadowQuads;
     private static long gridTick = Long.MIN_VALUE;
@@ -63,6 +67,12 @@ public final class SkyRenderer {
     private static long cellsDrawn;
     private static long frames;
     private static int stormCells;
+    private static int dustCells;
+
+    /** Celdas con muro de arena en la última rejilla (para el self-test). */
+    public static int dustCells() {
+        return dustCells;
+    }
 
     private SkyRenderer() {
     }
@@ -195,6 +205,15 @@ public final class SkyRenderer {
                         b = (int) (228 - 18 * amount);
                         alpha = 244;
                     }
+                    case DUST -> {
+                        // Tormenta de arena: un muro marrón desde casi el suelo, visible desde muy lejos.
+                        bottom = DUST_Y;
+                        height = heightOf(kind, amount);
+                        r = (int) (204 - 30 * amount);
+                        g = (int) (168 - 34 * amount);
+                        b = (int) (116 - 30 * amount);
+                        alpha = 200 + (int) (40 * amount);
+                    }
                     case RAIN -> {
                         bottom = FAIR_Y - 6;
                         height = heightOf(kind, amount);
@@ -211,6 +230,10 @@ public final class SkyRenderer {
                         g = (int) (255 - 86 * amount);
                         b = (int) (255 - 72 * amount);
                         alpha = 204 + (int) (36 * amount);
+                        // Calima: cerca de una tormenta de arena, las nubes de buen tiempo se vuelven anaranjadas.
+                        float calima = CALIMA[i + 1][j + 1];
+                        g -= (int) (60 * calima);
+                        b -= (int) (110 * calima);
                     }
                 }
                 float x1 = x0 + C;
@@ -371,6 +394,7 @@ public final class SkyRenderer {
             case STORM, HAIL -> 5 + 9 * amount;
             case SNOW -> 6 + 6 * amount;
             case RAIN -> 4 + 3 * amount;
+            case DUST -> 40 + 60 * amount;
             default -> 4;
         };
     }
@@ -401,6 +425,7 @@ public final class SkyRenderer {
                 double darkness = switch (kind) {
                     case STORM, HAIL -> 0.42;
                     case RAIN, SNOW -> 0.32;
+                    case DUST -> 0.25 + 0.15 * SHADE[i + 1][j + 1];
                     default -> 0.2 + 0.12 * SHADE[i + 1][j + 1];
                 };
                 double wx0 = (camCellX - RADIUS + i) * C + driftX;
@@ -443,6 +468,7 @@ public final class SkyRenderer {
         double driftX = CloudCover.driftX(wind, seconds);
         double driftZ = CloudCover.driftZ(wind, seconds);
         int storms = 0;
+        int dust = 0;
         for (int i = 0; i < SIZE + 2; i++) {
             for (int j = 0; j < SIZE + 2; j++) {
                 GRID[i][j] = 0;
@@ -462,7 +488,10 @@ public final class SkyRenderer {
                 double x = u + driftX;
                 double z = v + driftZ;
                 CloudCover.Kind kind = CloudCover.frontCloud(seed, x, z, u, v, seconds, fronts);
-                if (kind != CloudCover.Kind.NONE) {
+                CALIMA[i][j] = (float) CloudCover.calima(x, z, fronts);
+                if (kind == CloudCover.Kind.DUST) {
+                    SHADE[i][j] = (float) CloudCover.dustIntensity(x, z, fronts);
+                } else if (kind != CloudCover.Kind.NONE) {
                     SHADE[i][j] = (float) CloudCover.frontIntensity(x, z, fronts);
                 } else {
                     double bias = CloudCover.fairBias(x, z, fronts);
@@ -475,10 +504,14 @@ public final class SkyRenderer {
                 if (kind == CloudCover.Kind.STORM || kind == CloudCover.Kind.HAIL) {
                     storms++;
                 }
+                if (kind == CloudCover.Kind.DUST) {
+                    dust++;
+                }
                 HIGH[i][j] = CloudCover.highCloud(seed, u, v, seconds);
             }
         }
         stormCells = storms;
+        dustCells = dust;
     }
 
     private static void quad(VertexConsumer vc, PoseStack.Pose pose,

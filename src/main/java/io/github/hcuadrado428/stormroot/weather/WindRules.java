@@ -66,7 +66,7 @@ public final class WindRules {
     /** Fuerza máxima que da cada tipo de frente. */
     public static double gust(FrontType type) {
         return switch (type) {
-            case THUNDERSTORM, BLIZZARD -> 1.0;
+            case THUNDERSTORM, BLIZZARD, SANDSTORM -> 1.0;
             case MONSOON -> 0.8;
             case RAIN -> 0.45;
             default -> 0;

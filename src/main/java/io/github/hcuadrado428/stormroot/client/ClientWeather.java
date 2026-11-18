@@ -76,7 +76,13 @@ public final class ClientWeather {
         thunder = approach(thunder, (float) Math.min(1.0, storm * 2));
         // Ventisca: casi tanta niebla como un banco de niebla (la nieve no deja ver).
         // Monzón: la lluvia torrencial también quita visibilidad (algo menos que la ventisca).
-        fog = approach(fog, (float) Math.min(1.0, Math.max(Math.max(mist, blizzard * 0.8), monsoon * 0.45) * 2));
+        // Tormenta de arena: solo sobre biomas secos (fuera, es calima: solo polvo fino y nubes anaranjadas).
+        // Con gafas de arena se ve el doble de lejos.
+        boolean dryHere = !level.getBiome(player.blockPosition()).value().hasPrecipitation();
+        double sand = dryHere ? ClientFronts.intensity(FrontType.SANDSTORM, x, z) : 0;
+        double sandFog = sand * (wearsGoggles(player) ? 0.45 : 0.9);
+        fog = approach(fog, (float) Math.min(1.0, Math.max(Math.max(Math.max(mist, blizzard * 0.8), monsoon * 0.45), sandFog) * 2));
+        sandHere = sand;
 
         level.setRainLevel(rain);
         level.setThunderLevel(thunder);
@@ -86,7 +92,49 @@ public final class ClientWeather {
         spawnHail(level, player);
         spawnCaveParticles(level, player);
         spawnFrost(level, player);
+        spawnSand(level, player, sand, dryHere ? 0
+                : io.github.hcuadrado428.stormroot.sky.CloudCover.calima(x, z, ClientFronts.snapshot()));
         ClientWind.tick(level, player);
+    }
+
+    /** Intensidad de la tormenta de arena donde está el jugador (0 fuera de los biomas secos). */
+    private static double sandHere;
+    /** Partículas de arena soltadas (para el self-test). */
+    public static long sandParticles;
+
+    public static double sandHere() {
+        return sandHere;
+    }
+
+    public static boolean wearsGoggles(LocalPlayer player) {
+        return player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD)
+                .is(io.github.hcuadrado428.stormroot.registry.ModItems.SAND_GOGGLES);
+    }
+
+    /** Arena que vuela con el viento dentro de la tormenta; fuera, calima: polvo fino que cae despacio. */
+    private static void spawnSand(ClientLevel level, LocalPlayer player, double sand, double calima) {
+        RandomSource random = level.getRandom();
+        net.minecraft.core.particles.BlockParticleOption dust = new net.minecraft.core.particles.BlockParticleOption(
+                ParticleTypes.FALLING_DUST, net.minecraft.world.level.block.Blocks.SAND.defaultBlockState());
+        double angle = ClientFronts.windAngle();
+        double dx = io.github.hcuadrado428.stormroot.weather.WindRules.dirX(angle);
+        double dz = io.github.hcuadrado428.stormroot.weather.WindRules.dirZ(angle);
+        int count = (int) Math.round(sand * 14);
+        for (int i = 0; i < count; i++) {
+            double px = player.getX() + (random.nextDouble() - 0.5) * 20;
+            double py = player.getY() + random.nextDouble() * 5 - 1;
+            double pz = player.getZ() + (random.nextDouble() - 0.5) * 20;
+            level.addParticle(dust, px, py, pz, 0, 0, 0);
+            if (random.nextInt(3) == 0) {
+                level.addParticle(ParticleTypes.CLOUD, px, py, pz, dx * 0.4, 0, dz * 0.4);
+            }
+            sandParticles++;
+        }
+        if (calima > 0.05 && random.nextDouble() < calima * 0.6) {
+            level.addParticle(dust, player.getX() + (random.nextDouble() - 0.5) * 24, player.getY() + 6 + random.nextDouble() * 6,
+                    player.getZ() + (random.nextDouble() - 0.5) * 24, 0, 0, 0);
+            sandParticles++;
+        }
     }
 
     /** ¿Hiela donde está el jugador? (mismas reglas que el servidor: {@code weather/Frost}). */

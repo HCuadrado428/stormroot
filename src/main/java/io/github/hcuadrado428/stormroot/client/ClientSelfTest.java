@@ -267,9 +267,26 @@ public final class ClientSelfTest {
                     double wind = ClientWind.here();
                     SelfTest.report("wind pushes arrows in a storm", pushed > 0 && wind >= 0.5,
                             "empujes=" + pushed + ", viento aquí=" + wind);
-                    clear(server);
-                    finish(mc);
+                    spawnAt(server, FrontType.SANDSTORM, x, z);
+                    stage = 70;
+                    stageStart = ticks;
                 }
+            }
+            case 70 -> {
+                // Tormenta de arena encima de un bioma templado: muro marrón en el cielo y calima (polvo fino).
+                if ((SkyRenderer.dustCells() > 0 && ClientWeather.sandParticles > 0 && waited > 200) || waited > 700) {
+                    SelfTest.report("sandstorm wall and calima on the client",
+                            SkyRenderer.dustCells() > 0 && ClientWeather.sandParticles > 0,
+                            "celdas de arena=" + SkyRenderer.dustCells() + ", partículas=" + ClientWeather.sandParticles);
+                    stage = 71;
+                    stageStart = ticks;
+                    requestShot(mc, "tormenta_de_arena", 0f, -10f);
+                }
+            }
+            case 71 -> {
+                mc.options.hideGui = false;
+                clear(server);
+                finish(mc);
             }
             case 20 -> {
                 clear(server);

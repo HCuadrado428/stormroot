@@ -64,6 +64,7 @@ public final class SelfTest {
 
     private static final MyceliumSelfTest MYCELIUM = new MyceliumSelfTest(BX, BZ);
     private static final FrostSelfTest FROST = new FrostSelfTest(BX, BZ, Y_TOP);
+    private static final SandSelfTest SAND = new SandSelfTest(BX, BZ, Y_TOP);
     private static final AtomicInteger PASSED = new AtomicInteger();
     private static final AtomicInteger FAILED = new AtomicInteger();
 
@@ -155,6 +156,7 @@ public final class SelfTest {
                 run("storm fire starts", () -> startStormFire(level));
                 run("mycelium tunnel", () -> MYCELIUM.build(level));
                 run("frost pools", () -> FROST.build(level));
+                run("sand corner", () -> SAND.build(level));
                 stage = 1;
                 waitUntil = ticks + 160;
             }
@@ -176,6 +178,7 @@ public final class SelfTest {
                 run("mycelium network", () -> MYCELIUM.run(level));
                 run("frost and aurora", () -> FROST.run(level));
                 run("wind", WindSelfTest::run);
+                run("sandstorm", () -> SAND.run(level));
                 finish(server);
             }
             default -> {
@@ -189,7 +192,7 @@ public final class SelfTest {
         boolean ok = ModItems.LIGHTNING_CRYSTAL != null && ModBlocks.WEATHERVANE != null && ModBlocks.BAROMETER != null
                 && ModBlocks.LIGHTNING_ROOT != null && ModBlocks.WEATHERVANE_ITEM != null && ModBlocks.BAROMETER_ITEM != null
                 && ModBlocks.LIGHTNING_ROOT_ITEM != null && ModBlocks.MYCELIUM_VEIN != null && ModBlocks.MYCELIUM_NODE != null
-                && ModBlocks.MYCELIUM_NODE_ITEM != null && ModItems.SPORES != null && ModBlocks.FROST_ICE != null;
+                && ModBlocks.MYCELIUM_NODE_ITEM != null && ModItems.SPORES != null && ModBlocks.FROST_ICE != null && ModBlocks.SAND_LAYER != null && ModItems.SAND_GOGGLES != null;
         check("registries", ok, "algún item o bloque es null");
     }
 
@@ -383,13 +386,14 @@ public final class SelfTest {
             blizzardOnlyCold &= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.HUMID) != FrontType.AURORA;
             FrontType dryType = sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.DRY);
             dryOnlyStorms &= dryType == FrontType.THUNDERSTORM || dryType == FrontType.HEAT_WAVE
-                    || dryType == FrontType.MAGNETIC_STORM;
+                    || dryType == FrontType.MAGNETIC_STORM || dryType == FrontType.SANDSTORM;
+            blizzardOnlyCold &= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE) != FrontType.SANDSTORM;
             temperateHasRain |= sim.typeFor(io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE) == FrontType.RAIN;
         }
         check("fronts are born by biome",
                 here == io.github.hcuadrado428.stormroot.weather.ClimateZone.TEMPERATE && dryOnlyStorms && temperateHasRain
                         && blizzardOnlyCold && coldHasBlizzard && monsoonInHumid,
-                "zona del mundo plano=" + here + ", en seco solo tormentas, calor y magnéticas=" + dryOnlyStorms + ", lluvia en templado="
+                "zona del mundo plano=" + here + ", en seco solo tormentas, calor, arena y magnéticas=" + dryOnlyStorms + ", lluvia en templado="
                         + temperateHasRain + ", ventiscas y monzones solo donde tocan=" + blizzardOnlyCold + ", ventiscas en frío=" + coldHasBlizzard
                         + ", monzones en húmedos=" + monsoonInHumid);
     }

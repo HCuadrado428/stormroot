@@ -30,7 +30,10 @@ public final class CloudCover {
     /** Tipo de nube de una celda. */
     public enum Kind {
         /** Orden = fuerza: cuando dos frentes se tapan, se ve el de más abajo en la lista. */
-        NONE, FAIR, RAIN, SNOW, STORM,
+        NONE, FAIR,
+        /** Muro de arena de una tormenta de arena: no llueve debajo. */
+        DUST,
+        RAIN, SNOW, STORM,
         /** Centro de una tormenta de granizo ({@link #isHailStorm}): nubarrón verdoso. */
         HAIL
     }
@@ -94,7 +97,7 @@ public final class CloudCover {
     public static Kind frontCloud(long seed, double x, double z, double u, double v, double seconds, List<WeatherFront> fronts) {
         Kind best = Kind.NONE;
         for (WeatherFront front : fronts) {
-            if (!front.type().precipitates()) {
+            if (!front.type().precipitates() && front.type() != FrontType.SANDSTORM) {
                 continue;
             }
             double intensity = front.intensityAt(x, z);
@@ -110,6 +113,7 @@ public final class CloudCover {
             Kind kind = switch (front.type()) {
                 case THUNDERSTORM -> isHailStorm(front) && intensity >= HAIL_CORE ? Kind.HAIL : Kind.STORM;
                 case BLIZZARD -> Kind.SNOW;
+                case SANDSTORM -> Kind.DUST;
                 default -> Kind.RAIN;
             };
             if (kind.ordinal() > best.ordinal()) {
@@ -117,6 +121,41 @@ public final class CloudCover {
             }
         }
         return best;
+    }
+
+    /** La calima llega hasta estos radios de una tormenta de arena. */
+    public static final double CALIMA_REACH = 2.5;
+
+    /** Intensidad de la tormenta de arena más fuerte en un punto. */
+    public static double dustIntensity(double x, double z, List<WeatherFront> fronts) {
+        double best = 0;
+        for (WeatherFront front : fronts) {
+            if (front.type() == FrontType.SANDSTORM) {
+                best = Math.max(best, front.intensityAt(x, z));
+            }
+        }
+        return best;
+    }
+
+    /**
+     * Calima (0–1): polvo fino que viaja lejos de las tormentas de arena (hasta {@link #CALIMA_REACH} radios) y tiñe el
+     * cielo de naranja. Solo visual.
+     */
+    public static double calima(double x, double z, List<WeatherFront> fronts) {
+        double best = 0;
+        for (WeatherFront front : fronts) {
+            if (front.type() != FrontType.SANDSTORM) {
+                continue;
+            }
+            double dist = Math.hypot(x - front.x(), z - front.z());
+            double r = front.radius();
+            if (dist >= r * CALIMA_REACH) {
+                continue;
+            }
+            double reach = dist <= r ? 1 : 1 - (dist - r) / (r * (CALIMA_REACH - 1));
+            best = Math.max(best, reach * front.lifeFactor());
+        }
+        return Math.min(1, best);
     }
 
     /** Hasta dónde llega el aviso por delante de un frente, en radios del frente. */

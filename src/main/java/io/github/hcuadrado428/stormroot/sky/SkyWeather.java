@@ -77,7 +77,8 @@ public final class SkyWeather {
         if (source == null || !source.active()) {
             return false;
         }
-        return rainCloudAt(source, x, z) == CloudCover.Kind.NONE;
+        CloudCover.Kind kind = rainCloudAt(source, x, z);
+        return kind == CloudCover.Kind.NONE || kind == CloudCover.Kind.DUST;
     }
 
     /** Nubarrón (lluvia o tormenta) sobre (x, z) según una fuente, o {@link CloudCover.Kind#NONE}. */

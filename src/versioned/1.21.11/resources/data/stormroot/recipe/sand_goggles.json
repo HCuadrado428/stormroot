@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "SLS",
+    "G G"
+  ],
+  "key": {
+    "S": "minecraft:string",
+    "L": "minecraft:leather",
+    "G": "minecraft:glass_pane"
+  },
+  "result": {
+    "id": "stormroot:sand_goggles",
+    "count": 1
+  }
+}

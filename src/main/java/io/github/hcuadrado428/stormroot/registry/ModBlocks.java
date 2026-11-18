@@ -29,6 +29,7 @@ public final class ModBlocks {
     public static final String MYCELIUM_VEIN_ID = "mycelium_vein";
     public static final String MYCELIUM_NODE_ID = "mycelium_node";
     public static final String FROST_ICE_ID = "frost_ice";
+    public static final String SAND_LAYER_ID = "sand_layer";
 
     public static Block WEATHERVANE;
     public static Block BAROMETER;
@@ -51,6 +52,8 @@ public final class ModBlocks {
     public static Item MYCELIUM_NODE_ITEM;
     /** Hielo de helada (sin objeto: se rompe como el hielo y vuelve a ser agua). */
     public static Block FROST_ICE;
+    /** Capas de arena de la tormenta de arena (sin objeto: el viento se las lleva). */
+    public static Block SAND_LAYER;
 
     private ModBlocks() {
     }
@@ -123,6 +126,12 @@ public final class ModBlocks {
         BlockBehaviour.Properties properties = BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_LIGHT_GREEN).strength(0.8F)
                 .sound(SoundType.FUNGUS).lightLevel(state -> 6).randomTicks();
         return create(MYCELIUM_NODE_ID, io.github.hcuadrado428.stormroot.block.MyceliumNodeBlock::new, properties);
+    }
+
+    public static Block createSandLayer() {
+        BlockBehaviour.Properties properties = BlockBehaviour.Properties.of().mapColor(MapColor.SAND).replaceable()
+                .strength(0.1F).sound(SoundType.SAND).randomTicks();
+        return create(SAND_LAYER_ID, io.github.hcuadrado428.stormroot.block.SandLayerBlock::new, properties);
     }
 
     public static Block createFrostIce() {

@@ -20,7 +20,9 @@ public enum FrontType {
     /** Aurora (rara): solo se ve de noche, en biomas fríos y cumbres; deja polvo de aurora. */
     AURORA("aurora", 192, 320, 0.2, 900, 1800),
     /** Tormenta magnética (rara, en cualquier bioma): destellos sin trueno, instrumentos locos y hierro magnetizado. */
-    MAGNETIC_STORM("magnetic_storm", 128, 224, 0.5, 600, 1200);
+    MAGNETIC_STORM("magnetic_storm", 128, 224, 0.5, 600, 1200),
+    /** Tormenta de arena: solo en desiertos, badlands y sabanas. Muro de arena, capas de arena y ceguera; su calima llega lejos. */
+    SANDSTORM("sandstorm", 96, 192, 0.9, 300, 900);
 
     private final String id;
     private final int minRadius;

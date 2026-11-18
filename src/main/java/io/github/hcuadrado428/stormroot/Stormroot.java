@@ -108,6 +108,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 () -> ModBlocks.MYCELIUM_NODE = ModBlocks.createMyceliumNode());
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.FROST_ICE_ID),
                 () -> ModBlocks.FROST_ICE = ModBlocks.createFrostIce());
+        event.register(Registries.BLOCK, ModIds.id(ModBlocks.SAND_LAYER_ID),
+                () -> ModBlocks.SAND_LAYER = ModBlocks.createSandLayer());
         event.register(Registries.ITEM, ModIds.id("lightning_crystal"),
                 () -> ModItems.LIGHTNING_CRYSTAL = ModItems.create("lightning_crystal"));
         event.register(Registries.ITEM, ModIds.id("hailstone"),
@@ -129,6 +131,7 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
         event.register(Registries.ITEM, ModIds.id(ModBlocks.MYCELIUM_NODE_ID),
                 () -> ModBlocks.MYCELIUM_NODE_ITEM = ModBlocks.createBlockItem(ModBlocks.MYCELIUM_NODE_ID, ModBlocks.MYCELIUM_NODE));
         event.register(Registries.ITEM, ModIds.id("spores"), () -> ModItems.SPORES = ModItems.create("spores"));
+        event.register(Registries.ITEM, ModIds.id("sand_goggles"), () -> ModItems.SAND_GOGGLES = ModItems.createGoggles("sand_goggles"));
     }
 
     private static void onCreativeTabs(BuildCreativeModeTabContentsEvent event) {
@@ -143,6 +146,7 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
             event.accept(ModItems.RAINBOW_SHARD);
             event.accept(ModBlocks.MYCELIUM_NODE_ITEM);
             event.accept(ModItems.SPORES);
+            event.accept(ModItems.SAND_GOGGLES);
         }
         if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
             event.accept(ModBlocks.WEATHERVANE_ITEM);
@@ -204,6 +208,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 () -> ModBlocks.MYCELIUM_NODE = ModBlocks.createMyceliumNode());
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.FROST_ICE_ID),
                 () -> ModBlocks.FROST_ICE = ModBlocks.createFrostIce());
+        event.register(Registries.BLOCK, ModIds.id(ModBlocks.SAND_LAYER_ID),
+                () -> ModBlocks.SAND_LAYER = ModBlocks.createSandLayer());
         event.register(Registries.ITEM, ModIds.id("lightning_crystal"),
                 () -> ModItems.LIGHTNING_CRYSTAL = ModItems.create("lightning_crystal"));
         event.register(Registries.ITEM, ModIds.id("hailstone"),
@@ -225,6 +231,7 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
         event.register(Registries.ITEM, ModIds.id(ModBlocks.MYCELIUM_NODE_ID),
                 () -> ModBlocks.MYCELIUM_NODE_ITEM = ModBlocks.createBlockItem(ModBlocks.MYCELIUM_NODE_ID, ModBlocks.MYCELIUM_NODE));
         event.register(Registries.ITEM, ModIds.id("spores"), () -> ModItems.SPORES = ModItems.create("spores"));
+        event.register(Registries.ITEM, ModIds.id("sand_goggles"), () -> ModItems.SAND_GOGGLES = ModItems.createGoggles("sand_goggles"));
     }
 
     private static void onCreativeTabs(BuildCreativeModeTabContentsEvent event) {
@@ -239,6 +246,7 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
             event.accept(ModItems.RAINBOW_SHARD);
             event.accept(ModBlocks.MYCELIUM_NODE_ITEM);
             event.accept(ModItems.SPORES);
+            event.accept(ModItems.SAND_GOGGLES);
         }
         if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
             event.accept(ModBlocks.WEATHERVANE_ITEM);
@@ -285,6 +293,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 ModIds.id(ModBlocks.MYCELIUM_NODE_ID), ModBlocks.createMyceliumNode());
         ModBlocks.FROST_ICE = Registry.register(BuiltInRegistries.BLOCK,
                 ModIds.id(ModBlocks.FROST_ICE_ID), ModBlocks.createFrostIce());
+        ModBlocks.SAND_LAYER = Registry.register(BuiltInRegistries.BLOCK,
+                ModIds.id(ModBlocks.SAND_LAYER_ID), ModBlocks.createSandLayer());
         ModItems.LIGHTNING_CRYSTAL = Registry.register(BuiltInRegistries.ITEM,
                 ModIds.id("lightning_crystal"), ModItems.create("lightning_crystal"));
         ModItems.HAILSTONE = Registry.register(BuiltInRegistries.ITEM, ModIds.id("hailstone"), ModItems.create("hailstone"));
@@ -305,6 +315,7 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
         ModBlocks.MYCELIUM_NODE_ITEM = Registry.register(BuiltInRegistries.ITEM, ModIds.id(ModBlocks.MYCELIUM_NODE_ID),
                 ModBlocks.createBlockItem(ModBlocks.MYCELIUM_NODE_ID, ModBlocks.MYCELIUM_NODE));
         ModItems.SPORES = Registry.register(BuiltInRegistries.ITEM, ModIds.id("spores"), ModItems.create("spores"));
+        ModItems.SAND_GOGGLES = Registry.register(BuiltInRegistries.ITEM, ModIds.id("sand_goggles"), ModItems.createGoggles("sand_goggles"));
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.INGREDIENTS)
                 .register(entries -> {
                     entries.accept(ModItems.LIGHTNING_CRYSTAL);
@@ -317,6 +328,7 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                     entries.accept(ModItems.RAINBOW_SHARD);
                     entries.accept(ModBlocks.MYCELIUM_NODE_ITEM);
                     entries.accept(ModItems.SPORES);
+                    entries.accept(ModItems.SAND_GOGGLES);
                 });
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(entries -> {
             entries.accept(ModBlocks.WEATHERVANE_ITEM);

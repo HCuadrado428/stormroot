@@ -20,8 +20,19 @@ public final class ModItems {
     public static Item RAINBOW_SHARD;
     /** Esporas: las sueltan los nodos de la red de micelio (ingrediente, más adelante). */
     public static Item SPORES;
+    /** Gafas de arena: protegen de la tormenta de arena. */
+    public static Item SAND_GOGGLES;
 
     private ModItems() {
+    }
+
+    public static Item createGoggles(String name) {
+        Item.Properties properties = new Item.Properties().stacksTo(1);
+        //? if >=1.21.2 {
+        properties = properties.setId(ResourceKey.create(Registries.ITEM, ModIds.id(name)))
+                .equippable(net.minecraft.world.entity.EquipmentSlot.HEAD);
+        //?}
+        return new io.github.hcuadrado428.stormroot.item.SandGogglesItem(properties);
     }
 
     public static Item create(String name) {

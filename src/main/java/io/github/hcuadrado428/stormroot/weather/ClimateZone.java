@@ -5,14 +5,14 @@ package io.github.hcuadrado428.stormroot.weather;
  * fenómenos). Java puro: {@code FrontTicker} clasifica el bioma y {@link FrontSimulation} elige el tipo.
  */
 public enum ClimateZone {
-    //        lluvia tormenta niebla ventisca calor monzón aurora magnética
-    COLD(1.0, 0.5, 0.7, 1.6, 0.0, 0.0, 0.15, 0.06),
-    TEMPERATE(1.0, 1.0, 0.7, 0.0, 0.4, 0.0, 0.0, 0.06),
-    HUMID(2.0, 2.0, 2.0, 0.0, 0.3, 1.2, 0.0, 0.06),
+    //        lluvia tormenta niebla ventisca calor monzón aurora magnética arena
+    COLD(1.0, 0.5, 0.7, 1.6, 0.0, 0.0, 0.15, 0.06, 0.0),
+    TEMPERATE(1.0, 1.0, 0.7, 0.0, 0.4, 0.0, 0.0, 0.06, 0.0),
+    HUMID(2.0, 2.0, 2.0, 0.0, 0.3, 1.2, 0.0, 0.06, 0.0),
     /** Sin lluvia en vanilla (desierto, badlands, sabana): tormentas (secas), olas de calor y, rara, la magnética. */
-    DRY(0.0, 0.6, 0.0, 0.0, 0.8, 0.0, 0.0, 0.06),
-    OCEAN(2.0, 1.0, 2.0, 0.0, 0.0, 0.6, 0.0, 0.06),
-    MOUNTAIN(1.0, 1.0, 0.7, 0.6, 0.0, 0.0, 0.15, 0.06);
+    DRY(0.0, 0.6, 0.0, 0.0, 0.8, 0.0, 0.0, 0.06, 1.0),
+    OCEAN(2.0, 1.0, 2.0, 0.0, 0.0, 0.6, 0.0, 0.06, 0.0),
+    MOUNTAIN(1.0, 1.0, 0.7, 0.6, 0.0, 0.0, 0.15, 0.06, 0.0);
 
     private final double rain;
     private final double thunderstorm;
@@ -22,9 +22,10 @@ public enum ClimateZone {
     private final double monsoon;
     private final double aurora;
     private final double magnetic;
+    private final double sandstorm;
 
     ClimateZone(double rain, double thunderstorm, double fog, double blizzard, double heatWave, double monsoon,
-                double aurora, double magnetic) {
+                double aurora, double magnetic, double sandstorm) {
         this.rain = rain;
         this.thunderstorm = thunderstorm;
         this.fog = fog;
@@ -33,6 +34,7 @@ public enum ClimateZone {
         this.monsoon = monsoon;
         this.aurora = aurora;
         this.magnetic = magnetic;
+        this.sandstorm = sandstorm;
     }
 
     /** Peso de un tipo de frente en esta zona (0 = nunca nace aquí). */
@@ -46,6 +48,7 @@ public enum ClimateZone {
             case MONSOON -> monsoon;
             case AURORA -> aurora;
             case MAGNETIC_STORM -> magnetic;
+            case SANDSTORM -> sandstorm;
         };
     }
 
