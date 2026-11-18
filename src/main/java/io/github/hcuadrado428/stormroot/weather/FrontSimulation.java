@@ -31,6 +31,12 @@ public final class FrontSimulation {
 
     /** Dirección del viento dominante en radianes (0 = hacia +X). Provisional: fija por mundo. */
     private double windAngle;
+    private List<FrontCollisions.Event> lastCollisions = new ArrayList<>();
+
+    /** Choques del último paso (para el registro y el self-test). */
+    public List<FrontCollisions.Event> lastCollisions() {
+        return lastCollisions;
+    }
 
     public FrontSimulation(long seed) {
         this.random = new Random(seed);
@@ -62,6 +68,9 @@ public final class FrontSimulation {
                 it.remove();
             }
         }
+
+        // Frentes que chocan.
+        lastCollisions = FrontCollisions.resolve(fronts, () -> nextId++);
 
         // El viento cambia muy despacio.
         windAngle += (random.nextDouble() - 0.5) * 0.02 * seconds;

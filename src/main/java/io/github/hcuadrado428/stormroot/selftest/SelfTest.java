@@ -178,6 +178,7 @@ public final class SelfTest {
                 run("mycelium network", () -> MYCELIUM.run(level));
                 run("frost and aurora", () -> FROST.run(level));
                 run("wind", WindSelfTest::run);
+                run("front collisions", CollisionSelfTest::run);
                 run("sandstorm", () -> SAND.run(level));
                 finish(server);
             }

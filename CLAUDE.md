@@ -144,11 +144,20 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   Registro: Fabric `EntityModelLayerRegistry` + `EntityRendererRegistry`; Forge/NeoForge `EntityRenderersEvent`
   (`StormrootClient.register(modBus)` en NeoForge). Aparición propia (no por bioma) en `Mycelium.maybeSpawnSporeling`
   con `EntityType.spawn(level, pos, EntitySpawnReason/MobSpawnType)`. `Weaver` (tejedor, neutral: `RepairGoal` teje la red, `HurtByTargetGoal`, golpes con lentitud: `doHurtTarget(ServerLevel, Entity)` desde 1.21.2, `MobEffects.SLOWNESS` en 1.21.11 / `MOVEMENT_SLOWDOWN` antes; romper un nodo → `MyceliumNodeBlock.playerDestroy` → `Mycelium.onNodeBroken`). Objetivo común `entity/goal/FleeLightGoal`. `MyceliumGuardian` (Monster, 60 de vida, duerme hasta que le atacan o rompes nodos: `wake`; nube de esporas `AreaEffectCloud`, raíces; luz → debilidad; `die` → `Mycelium.onGuardianDefeated` calma la red). Estado de cada red en `MyceliumNetworks.State` (WILD/CALM/TAMED, guardado como `state`): CALM no crece; TAMED solo se agarra a roca/tierra (`veinStateAt(..., naturalOnly)`) y sus tejedores atacan monstruos. `item/MyceliumHeartItem` (`useOn` sobre un nodo → `Mycelium.tame`). Huevos: `ModItems.createSpawnEgg` (`SpawnEggItem(type, c1, c2, props)` hasta 1.21.1; `Properties.spawnEgg(type)` + textura propia en 1.21.11, `items/*_spawn_egg.json` → `*_icon`). Los tipos se crean al pedirlos (`ModEntities.sporeling()`...) porque en Forge/NeoForge los objetos se registran antes que las entidades. En el self-test del cliente el mundo es pacífico (pon `difficulty normal` para monstruos).
+- **Choques entre frentes**: `weather/FrontCollisions` (Java puro; lo llama `FrontSimulation.step` tras mover los
+  frentes; `lastCollisions()`): frentes maduros con centros a menos de `CONTACT`×(r1+r2). Calor+lluvia → tormenta;
+  calor+ventisca → la ventisca se deshace; ventisca+lluvia → la ventisca dura más; niebla + casi todo → se disipa;
+  lluvia/tormenta/monzón + arena → la arena se deshace; mismo tipo → se funden (hasta 1,3 × radio máximo).
+  `WeatherFront` ya no es inmutable en radio y vida (`growTo`, `fadeOut`, `extend`, `expireNow`, `asType`).
+- Helada en cuevas: `Frost.freezeCavePuddle` (luz del cielo ≥ 6 sin ver el cielo); la filtración trata `frost_ice` como
+  su charco al deshacer (`SeepageTicker.undo`). Fósiles: `Sandstorms.uncoverFossil` (huesos sobre arena natural).
+  Niebla marrón: `client/mixin/sky/FogColorMixin` (`FogRenderer.setupColor` TAIL hasta 1.21.1, `computeFogColor`
+  RETURN en 1.21.11; 3 loaders) + `ClientWeather.sandFogTint`.
 - `research` también saca JSON de datos y recursos vanilla (loot tables, modelos) de los jars del juego.
 - Fuentes decompiladas desde la CI: `gh api -X POST repos/HCuadrado428/stormroot/actions/workflows/research.yml/dispatches`
   con `inputs[classes]` y `inputs[pattern]` (workflow `research`).
-- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 57 comprobaciones; cliente con
-  un jugador en pantalla virtual: 19 más, incluidas las de Bloomberto y las del cielo).
+- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 60 comprobaciones; cliente con
+  un jugador en pantalla virtual: 20 más, incluidas las de Bloomberto y las del cielo).
 - En el self-test, el clima se lee de `server.getWorldData().overworldData()`: `level.isRaining()/isThundering()` son la
   intensidad visual, que sube tick a tick. Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.
 - **Self-test** (`selftest/SelfTest`, `client/ClientSelfTest`, `scripts/selftest.sh`, job `selftest` de la CI): cuando

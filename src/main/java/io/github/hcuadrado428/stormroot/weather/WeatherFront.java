@@ -9,12 +9,12 @@ public final class WeatherFront {
     private final FrontType type;
     private double x;
     private double z;
-    private final double radius;
+    private double radius;
     /** Velocidad en bloques por segundo en cada eje. */
     private final double vx;
     private final double vz;
     private double ageSeconds;
-    private final double maxAgeSeconds;
+    private double maxAgeSeconds;
 
     public WeatherFront(long id, FrontType type, double x, double z, double radius,
                         double vx, double vz, double ageSeconds, double maxAgeSeconds) {
@@ -76,6 +76,36 @@ public final class WeatherFront {
             return Math.max(0.0, (1.0 - t) / 0.1);
         }
         return 1.0;
+    }
+
+    /** Choques entre frentes: crece hasta {@code max} de radio. */
+    public void growTo(double newRadius, double max) {
+        radius = Math.min(max, Math.max(radius, newRadius));
+    }
+
+    /** Choques: desaparece ahora mismo (se ha fundido con otro). */
+    public void expireNow() {
+        ageSeconds = maxAgeSeconds;
+    }
+
+    /** Choques: se deshace ya (pasa a su último 10 % de vida, que se desvanece poco a poco). */
+    public void fadeOut() {
+        ageSeconds = Math.max(ageSeconds, maxAgeSeconds * 0.9);
+    }
+
+    /** Choques: vive {@code seconds} más (sin pasar de {@code maxTotal}). */
+    public void extend(double seconds, double maxTotal) {
+        maxAgeSeconds = Math.min(maxTotal, maxAgeSeconds + seconds);
+    }
+
+    /** Mismo frente con otro tipo (mismo id nuevo lo pone quien llama). */
+    public WeatherFront asType(long newId, FrontType newType) {
+        return new WeatherFront(newId, newType, x, z, radius, vx, vz, ageSeconds, maxAgeSeconds);
+    }
+
+    /** Distancia entre centros. */
+    public double distanceTo(WeatherFront other) {
+        return Math.hypot(other.x - x, other.z - z);
     }
 
     public boolean overlaps(WeatherFront other) {

@@ -28,6 +28,10 @@ Primera versión jugable. Minecraft 1.20.1 (Fabric, Forge; también NeoForge 1.2
   vuelve a su sitio al irse.
 - **Aurora** de noche en biomas fríos (polvo de aurora) y **tormenta magnética** (instrumentos locos, roca magnetizada).
 - **Arcoíris** tras la lluvia, con un tesoro en su extremo (fragmento de arcoíris y esmeraldas).
+- **Frentes que chocan**: calor + lluvia = tormenta, la ventisca se traga la lluvia, la niebla se disipa, la lluvia asienta
+  la arena y dos frentes iguales se funden.
+- Niebla marrón en la tormenta de arena, **fósiles** que destapa el viento y **charcos de cueva** que se hielan con la helada.
+- Guardián de micelio más robusto.
 - **Guardián de micelio**: defensor de las redes grandes; al vencerlo la red se calma y suelta el **corazón de micelio**,
   que domestica redes. **Huevos de generación** de esporín, tejedor y guardián.
 - **Tejedores**: neutrales; reparan la red y te enredan si rompes nodos cerca. Sueltan **hilo de micelio**.
