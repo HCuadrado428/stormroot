@@ -28,6 +28,9 @@ Primera versión jugable. Minecraft 1.20.1 (Fabric, Forge; también NeoForge 1.2
   vuelve a su sitio al irse.
 - **Aurora** de noche en biomas fríos (polvo de aurora) y **tormenta magnética** (instrumentos locos, roca magnetizada).
 - **Arcoíris** tras la lluvia, con un tesoro en su extremo (fragmento de arcoíris y esmeraldas).
+- **Helada** en noches despejadas de biomas fríos y templados: hiela el agua poco honda y para los cultivos sin luz.
+- Las **brújulas giran** dentro de una tormenta magnética.
+- La **aurora calma la noche**: bajo ella, al aire libre, salen muchos menos mobs hostiles.
 - **Red de micelio** bajo pantanos, manglares y campos de champiñones: nodos e hilos que crecen con la humedad, se
   asustan con la luz y mueren si rompes su nodo; hasta 30 chunks por red. Da esporas, setas y el nodo (toque de seda).
 - **Bruma de esporas**: la niebla sobre esos biomas marea si la respiras mucho y hace crecer setas.

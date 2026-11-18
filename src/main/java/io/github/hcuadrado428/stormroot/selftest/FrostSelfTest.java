@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Self-test de la helada y de la aurora que calma la noche. Usa la cima de la zona de pruebas: una charca de un bloque
- * en (+10, +5), una de dos bloques en (+10, +7) y trigo en (+10, +9). La luz la pone la cámara de la red de micelio.
+ * en (+10, +5), una de dos bloques en (+10, +7) y trigo en (+1, +6), lejos de la luz de las raíces de rayo. La luz la pone la cámara de la red de micelio.
  */
 final class FrostSelfTest {
     private final int bx;
@@ -37,7 +37,7 @@ final class FrostSelfTest {
     }
 
     private BlockPos crop() {
-        return new BlockPos(bx + 10, top + 1, bz + 9);
+        return new BlockPos(bx + 1, top + 1, bz + 6);
     }
 
     /** Fase 0: charcas y trigo (la luz del cielo necesita unos ticks). */
@@ -115,7 +115,7 @@ final class FrostSelfTest {
         }
         int thawedAge = level.getBlockState(crop()).getValue(CropBlock.AGE);
         SelfTest.check("frost stops crops unless there is light", frozenAge == 0 && thawedAge > frozenAge && lightHelps,
-                "edad al empezar=" + startAge + ", para=" + stops + ", bloque=" + level.getBlockState(crop()).getBlock().getClass().getName()
+                "edad al empezar=" + startAge + ", para=" + stops + ", luz=" + level.getBrightness(net.minecraft.world.level.LightLayer.BLOCK, crop()) + ", bloque=" + level.getBlockState(crop()).getBlock().getClass().getName()
                         + ", edad con helada=" + frozenAge + ", sin helada=" + thawedAge + ", con luz crece=" + lightHelps);
     }
 }

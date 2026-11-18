@@ -218,8 +218,12 @@ public final class ClientSelfTest {
                 server.execute(io.github.hcuadrado428.stormroot.weather.Rainbows::clear);
                 spawnAt(server, FrontType.MAGNETIC_STORM, x, z);
                 mc.options.hideGui = false;
-                mc.player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,
-                        new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.COMPASS));
+                // En espectador no se ve la mano: modo creativo y una brújula en la mano.
+                server.execute(() -> {
+                    net.minecraft.commands.CommandSourceStack src = server.createCommandSourceStack().withSuppressedOutput();
+                    server.getCommands().performPrefixedCommand(src, "gamemode creative @a");
+                    server.getCommands().performPrefixedCommand(src, "item replace entity @a weapon.mainhand with minecraft:compass");
+                });
                 stage = 66;
                 stageStart = ticks;
             }
@@ -231,10 +235,12 @@ public final class ClientSelfTest {
                     stage = 67;
                     stageStart = ticks;
                     requestShot(mc, "brujula_en_tormenta_magnetica", 0f, 30f);
+                    mc.options.hideGui = false;
                 }
             }
             case 67 -> {
-                mc.player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, net.minecraft.world.item.ItemStack.EMPTY);
+                server.execute(() -> server.getCommands().performPrefixedCommand(
+                        server.createCommandSourceStack().withSuppressedOutput(), "item replace entity @a weapon.mainhand with minecraft:air"));
                 clear(server);
                 finish(mc);
             }

@@ -138,6 +138,7 @@ src/versioned/<versión>/  → recetas, loot tables y tags (su formato cambia en
 - **Aurora** (rara, biomas fríos y cumbres): de noche, cortinas de luz verde y morada en el cielo; a veces cae **polvo de aurora**.
 - **Tormenta magnética** (rara, en cualquier bioma): chispas en el aire, los instrumentos (veleta, barómetro) dan lecturas locas y el mineral de hierro de alrededor se vuelve **roca magnetizada** (suelta chispas y sigue dando hierro).
 - **Arcoíris** (evento raro): cuando se acaba una lluvia, tormenta o monzón cerca de ti, de día, a veces sale un arcoíris. Uno de sus extremos toca el suelo cerca: si llegas antes de que se borre (2,5 min) encuentras un **fragmento de arcoíris** y esmeraldas.
+- **Helada**: en las noches despejadas de los biomas fríos (7 de cada 10 noches) y templados (3 de cada 10) hiela de 20:00 a 10:00. El agua quieta de un bloque de hondo se congela (y vuelve a ser agua al acabar), los cultivos no crecen salvo con una antorcha cerca y hay escarcha sobre la hierba.
 - **Red de micelio**: bajo pantanos, manglares y campos de champiñones, en cuevas húmedas, nace una red viva: **nodos** que brillan un poco y sueltan esporas, e **hilos** finos en el suelo, las paredes y el techo. Crece con la humedad del subsuelo (el doble con niebla), se para con la sequía y es permanente; cada red ocupa como mucho **30 chunks** y nunca sale de esos biomas. **Se asusta con la luz**: los hilos con luz de antorcha se retiran y no crecen hacia ella. Si **rompes un nodo**, muere el trozo de red que solo dependía de él. Los nodos dan **esporas** (y a veces una seta); con toque de seda, el nodo.
 - **Bruma de esporas**: la niebla sobre esos mismos biomas lleva esporas. Respirarla unos 30 s da **náusea leve**; protege llevar una calabaza tallada o subir a terreno alto (16 bloques sobre el mar). Las setas de alrededor se extienden más deprisa y la red crece el doble.
 - **Granizo**: una de cada tres tormentas tiene un núcleo verdoso que suelta granizo donde haría llover. Sin casco quita medio corazón cada pocos segundos, los cultivos maduros retroceden dos etapas, puede romper el cristal normal a la intemperie (`/stormroot settings hail_breaks_glass off` para evitarlo) y deja **granizo** en el suelo (4 = un bloque de hielo).
@@ -159,7 +160,7 @@ src/versioned/<versión>/  → recetas, loot tables y tags (su formato cambia en
 
 ## 🔜 Siguientes pasos
 
-1. **Revisión a ojo** de la ventisca, las cuevas de hielo, la ola de calor y la red de micelio; luego los defensores de la red y que la brújula gire con la tormenta magnética.
+1. **Revisión a ojo** de la ventisca, las cuevas de hielo, la ola de calor y la red de micelio; luego la mecánica del viento, la tormenta de arena y los defensores de la red.
 2. **Revisión a ojo** de lo visual (ver "Pruebas dentro del juego") y **publicar la 0.1** (crear los proyectos en Modrinth/CurseForge y los secretos de la CI).
 3. **Texturas definitivas** (encargadas; guía en `stormroot-texturas`).
 4. Del diseño: más frentes (granizo, calor, polvo, ventisca, aurora), corrientes de aire y bolsas de gas, red de micelio, ruinas de los Tempestarios, más instrumentos, muestras y frascos, el jugador y el clima, fauna y flora, eventos raros y progresión.
