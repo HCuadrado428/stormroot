@@ -32,5 +32,6 @@
   "item.stormroot.rainbow_shard": "Rainbow Shard",
   "block.stormroot.mycelium_vein": "Mycelium Vein",
   "block.stormroot.mycelium_node": "Mycelium Node",
-  "item.stormroot.spores": "Spores"
+  "item.stormroot.spores": "Spores",
+  "block.stormroot.frost_ice": "Frost Ice"
 }

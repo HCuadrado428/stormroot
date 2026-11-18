@@ -50,6 +50,9 @@ public class StormrootClient /*? if fabric {*/ implements ClientModInitializer /
             net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap.putBlock(block,
                     net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
         }
+        net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap.putBlock(
+                io.github.hcuadrado428.stormroot.registry.ModBlocks.FROST_ICE,
+                net.minecraft.client.renderer.chunk.ChunkSectionLayer.TRANSLUCENT);
     }
     //?} else if fabric {
     /*private static void registerRenderLayers() {
@@ -58,6 +61,8 @@ public class StormrootClient /*? if fabric {*/ implements ClientModInitializer /
                 io.github.hcuadrado428.stormroot.registry.ModBlocks.ICICLE,
                 io.github.hcuadrado428.stormroot.registry.ModBlocks.ICE_CRYSTAL,
                 io.github.hcuadrado428.stormroot.registry.ModBlocks.MYCELIUM_VEIN);
+        net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlock(
+                io.github.hcuadrado428.stormroot.registry.ModBlocks.FROST_ICE, net.minecraft.client.renderer.RenderType.translucent());
     }
     *///?}
 

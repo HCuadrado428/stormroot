@@ -5,7 +5,8 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "BiomePrecipitationMixin",
-    "LightningBoltFireMixin"
+    "LightningBoltFireMixin",
+    "CropFrostMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -24,7 +24,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 *///?}
 
 /**
- * Dibuja el cielo de Stormroot (sustituye a las nubes vanilla; ver {@code client/mixin/clouds/OptionsCloudsMixin}).
+ * Dibuja el cielo de Stormroot (sustituye a las nubes vanilla; ver {@code client/mixin/sky/OptionsCloudsMixin}).
  * Qué nube hay en cada celda lo decide {@link CloudCover} (Java puro, determinista). Aquí solo se dibuja:
  * <ul>
  *   <li>aviso de tormenta: delante de un frente salen más nubes y se vuelven grises; los nubarrones son más gruesos y

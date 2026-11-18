@@ -32,5 +32,6 @@
   "item.stormroot.rainbow_shard": "Fragmento de arcoíris",
   "block.stormroot.mycelium_vein": "Hilo de micelio",
   "block.stormroot.mycelium_node": "Nodo de micelio",
-  "item.stormroot.spores": "Esporas"
+  "item.stormroot.spores": "Esporas",
+  "block.stormroot.frost_ice": "Hielo de helada"
 }

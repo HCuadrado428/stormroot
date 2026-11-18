@@ -84,7 +84,7 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
 - **Cielo propio (fase 1 hecha)**: `sky/CloudCover` + `sky/ValueNoise` (Java puro y deterministas: el servidor podrá
   usarlos en la fase 2) deciden la nube de cada celda de 12 bloques; `client/sky/SkyRenderer` la dibuja desde
   `client/render/WorldRenderHook` (eventos de render de cada loader en `StormrootClient`, igual que `WorldRenderBridge`
-  de Bloomberto). Las vanilla se ocultan con `client/mixin/clouds/OptionsCloudsMixin` (`Options#getCloudsType` → OFF),
+  de Bloomberto). Las vanilla se ocultan con `client/mixin/sky/OptionsCloudsMixin` (`Options#getCloudsType` → OFF),
   en `stormroot-sky.mixins.json`, que cargan los 3 loaders (Fabric `fabric.mod.json`, NeoForge `[[mixins]]`, Forge
   `loom.forge.mixinConfig` en `build.gradle.kts`). Opción `custom_clouds` (Bloomberto) o `config/stormroot-client.properties`
   (`config/ClientSettingsFile`).

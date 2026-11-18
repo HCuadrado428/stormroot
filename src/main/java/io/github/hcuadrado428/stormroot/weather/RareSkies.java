@@ -85,7 +85,7 @@ public final class RareSkies {
         return false;
     }
 
-    private static boolean isNight(ServerLevel level) {
+    public static boolean isNight(ServerLevel level) {
         long time = level.getDayTime() % 24000L;
         return time >= 13000 && time < 23000;
     }

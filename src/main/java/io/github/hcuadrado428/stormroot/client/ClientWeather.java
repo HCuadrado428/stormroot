@@ -85,6 +85,34 @@ public final class ClientWeather {
         spawnRollingFog(level, player);
         spawnHail(level, player);
         spawnCaveParticles(level, player);
+        spawnFrost(level, player);
+    }
+
+    /** ¿Hiela donde está el jugador? (mismas reglas que el servidor: {@code weather/Frost}). */
+    public static boolean frostHere() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null || mc.player == null || !ClientFronts.active()) {
+            return false;
+        }
+        double x = mc.player.getX();
+        double z = mc.player.getZ();
+        return io.github.hcuadrado428.stormroot.weather.FrostRules.freezing(ClientFronts.skySeed(), mc.level.getDayTime(),
+                io.github.hcuadrado428.stormroot.weather.BiomeClimate.zoneAt(mc.level, x, z),
+                io.github.hcuadrado428.stormroot.weather.Frost.cloudsAt(ClientFronts.snapshot(), x, z));
+    }
+
+    /** Escarcha: destellos blancos que se posan sobre la hierba y las hojas, al aire libre, mientras hiela. */
+    private static void spawnFrost(ClientLevel level, LocalPlayer player) {
+        RandomSource random = level.getRandom();
+        if (random.nextInt(4) != 0 || !level.canSeeSky(player.blockPosition()) || !frostHere()) {
+            return;
+        }
+        for (int i = 0; i < 3; i++) {
+            BlockPos column = player.blockPosition().offset(random.nextInt(17) - 8, 0, random.nextInt(17) - 8);
+            BlockPos top = level.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, column);
+            level.addParticle(ParticleTypes.SNOWFLAKE, top.getX() + random.nextDouble(), top.getY() + 0.1,
+                    top.getZ() + random.nextDouble(), 0, 0.005, 0);
+        }
     }
 
     /** Bajo tierra: goteo del techo si el subsuelo está empapado, polvo si hay sequía. */

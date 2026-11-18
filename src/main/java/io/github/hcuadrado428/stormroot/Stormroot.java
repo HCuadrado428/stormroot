@@ -106,6 +106,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 () -> ModBlocks.MYCELIUM_VEIN = ModBlocks.createMyceliumVein());
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.MYCELIUM_NODE_ID),
                 () -> ModBlocks.MYCELIUM_NODE = ModBlocks.createMyceliumNode());
+        event.register(Registries.BLOCK, ModIds.id(ModBlocks.FROST_ICE_ID),
+                () -> ModBlocks.FROST_ICE = ModBlocks.createFrostIce());
         event.register(Registries.ITEM, ModIds.id("lightning_crystal"),
                 () -> ModItems.LIGHTNING_CRYSTAL = ModItems.create("lightning_crystal"));
         event.register(Registries.ITEM, ModIds.id("hailstone"),
@@ -159,7 +161,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
     }
 
     private static void onEntityJoin(EntityJoinLevelEvent event) {
-        if (LightningCrystals.onEntityAdded(event.getEntity(), event.getLevel())) {
+        if (LightningCrystals.onEntityAdded(event.getEntity(), event.getLevel())
+                || io.github.hcuadrado428.stormroot.weather.AuroraCalm.onEntityAdded(event.getEntity(), event.getLevel())) {
             event.setCanceled(true);
         }
     }
@@ -199,6 +202,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 () -> ModBlocks.MYCELIUM_VEIN = ModBlocks.createMyceliumVein());
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.MYCELIUM_NODE_ID),
                 () -> ModBlocks.MYCELIUM_NODE = ModBlocks.createMyceliumNode());
+        event.register(Registries.BLOCK, ModIds.id(ModBlocks.FROST_ICE_ID),
+                () -> ModBlocks.FROST_ICE = ModBlocks.createFrostIce());
         event.register(Registries.ITEM, ModIds.id("lightning_crystal"),
                 () -> ModItems.LIGHTNING_CRYSTAL = ModItems.create("lightning_crystal"));
         event.register(Registries.ITEM, ModIds.id("hailstone"),
@@ -250,7 +255,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
     }
 
     private static void onEntityJoin(EntityJoinLevelEvent event) {
-        if (LightningCrystals.onEntityAdded(event.getEntity(), event.getLevel())) {
+        if (LightningCrystals.onEntityAdded(event.getEntity(), event.getLevel())
+                || io.github.hcuadrado428.stormroot.weather.AuroraCalm.onEntityAdded(event.getEntity(), event.getLevel())) {
             event.setCanceled(true);
         }
     }
@@ -277,6 +283,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 ModIds.id(ModBlocks.MYCELIUM_VEIN_ID), ModBlocks.createMyceliumVein());
         ModBlocks.MYCELIUM_NODE = Registry.register(BuiltInRegistries.BLOCK,
                 ModIds.id(ModBlocks.MYCELIUM_NODE_ID), ModBlocks.createMyceliumNode());
+        ModBlocks.FROST_ICE = Registry.register(BuiltInRegistries.BLOCK,
+                ModIds.id(ModBlocks.FROST_ICE_ID), ModBlocks.createFrostIce());
         ModItems.LIGHTNING_CRYSTAL = Registry.register(BuiltInRegistries.ITEM,
                 ModIds.id("lightning_crystal"), ModItems.create("lightning_crystal"));
         ModItems.HAILSTONE = Registry.register(BuiltInRegistries.ITEM, ModIds.id("hailstone"), ModItems.create("hailstone"));
@@ -316,7 +324,8 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
         });
         ServerTickEvents.END_SERVER_TICK.register(FrontTicker::onServerTick);
         ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
-            if (LightningCrystals.onEntityAdded(entity, level)) {
+            if (LightningCrystals.onEntityAdded(entity, level)
+                    || io.github.hcuadrado428.stormroot.weather.AuroraCalm.onEntityAdded(entity, level)) {
                 entity.discard();
             }
         });

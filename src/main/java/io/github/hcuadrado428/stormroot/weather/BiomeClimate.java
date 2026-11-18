@@ -20,7 +20,7 @@ public final class BiomeClimate {
     private BiomeClimate() {
     }
 
-    public static ClimateZone zoneAt(ServerLevel level, double x, double z) {
+    public static ClimateZone zoneAt(net.minecraft.world.level.Level level, double x, double z) {
         Holder<Biome> holder = level.getBiome(BlockPos.containing(x, SAMPLE_Y, z));
         Biome biome = holder.value();
         if (holder.is(BiomeTags.IS_OCEAN) || holder.is(BiomeTags.IS_BEACH)) {

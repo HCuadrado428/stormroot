@@ -63,6 +63,7 @@ public final class SelfTest {
     private static final int CAVE_FLOOR = -46;
 
     private static final MyceliumSelfTest MYCELIUM = new MyceliumSelfTest(BX, BZ);
+    private static final FrostSelfTest FROST = new FrostSelfTest(BX, BZ, Y_TOP);
     private static final AtomicInteger PASSED = new AtomicInteger();
     private static final AtomicInteger FAILED = new AtomicInteger();
 
@@ -153,6 +154,7 @@ public final class SelfTest {
                 run("dry storm bolts start", () -> strikeFireTest(level));
                 run("storm fire starts", () -> startStormFire(level));
                 run("mycelium tunnel", () -> MYCELIUM.build(level));
+                run("frost pools", () -> FROST.build(level));
                 stage = 1;
                 waitUntil = ticks + 160;
             }
@@ -172,6 +174,7 @@ public final class SelfTest {
                 run("the end of the rainbow has a treasure", () -> checkRainbowTreasure(level));
                 run("hail hurts crops and glass and leaves hailstones", () -> checkHailGround(level));
                 run("mycelium network", () -> MYCELIUM.run(level));
+                run("frost and aurora", () -> FROST.run(level));
                 finish(server);
             }
             default -> {
@@ -185,7 +188,7 @@ public final class SelfTest {
         boolean ok = ModItems.LIGHTNING_CRYSTAL != null && ModBlocks.WEATHERVANE != null && ModBlocks.BAROMETER != null
                 && ModBlocks.LIGHTNING_ROOT != null && ModBlocks.WEATHERVANE_ITEM != null && ModBlocks.BAROMETER_ITEM != null
                 && ModBlocks.LIGHTNING_ROOT_ITEM != null && ModBlocks.MYCELIUM_VEIN != null && ModBlocks.MYCELIUM_NODE != null
-                && ModBlocks.MYCELIUM_NODE_ITEM != null && ModItems.SPORES != null;
+                && ModBlocks.MYCELIUM_NODE_ITEM != null && ModItems.SPORES != null && ModBlocks.FROST_ICE != null;
         check("registries", ok, "algún item o bloque es null");
     }
 

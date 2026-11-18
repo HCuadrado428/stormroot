@@ -1,4 +1,4 @@
-package io.github.hcuadrado428.stormroot.client.mixin.clouds;
+package io.github.hcuadrado428.stormroot.client.mixin.sky;
 
 import io.github.hcuadrado428.stormroot.client.sky.SkyRenderer;
 import net.minecraft.client.CloudStatus;

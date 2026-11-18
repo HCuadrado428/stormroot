@@ -214,7 +214,27 @@ public final class ClientSelfTest {
                 }
             }
             case 65 -> {
+                // Tormenta magnética encima, con una brújula en la mano: debe girar sin parar.
                 server.execute(io.github.hcuadrado428.stormroot.weather.Rainbows::clear);
+                spawnAt(server, FrontType.MAGNETIC_STORM, x, z);
+                mc.player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,
+                        new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.COMPASS));
+                stage = 66;
+                stageStart = ticks;
+            }
+            case 66 -> {
+                long spins = MagneticCompass.spinChecks();
+                if ((spins > 0 && waited > 100) || waited > 600) {
+                    SelfTest.report("compass spins in a magnetic storm", spins > 0,
+                            "giros=" + spins + ", tormenta=" + ClientFronts.intensity(FrontType.MAGNETIC_STORM, x, z));
+                    stage = 67;
+                    stageStart = ticks;
+                    requestShot(mc, "brujula_en_tormenta_magnetica", 0f, 30f);
+                }
+            }
+            case 67 -> {
+                mc.player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, net.minecraft.world.item.ItemStack.EMPTY);
+                clear(server);
                 finish(mc);
             }
             case 20 -> {
