@@ -1,0 +1,32 @@
+{
+  "size": [
+    16,
+    16
+  ],
+  "palette": {
+    ".": "transparent",
+    "o": "#1d161e",
+    "B": "#4a3b47",
+    "L": "#ffffff",
+    "s": "#b9d98a",
+    "d": "#352a33"
+  },
+  "rows": [
+    "................",
+    "......oooo......",
+    ".....oLBBBo.....",
+    "....oLBBsBBo....",
+    "....oBBBBBdo....",
+    "...oBsBBBBBdo...",
+    "...oBBBBsBBdo...",
+    "...oBBBBBBddo...",
+    "...osBBBsBBdo...",
+    "...oBBBBBBddo...",
+    "....oBBsBBdo....",
+    "....oBBBBddo....",
+    ".....oddddo.....",
+    "......oooo......",
+    "................",
+    "................"
+  ]
+}

@@ -119,7 +119,11 @@ public final class Mycelium {
         if (MyceliumRules.scaredBy(level.getBrightness(LightLayer.BLOCK, to)) || !habitable(level, to)) {
             return false;
         }
-        BlockState vein = veinStateAt(level, to);
+        MyceliumNetworks.State state = networks(level).stateAt(chunkKey(from));
+        if (state == MyceliumNetworks.State.CALM) {
+            return false;
+        }
+        BlockState vein = veinStateAt(level, to, state == MyceliumNetworks.State.TAMED);
         if (vein == null) {
             return false;
         }
@@ -139,12 +143,18 @@ public final class Mycelium {
 
     /** Hilo con una cara en cada bloque sólido de alrededor, o {@code null} si no hay donde agarrarse. */
     public static BlockState veinStateAt(ServerLevel level, BlockPos pos) {
+        return veinStateAt(level, pos, false);
+    }
+
+    /** Con {@code naturalOnly} (red domesticada) solo se agarra a roca y tierra naturales: no trepa por tus construcciones. */
+    public static BlockState veinStateAt(ServerLevel level, BlockPos pos, boolean naturalOnly) {
         BlockState state = ModBlocks.MYCELIUM_VEIN.defaultBlockState();
         boolean any = false;
         for (Direction direction : Direction.values()) {
             BlockPos neighbor = pos.relative(direction);
             BlockState other = level.getBlockState(neighbor);
-            if (other.isFaceSturdy(level, neighbor, direction.getOpposite()) && !isNode(other)) {
+            if (other.isFaceSturdy(level, neighbor, direction.getOpposite()) && !isNode(other)
+                    && (!naturalOnly || isNatural(other))) {
                 state = state.setValue(MultifaceBlock.getFaceProperty(direction), true);
                 any = true;
             }
@@ -242,6 +252,7 @@ public final class Mycelium {
             }
             maybeSpawnSporeling(level, player, random);
             maybeSpawnWeaver(level, player, random);
+            maybeSpawnGuardian(level, player, random);
             for (int i = 0; i < BIRTH_TRIES; i++) {
                 if (random.nextDouble() >= BIRTH_CHANCE) {
                     continue;
@@ -262,7 +273,7 @@ public final class Mycelium {
     /** De vez en cuando aparece un esporín sobre un hilo a oscuras (más con niebla; ninguno con sequía). */
     private static void maybeSpawnSporeling(ServerLevel level, ServerPlayer player, RandomSource random) {
         AABB around = player.getBoundingBox().inflate(32);
-        if (level.getEntities(ModEntities.SPORELING, around, e -> true).size() >= MAX_SPORELINGS) {
+        if (level.getEntities(ModEntities.sporeling(), around, e -> true).size() >= MAX_SPORELINGS) {
             return;
         }
         for (int i = 0; i < 6; i++) {
@@ -288,7 +299,7 @@ public final class Mycelium {
     /** Un tejedor aparece a veces sobre un hilo cerca de un nodo (nunca con sequía). */
     private static void maybeSpawnWeaver(ServerLevel level, ServerPlayer player, RandomSource random) {
         AABB around = player.getBoundingBox().inflate(32);
-        if (level.getEntities(ModEntities.WEAVER, around, e -> true).size() >= MAX_WEAVERS) {
+        if (level.getEntities(ModEntities.weaver(), around, e -> true).size() >= MAX_WEAVERS) {
             return;
         }
         for (int i = 0; i < 4; i++) {
@@ -300,7 +311,7 @@ public final class Mycelium {
             if (cell != null && cell.deep() < MyceliumRules.DRY_AT) {
                 return;
             }
-            if (random.nextDouble() < WEAVER_CHANCE && spawn(ModEntities.WEAVER, level, pos) != null) {
+            if (random.nextDouble() < WEAVER_CHANCE && spawn(ModEntities.weaver(), level, pos) != null) {
                 return;
             }
         }
@@ -308,16 +319,91 @@ public final class Mycelium {
 
     /** Has roto un nodo: los tejedores de alrededor van a por ti. Devuelve cuántos se enfadan. */
     public static int onNodeBroken(ServerLevel level, BlockPos pos, net.minecraft.world.entity.player.Player player) {
-        if (player.isCreative() || player.isSpectator()) {
+        if (player.isCreative() || player.isSpectator()
+                || networks(level).stateAt(chunkKey(pos)) != MyceliumNetworks.State.WILD) {
             return 0;
         }
         int angry = 0;
-        for (io.github.hcuadrado428.stormroot.entity.Weaver weaver : level.getEntities(ModEntities.WEAVER,
+        for (io.github.hcuadrado428.stormroot.entity.MyceliumGuardian guardian : level.getEntities(ModEntities.guardian(),
+                new AABB(pos).inflate(GUARDIAN_ALERT), e -> true)) {
+            guardian.wake(player);
+            angry++;
+        }
+        for (io.github.hcuadrado428.stormroot.entity.Weaver weaver : level.getEntities(ModEntities.weaver(),
                 new AABB(pos).inflate(WEAVER_ALERT), e -> true)) {
             weaver.setTarget(player);
             angry++;
         }
         return angry;
+    }
+
+    /** Radio en el que un guardián dormido se entera de que rompes nodos. */
+    public static final int GUARDIAN_ALERT = 24;
+    private static final double GUARDIAN_CHANCE = 0.08;
+
+    /** En una red salvaje grande, un guardián duerme sobre uno de sus nodos (uno cada 96 bloques como mucho). */
+    private static void maybeSpawnGuardian(ServerLevel level, ServerPlayer player, RandomSource random) {
+        if (random.nextDouble() >= GUARDIAN_CHANCE) {
+            return;
+        }
+        MyceliumNetworks networks = networks(level);
+        for (int i = 0; i < 8; i++) {
+            BlockPos node = player.blockPosition().offset(random.nextInt(49) - 24, random.nextInt(17) - 8, random.nextInt(49) - 24);
+            if (!level.isLoaded(node) || !isNode(level.getBlockState(node))) {
+                continue;
+            }
+            int id = networks.networkAt(chunkKey(node));
+            if (id == 0 || networks.size(id) < MyceliumNetworks.GUARDIAN_AT || networks.state(id) != MyceliumNetworks.State.WILD
+                    || !level.getEntities(ModEntities.guardian(), new AABB(node).inflate(96), e -> true).isEmpty()) {
+                continue;
+            }
+            BlockPos above = node.above();
+            if (level.getBlockState(above).getCollisionShape(level, above).isEmpty()
+                    && level.getBlockState(above.above()).getCollisionShape(level, above.above()).isEmpty()
+                    && spawn(ModEntities.guardian(), level, above) != null) {
+                return;
+            }
+        }
+    }
+
+    /** Has vencido al guardián: su red se calma (deja de crecer) y los tejedores de alrededor se tranquilizan. */
+    public static boolean onGuardianDefeated(ServerLevel level, BlockPos pos) {
+        MyceliumNetworks networks = networks(level);
+        int id = networks.networkAt(chunkKey(pos));
+        for (io.github.hcuadrado428.stormroot.entity.Weaver weaver : level.getEntities(ModEntities.weaver(),
+                new AABB(pos).inflate(32), e -> true)) {
+            weaver.setTarget(null);
+        }
+        if (id == 0 || networks.state(id) != MyceliumNetworks.State.WILD) {
+            return false;
+        }
+        networks.setState(id, MyceliumNetworks.State.CALM);
+        SeepageSavedData.get(level.getServer()).changed();
+        return true;
+    }
+
+    /** Corazón de micelio sobre un nodo: su red pasa a ser tuya (domesticada). */
+    public static boolean tame(ServerLevel level, BlockPos node) {
+        if (!isNode(level.getBlockState(node))) {
+            return false;
+        }
+        MyceliumNetworks networks = networks(level);
+        int id = networks.networkAt(chunkKey(node));
+        if (id == 0) {
+            id = networks.create(chunkKey(node));
+        }
+        if (networks.state(id) == MyceliumNetworks.State.TAMED) {
+            return false;
+        }
+        networks.setState(id, MyceliumNetworks.State.TAMED);
+        for (io.github.hcuadrado428.stormroot.entity.Weaver weaver : level.getEntities(ModEntities.weaver(),
+                new AABB(node).inflate(32), e -> true)) {
+            weaver.setTarget(null);
+        }
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER, node.getX() + 0.5, node.getY() + 1.2,
+                node.getZ() + 0.5, 20, 0.6, 0.4, 0.6, 0.0);
+        SeepageSavedData.get(level.getServer()).changed();
+        return true;
     }
 
     /** Hace aparecer un habitante en {@code pos} si cabe y está a oscuras. */
@@ -335,7 +421,7 @@ public final class Mycelium {
 
     /** Hace aparecer un esporín en {@code pos} si cabe y está a oscuras. */
     public static Entity spawnSporeling(ServerLevel level, BlockPos pos) {
-        return spawn(ModEntities.SPORELING, level, pos);
+        return spawn(ModEntities.sporeling(), level, pos);
     }
 
     /** Nace una red con su primer nodo en el suelo de {@code air}, si se dan las condiciones. */

@@ -32,6 +32,21 @@ public class Weaver extends PathfinderMob {
     /** Segundos de lentitud que deja cada golpe. */
     public static final int ENTANGLE_TICKS = 60;
     private int repairCooldown;
+    /** ¿Vive en una red domesticada? (se mira cada 5 s). */
+    private boolean tamed;
+
+    public boolean isTamed() {
+        return tamed;
+    }
+
+    @Override
+    public void aiStep() {
+        super.aiStep();
+        if (this.tickCount % 100 == 0 && this.level() instanceof ServerLevel server) {
+            tamed = Mycelium.networks(server).stateAt(Mycelium.chunkKey(this.blockPosition()))
+                    == io.github.hcuadrado428.stormroot.mycel.MyceliumNetworks.State.TAMED;
+        }
+    }
 
     public Weaver(EntityType<? extends Weaver> type, Level level) {
         super(type, level);
@@ -52,6 +67,14 @@ public class Weaver extends PathfinderMob {
         this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 6.0F));
         this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this).setAlertOthers());
+        // En una red domesticada, defiende la zona de los monstruos.
+        this.targetSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(this,
+                net.minecraft.world.entity.monster.Monster.class, true) {
+            @Override
+            public boolean canUse() {
+                return tamed && super.canUse();
+            }
+        });
     }
 
     /** Hilos pegajosos: cada golpe deja lentitud. */

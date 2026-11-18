@@ -46,6 +46,10 @@ public class StormrootClient /*? if fabric {*/ implements ClientModInitializer /
                 io.github.hcuadrado428.stormroot.client.entity.WeaverModel.LAYER, io.github.hcuadrado428.stormroot.client.entity.WeaverModel::createLayer);
         net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
                 io.github.hcuadrado428.stormroot.entity.ModEntities.WEAVER, io.github.hcuadrado428.stormroot.client.entity.WeaverRenderer::new);
+        net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry.registerModelLayer(
+                io.github.hcuadrado428.stormroot.client.entity.MyceliumGuardianModel.LAYER, io.github.hcuadrado428.stormroot.client.entity.MyceliumGuardianModel::createLayer);
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
+                io.github.hcuadrado428.stormroot.entity.ModEntities.guardian(), io.github.hcuadrado428.stormroot.client.entity.MyceliumGuardianRenderer::new);
     }
     //?}
 
@@ -123,10 +127,12 @@ public class StormrootClient /*? if fabric {*/ implements ClientModInitializer /
         modBus.addListener((net.minecraftforge.client.event.EntityRenderersEvent.RegisterLayerDefinitions e) -> {
             e.registerLayerDefinition(io.github.hcuadrado428.stormroot.client.entity.SporelingModel.LAYER, io.github.hcuadrado428.stormroot.client.entity.SporelingModel::createLayer);
             e.registerLayerDefinition(io.github.hcuadrado428.stormroot.client.entity.WeaverModel.LAYER, io.github.hcuadrado428.stormroot.client.entity.WeaverModel::createLayer);
+            e.registerLayerDefinition(io.github.hcuadrado428.stormroot.client.entity.MyceliumGuardianModel.LAYER, io.github.hcuadrado428.stormroot.client.entity.MyceliumGuardianModel::createLayer);
         });
         modBus.addListener((net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers e) -> {
             e.registerEntityRenderer(io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING, io.github.hcuadrado428.stormroot.client.entity.SporelingRenderer::new);
             e.registerEntityRenderer(io.github.hcuadrado428.stormroot.entity.ModEntities.WEAVER, io.github.hcuadrado428.stormroot.client.entity.WeaverRenderer::new);
+            e.registerEntityRenderer(io.github.hcuadrado428.stormroot.entity.ModEntities.guardian(), io.github.hcuadrado428.stormroot.client.entity.MyceliumGuardianRenderer::new);
         });
         MinecraftForge.EVENT_BUS.addListener(StormrootClient::onClientTick);
         MinecraftForge.EVENT_BUS.addListener(StormrootClient::onRenderFog);
@@ -160,10 +166,12 @@ public class StormrootClient /*? if fabric {*/ implements ClientModInitializer /
         modBus.addListener((net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterLayerDefinitions e) -> {
             e.registerLayerDefinition(io.github.hcuadrado428.stormroot.client.entity.SporelingModel.LAYER, io.github.hcuadrado428.stormroot.client.entity.SporelingModel::createLayer);
             e.registerLayerDefinition(io.github.hcuadrado428.stormroot.client.entity.WeaverModel.LAYER, io.github.hcuadrado428.stormroot.client.entity.WeaverModel::createLayer);
+            e.registerLayerDefinition(io.github.hcuadrado428.stormroot.client.entity.MyceliumGuardianModel.LAYER, io.github.hcuadrado428.stormroot.client.entity.MyceliumGuardianModel::createLayer);
         });
         modBus.addListener((net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers e) -> {
             e.registerEntityRenderer(io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING, io.github.hcuadrado428.stormroot.client.entity.SporelingRenderer::new);
             e.registerEntityRenderer(io.github.hcuadrado428.stormroot.entity.ModEntities.WEAVER, io.github.hcuadrado428.stormroot.client.entity.WeaverRenderer::new);
+            e.registerEntityRenderer(io.github.hcuadrado428.stormroot.entity.ModEntities.guardian(), io.github.hcuadrado428.stormroot.client.entity.MyceliumGuardianRenderer::new);
         });
         NeoForge.EVENT_BUS.addListener(StormrootClient::onClientTick);
         registerFog();

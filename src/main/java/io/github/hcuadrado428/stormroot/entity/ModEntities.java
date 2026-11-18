@@ -10,13 +10,49 @@ import net.minecraft.world.entity.MobCategory;
 public final class ModEntities {
     public static final String SPORELING_ID = "sporeling";
     public static final String WEAVER_ID = "weaver";
+    public static final String GUARDIAN_ID = "mycelium_guardian";
 
     /** Esporín: habitante pequeño y pasivo de la red de micelio. */
     public static EntityType<Sporeling> SPORELING;
     /** Tejedor: habitante neutral que repara la red y te enreda si la atacas. */
     public static EntityType<Weaver> WEAVER;
+    /** Guardián de micelio: el defensor de las redes grandes. */
+    public static EntityType<MyceliumGuardian> GUARDIAN;
 
     private ModEntities() {
+    }
+
+    // Los tipos se crean la primera vez que se piden: en Forge/NeoForge los objetos (huevos) se registran antes que
+    // las entidades, y los huevos necesitan el tipo ya creado. El registro de entidades usa el mismo objeto.
+    public static EntityType<Sporeling> sporeling() {
+        if (SPORELING == null) {
+            SPORELING = createSporeling();
+        }
+        return SPORELING;
+    }
+
+    public static EntityType<Weaver> weaver() {
+        if (WEAVER == null) {
+            WEAVER = createWeaver();
+        }
+        return WEAVER;
+    }
+
+    public static EntityType<MyceliumGuardian> guardian() {
+        if (GUARDIAN == null) {
+            GUARDIAN = createGuardian();
+        }
+        return GUARDIAN;
+    }
+
+    public static EntityType<MyceliumGuardian> createGuardian() {
+        EntityType.Builder<MyceliumGuardian> builder = EntityType.Builder.of(MyceliumGuardian::new, MobCategory.MONSTER)
+                .sized(1.4F, 2.4F).clientTrackingRange(10);
+        //? if >=1.21.2 {
+        return builder.build(ResourceKey.create(Registries.ENTITY_TYPE, ModIds.id(GUARDIAN_ID)));
+        //?} else {
+        /*return builder.build(GUARDIAN_ID);
+        *///?}
     }
 
     public static EntityType<Weaver> createWeaver() {

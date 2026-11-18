@@ -80,8 +80,9 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
         MinecraftForge.EVENT_BUS.addListener(Stormroot::onRegisterCommands);
         MinecraftForge.EVENT_BUS.addListener(Stormroot::onEntityJoin);
         modBus.addListener((net.minecraftforge.event.entity.EntityAttributeCreationEvent e) -> {
-            e.put(io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING, io.github.hcuadrado428.stormroot.entity.Sporeling.createAttributes().build());
-            e.put(io.github.hcuadrado428.stormroot.entity.ModEntities.WEAVER, io.github.hcuadrado428.stormroot.entity.Weaver.createAttributes().build());
+            e.put(io.github.hcuadrado428.stormroot.entity.ModEntities.sporeling(), io.github.hcuadrado428.stormroot.entity.Sporeling.createAttributes().build());
+            e.put(io.github.hcuadrado428.stormroot.entity.ModEntities.weaver(), io.github.hcuadrado428.stormroot.entity.Weaver.createAttributes().build());
+            e.put(io.github.hcuadrado428.stormroot.entity.ModEntities.guardian(), io.github.hcuadrado428.stormroot.entity.MyceliumGuardian.createAttributes().build());
         });
         StormrootNetwork.init();
         if (FMLEnvironment.dist == Dist.CLIENT) {
@@ -92,11 +93,9 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
     }
 
     private static void onRegister(RegisterEvent event) {
-        event.register(Registries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING_ID),
-                () -> io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING =
-                        io.github.hcuadrado428.stormroot.entity.ModEntities.createSporeling());
-        event.register(Registries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.WEAVER_ID),
-                () -> io.github.hcuadrado428.stormroot.entity.ModEntities.WEAVER = io.github.hcuadrado428.stormroot.entity.ModEntities.createWeaver());
+        event.register(Registries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING_ID), io.github.hcuadrado428.stormroot.entity.ModEntities::sporeling);
+        event.register(Registries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.WEAVER_ID), io.github.hcuadrado428.stormroot.entity.ModEntities::weaver);
+        event.register(Registries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.GUARDIAN_ID), io.github.hcuadrado428.stormroot.entity.ModEntities::guardian);
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.WEATHERVANE_ID),
                 () -> ModBlocks.WEATHERVANE = ModBlocks.createWeathervane());
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.BAROMETER_ID),
@@ -141,6 +140,13 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 () -> ModBlocks.MYCELIUM_NODE_ITEM = ModBlocks.createBlockItem(ModBlocks.MYCELIUM_NODE_ID, ModBlocks.MYCELIUM_NODE));
         event.register(Registries.ITEM, ModIds.id("spores"), () -> ModItems.SPORES = ModItems.create("spores"));
         event.register(Registries.ITEM, ModIds.id("mycelium_thread"), () -> ModItems.MYCELIUM_THREAD = ModItems.create("mycelium_thread"));
+        event.register(Registries.ITEM, ModIds.id("mycelium_heart"), () -> ModItems.MYCELIUM_HEART = ModItems.createHeart("mycelium_heart"));
+        event.register(Registries.ITEM, ModIds.id("sporeling_spawn_egg"), () -> ModItems.SPORELING_SPAWN_EGG = ModItems.createSpawnEgg(
+                "sporeling_spawn_egg", io.github.hcuadrado428.stormroot.entity.ModEntities.sporeling(), 0xCFDCA6, 0x866A9A));
+        event.register(Registries.ITEM, ModIds.id("weaver_spawn_egg"), () -> ModItems.WEAVER_SPAWN_EGG = ModItems.createSpawnEgg(
+                "weaver_spawn_egg", io.github.hcuadrado428.stormroot.entity.ModEntities.weaver(), 0xD9D2C4, 0x9CAE7C));
+        event.register(Registries.ITEM, ModIds.id("mycelium_guardian_spawn_egg"), () -> ModItems.GUARDIAN_SPAWN_EGG = ModItems.createSpawnEgg(
+                "mycelium_guardian_spawn_egg", io.github.hcuadrado428.stormroot.entity.ModEntities.guardian(), 0x4A3B47, 0xB9D98A));
         event.register(Registries.ITEM, ModIds.id("sand_goggles"), () -> ModItems.SAND_GOGGLES = ModItems.createGoggles("sand_goggles"));
     }
 
@@ -157,6 +163,10 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
             event.accept(ModBlocks.MYCELIUM_NODE_ITEM);
             event.accept(ModItems.SPORES);
             event.accept(ModItems.MYCELIUM_THREAD);
+            event.accept(ModItems.MYCELIUM_HEART);
+            event.accept(ModItems.SPORELING_SPAWN_EGG);
+            event.accept(ModItems.WEAVER_SPAWN_EGG);
+            event.accept(ModItems.GUARDIAN_SPAWN_EGG);
             event.accept(ModItems.SAND_GOGGLES);
         }
         if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
@@ -192,8 +202,9 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
         NeoForge.EVENT_BUS.addListener(Stormroot::onRegisterCommands);
         NeoForge.EVENT_BUS.addListener(Stormroot::onEntityJoin);
         modBus.addListener((net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent e) -> {
-            e.put(io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING, io.github.hcuadrado428.stormroot.entity.Sporeling.createAttributes().build());
-            e.put(io.github.hcuadrado428.stormroot.entity.ModEntities.WEAVER, io.github.hcuadrado428.stormroot.entity.Weaver.createAttributes().build());
+            e.put(io.github.hcuadrado428.stormroot.entity.ModEntities.sporeling(), io.github.hcuadrado428.stormroot.entity.Sporeling.createAttributes().build());
+            e.put(io.github.hcuadrado428.stormroot.entity.ModEntities.weaver(), io.github.hcuadrado428.stormroot.entity.Weaver.createAttributes().build());
+            e.put(io.github.hcuadrado428.stormroot.entity.ModEntities.guardian(), io.github.hcuadrado428.stormroot.entity.MyceliumGuardian.createAttributes().build());
         });
         if (dist.isClient()) {
             StormrootClient.register(modBus);
@@ -203,11 +214,9 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
     }
 
     private static void onRegister(RegisterEvent event) {
-        event.register(Registries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING_ID),
-                () -> io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING =
-                        io.github.hcuadrado428.stormroot.entity.ModEntities.createSporeling());
-        event.register(Registries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.WEAVER_ID),
-                () -> io.github.hcuadrado428.stormroot.entity.ModEntities.WEAVER = io.github.hcuadrado428.stormroot.entity.ModEntities.createWeaver());
+        event.register(Registries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING_ID), io.github.hcuadrado428.stormroot.entity.ModEntities::sporeling);
+        event.register(Registries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.WEAVER_ID), io.github.hcuadrado428.stormroot.entity.ModEntities::weaver);
+        event.register(Registries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.GUARDIAN_ID), io.github.hcuadrado428.stormroot.entity.ModEntities::guardian);
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.WEATHERVANE_ID),
                 () -> ModBlocks.WEATHERVANE = ModBlocks.createWeathervane());
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.BAROMETER_ID),
@@ -252,6 +261,13 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 () -> ModBlocks.MYCELIUM_NODE_ITEM = ModBlocks.createBlockItem(ModBlocks.MYCELIUM_NODE_ID, ModBlocks.MYCELIUM_NODE));
         event.register(Registries.ITEM, ModIds.id("spores"), () -> ModItems.SPORES = ModItems.create("spores"));
         event.register(Registries.ITEM, ModIds.id("mycelium_thread"), () -> ModItems.MYCELIUM_THREAD = ModItems.create("mycelium_thread"));
+        event.register(Registries.ITEM, ModIds.id("mycelium_heart"), () -> ModItems.MYCELIUM_HEART = ModItems.createHeart("mycelium_heart"));
+        event.register(Registries.ITEM, ModIds.id("sporeling_spawn_egg"), () -> ModItems.SPORELING_SPAWN_EGG = ModItems.createSpawnEgg(
+                "sporeling_spawn_egg", io.github.hcuadrado428.stormroot.entity.ModEntities.sporeling(), 0xCFDCA6, 0x866A9A));
+        event.register(Registries.ITEM, ModIds.id("weaver_spawn_egg"), () -> ModItems.WEAVER_SPAWN_EGG = ModItems.createSpawnEgg(
+                "weaver_spawn_egg", io.github.hcuadrado428.stormroot.entity.ModEntities.weaver(), 0xD9D2C4, 0x9CAE7C));
+        event.register(Registries.ITEM, ModIds.id("mycelium_guardian_spawn_egg"), () -> ModItems.GUARDIAN_SPAWN_EGG = ModItems.createSpawnEgg(
+                "mycelium_guardian_spawn_egg", io.github.hcuadrado428.stormroot.entity.ModEntities.guardian(), 0x4A3B47, 0xB9D98A));
         event.register(Registries.ITEM, ModIds.id("sand_goggles"), () -> ModItems.SAND_GOGGLES = ModItems.createGoggles("sand_goggles"));
     }
 
@@ -268,6 +284,10 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
             event.accept(ModBlocks.MYCELIUM_NODE_ITEM);
             event.accept(ModItems.SPORES);
             event.accept(ModItems.MYCELIUM_THREAD);
+            event.accept(ModItems.MYCELIUM_HEART);
+            event.accept(ModItems.SPORELING_SPAWN_EGG);
+            event.accept(ModItems.WEAVER_SPAWN_EGG);
+            event.accept(ModItems.GUARDIAN_SPAWN_EGG);
             event.accept(ModItems.SAND_GOGGLES);
         }
         if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
@@ -319,16 +339,15 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 ModIds.id(ModBlocks.SAND_LAYER_ID), ModBlocks.createSandLayer());
         ModItems.LIGHTNING_CRYSTAL = Registry.register(BuiltInRegistries.ITEM,
                 ModIds.id("lightning_crystal"), ModItems.create("lightning_crystal"));
-        io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING = Registry.register(BuiltInRegistries.ENTITY_TYPE,
-                ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING_ID),
-                io.github.hcuadrado428.stormroot.entity.ModEntities.createSporeling());
+        Registry.register(BuiltInRegistries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING_ID), io.github.hcuadrado428.stormroot.entity.ModEntities.sporeling());
+        Registry.register(BuiltInRegistries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.WEAVER_ID), io.github.hcuadrado428.stormroot.entity.ModEntities.weaver());
+        Registry.register(BuiltInRegistries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.GUARDIAN_ID), io.github.hcuadrado428.stormroot.entity.ModEntities.guardian());
         net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(
-                io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING,
-                io.github.hcuadrado428.stormroot.entity.Sporeling.createAttributes());
-        io.github.hcuadrado428.stormroot.entity.ModEntities.WEAVER = Registry.register(BuiltInRegistries.ENTITY_TYPE,
-                ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.WEAVER_ID), io.github.hcuadrado428.stormroot.entity.ModEntities.createWeaver());
+                io.github.hcuadrado428.stormroot.entity.ModEntities.sporeling(), io.github.hcuadrado428.stormroot.entity.Sporeling.createAttributes());
         net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(
-                io.github.hcuadrado428.stormroot.entity.ModEntities.WEAVER, io.github.hcuadrado428.stormroot.entity.Weaver.createAttributes());
+                io.github.hcuadrado428.stormroot.entity.ModEntities.weaver(), io.github.hcuadrado428.stormroot.entity.Weaver.createAttributes());
+        net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(
+                io.github.hcuadrado428.stormroot.entity.ModEntities.guardian(), io.github.hcuadrado428.stormroot.entity.MyceliumGuardian.createAttributes());
         ModItems.HAILSTONE = Registry.register(BuiltInRegistries.ITEM, ModIds.id("hailstone"), ModItems.create("hailstone"));
         ModBlocks.WEATHERVANE_ITEM = Registry.register(BuiltInRegistries.ITEM, ModIds.id(ModBlocks.WEATHERVANE_ID),
                 ModBlocks.createBlockItem(ModBlocks.WEATHERVANE_ID, ModBlocks.WEATHERVANE));
@@ -348,6 +367,13 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 ModBlocks.createBlockItem(ModBlocks.MYCELIUM_NODE_ID, ModBlocks.MYCELIUM_NODE));
         ModItems.SPORES = Registry.register(BuiltInRegistries.ITEM, ModIds.id("spores"), ModItems.create("spores"));
         ModItems.MYCELIUM_THREAD = Registry.register(BuiltInRegistries.ITEM, ModIds.id("mycelium_thread"), ModItems.create("mycelium_thread"));
+        ModItems.MYCELIUM_HEART = Registry.register(BuiltInRegistries.ITEM, ModIds.id("mycelium_heart"), ModItems.createHeart("mycelium_heart"));
+        ModItems.SPORELING_SPAWN_EGG = Registry.register(BuiltInRegistries.ITEM, ModIds.id("sporeling_spawn_egg"), ModItems.createSpawnEgg(
+                "sporeling_spawn_egg", io.github.hcuadrado428.stormroot.entity.ModEntities.sporeling(), 0xCFDCA6, 0x866A9A));
+        ModItems.WEAVER_SPAWN_EGG = Registry.register(BuiltInRegistries.ITEM, ModIds.id("weaver_spawn_egg"), ModItems.createSpawnEgg(
+                "weaver_spawn_egg", io.github.hcuadrado428.stormroot.entity.ModEntities.weaver(), 0xD9D2C4, 0x9CAE7C));
+        ModItems.GUARDIAN_SPAWN_EGG = Registry.register(BuiltInRegistries.ITEM, ModIds.id("mycelium_guardian_spawn_egg"), ModItems.createSpawnEgg(
+                "mycelium_guardian_spawn_egg", io.github.hcuadrado428.stormroot.entity.ModEntities.guardian(), 0x4A3B47, 0xB9D98A));
         ModItems.SAND_GOGGLES = Registry.register(BuiltInRegistries.ITEM, ModIds.id("sand_goggles"), ModItems.createGoggles("sand_goggles"));
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.INGREDIENTS)
                 .register(entries -> {
@@ -362,6 +388,10 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                     entries.accept(ModBlocks.MYCELIUM_NODE_ITEM);
                     entries.accept(ModItems.SPORES);
                     entries.accept(ModItems.MYCELIUM_THREAD);
+                    entries.accept(ModItems.MYCELIUM_HEART);
+                    entries.accept(ModItems.SPORELING_SPAWN_EGG);
+                    entries.accept(ModItems.WEAVER_SPAWN_EGG);
+                    entries.accept(ModItems.GUARDIAN_SPAWN_EGG);
                     entries.accept(ModItems.SAND_GOGGLES);
                 });
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(entries -> {

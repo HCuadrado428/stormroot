@@ -38,5 +38,10 @@
   "item.stormroot.sand_goggles": "Sand Goggles",
   "entity.stormroot.sporeling": "Sporeling",
   "entity.stormroot.weaver": "Weaver",
-  "item.stormroot.mycelium_thread": "Mycelium Thread"
+  "item.stormroot.mycelium_thread": "Mycelium Thread",
+  "entity.stormroot.mycelium_guardian": "Mycelium Guardian",
+  "item.stormroot.mycelium_heart": "Mycelium Heart",
+  "item.stormroot.sporeling_spawn_egg": "Sporeling Spawn Egg",
+  "item.stormroot.weaver_spawn_egg": "Weaver Spawn Egg",
+  "item.stormroot.mycelium_guardian_spawn_egg": "Mycelium Guardian Spawn Egg"
 }

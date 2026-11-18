@@ -46,7 +46,8 @@ public class SeepageSavedData extends SavedData {
 
     private static final Codec<MyceliumNetworks.Entry> NETWORK_CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.INT.fieldOf("id").forGetter(MyceliumNetworks.Entry::id),
-            Codec.LONG.listOf().fieldOf("chunks").forGetter(MyceliumNetworks.Entry::chunks)
+            Codec.LONG.listOf().fieldOf("chunks").forGetter(MyceliumNetworks.Entry::chunks),
+            Codec.INT.optionalFieldOf("state", 0).forGetter(MyceliumNetworks.Entry::state)
     ).apply(i, MyceliumNetworks.Entry::new));
 
     /** Celdas de la filtración y, desde la red de micelio, qué chunks ocupa cada red ({@code mycelium}, opcional). */

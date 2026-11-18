@@ -332,12 +332,30 @@ public final class ClientSelfTest {
                 }
             }
             case 75 -> {
+                // El guardián de micelio, dormido, delante del jugador.
                 mc.options.hideGui = false;
                 server.execute(() -> {
                     net.minecraft.commands.CommandSourceStack src = server.createCommandSourceStack().withSuppressedOutput();
                     server.getCommands().performPrefixedCommand(src, "kill @e[type=stormroot:weaver]");
                     server.getCommands().performPrefixedCommand(src, "gamemode creative @a");
+                    server.getCommands().performPrefixedCommand(src, "execute as @a at @s run summon stormroot:mycelium_guardian ~5 ~ ~");
                 });
+                stage = 76;
+                stageStart = ticks;
+            }
+            case 76 -> {
+                long frames = io.github.hcuadrado428.stormroot.client.entity.MyceliumGuardianModel.frames;
+                if ((frames > 0 && waited > 60) || waited > 400) {
+                    SelfTest.report("mycelium guardian is drawn on the client", frames > 0, "fotogramas=" + frames);
+                    stage = 77;
+                    stageStart = ticks;
+                    requestShot(mc, "guardian_de_micelio", -90f, 0f);
+                }
+            }
+            case 77 -> {
+                mc.options.hideGui = false;
+                server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput(),
+                        "kill @e[type=stormroot:mycelium_guardian]"));
                 finish(mc);
             }
             case 20 -> {

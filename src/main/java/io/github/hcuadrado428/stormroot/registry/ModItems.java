@@ -22,10 +22,35 @@ public final class ModItems {
     public static Item SPORES;
     /** Hilo de micelio: lo sueltan los tejedores (3 hilos → 2 de cuerda). */
     public static Item MYCELIUM_THREAD;
+    /** Corazón de micelio: lo suelta el guardián; sobre un nodo, domestica su red. */
+    public static Item MYCELIUM_HEART;
+    public static Item SPORELING_SPAWN_EGG;
+    public static Item WEAVER_SPAWN_EGG;
+    public static Item GUARDIAN_SPAWN_EGG;
     /** Gafas de arena: protegen de la tormenta de arena. */
     public static Item SAND_GOGGLES;
 
     private ModItems() {
+    }
+
+    public static Item createHeart(String name) {
+        Item.Properties properties = new Item.Properties().stacksTo(16);
+        //? if >=1.21.2 {
+        properties = properties.setId(ResourceKey.create(Registries.ITEM, ModIds.id(name)));
+        //?}
+        return new io.github.hcuadrado428.stormroot.item.MyceliumHeartItem(properties);
+    }
+
+    /** Huevo de generación: hasta 1.21.1 se tiñe con dos colores; desde 1.21.5 lleva textura propia. */
+    public static Item createSpawnEgg(String name, net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.Mob> type,
+                                      int primary, int secondary) {
+        Item.Properties properties = new Item.Properties();
+        //? if >=1.21.11 {
+        properties = properties.setId(ResourceKey.create(Registries.ITEM, ModIds.id(name))).spawnEgg(type);
+        return new net.minecraft.world.item.SpawnEggItem(properties);
+        //?} else {
+        /*return new net.minecraft.world.item.SpawnEggItem(type, primary, secondary, properties);
+        *///?}
     }
 
     public static Item createGoggles(String name) {

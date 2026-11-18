@@ -16,7 +16,20 @@ public final class MyceliumNetworks {
     /** Tamaño máximo de una red: como un megabioma pequeño. */
     public static final int MAX_CHUNKS = 30;
 
+    /** Estado de una red: salvaje (por defecto), calmada (venciste a su guardián) o domesticada (corazón de micelio). */
+    public enum State {
+        WILD, CALM, TAMED;
+
+        public static State byId(int id) {
+            return id >= 0 && id < values().length ? values()[id] : WILD;
+        }
+    }
+
+    /** Una red grande tiene guardián a partir de estos chunks. */
+    public static final int GUARDIAN_AT = 8;
+
     private final Map<Integer, Set<Long>> chunksByNetwork = new HashMap<>();
+    private final Map<Integer, State> stateByNetwork = new HashMap<>();
     private final Map<Long, Integer> networkByChunk = new HashMap<>();
     private int nextId = 1;
 
@@ -57,12 +70,32 @@ public final class MyceliumNetworks {
             return true;
         }
         Set<Long> chunks = chunksByNetwork.get(id);
-        if (chunks.size() >= MAX_CHUNKS) {
+        if (chunks.size() >= MAX_CHUNKS || state(id) == State.CALM) {
             return false;
         }
         chunks.add(to);
         networkByChunk.put(to, id);
         return true;
+    }
+
+    public State state(int id) {
+        return stateByNetwork.getOrDefault(id, State.WILD);
+    }
+
+    /** Estado de la red que ocupa ese chunk (salvaje si no hay red). */
+    public State stateAt(long chunk) {
+        return state(networkAt(chunk));
+    }
+
+    public void setState(int id, State state) {
+        if (id != 0 && chunksByNetwork.containsKey(id)) {
+            stateByNetwork.put(id, state);
+        }
+    }
+
+    /** ¿Crece la red? Las calmadas no; las salvajes y domesticadas, sí (las domesticadas solo por roca y tierra). */
+    public boolean grows(long chunk) {
+        return stateAt(chunk) != State.CALM;
     }
 
     public int size(int id) {
@@ -76,6 +109,7 @@ public final class MyceliumNetworks {
 
     public void clear() {
         chunksByNetwork.clear();
+        stateByNetwork.clear();
         networkByChunk.clear();
         nextId = 1;
     }
@@ -84,7 +118,7 @@ public final class MyceliumNetworks {
     public List<Entry> entries() {
         List<Entry> list = new ArrayList<>();
         for (Map.Entry<Integer, Set<Long>> e : chunksByNetwork.entrySet()) {
-            list.add(new Entry(e.getKey(), new ArrayList<>(e.getValue())));
+            list.add(new Entry(e.getKey(), new ArrayList<>(e.getValue()), state(e.getKey()).ordinal()));
         }
         return list;
     }
@@ -98,9 +132,15 @@ public final class MyceliumNetworks {
                 networkByChunk.putIfAbsent(c, e.id());
             }
             nextId = Math.max(nextId, e.id() + 1);
+            if (e.state() != 0) {
+                stateByNetwork.put(e.id(), State.byId(e.state()));
+            }
         }
     }
 
-    public record Entry(int id, List<Long> chunks) {
+    public record Entry(int id, List<Long> chunks, int state) {
+        public Entry(int id, List<Long> chunks) {
+            this(id, chunks, 0);
+        }
     }
 }

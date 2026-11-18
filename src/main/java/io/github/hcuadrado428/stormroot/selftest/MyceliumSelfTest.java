@@ -65,6 +65,79 @@ final class MyceliumSelfTest {
         checkMistRules();
         checkLoot(level);
         checkCodec(level);
+        checkGuardian(level);
+    }
+
+    /**
+     * Guardián: duerme, despierta contra un objetivo, nube de esporas y raíces; al vencerlo la red se calma (no crece) y
+     * el corazón la domestica (solo crece por roca y tierra naturales). Se prueba en la cima de la zona (cabe de pie).
+     */
+    private void checkGuardian(ServerLevel level) {
+        BlockPos at = new BlockPos(bx + 3, -20, bz + 4);
+        io.github.hcuadrado428.stormroot.entity.MyceliumGuardian guardian =
+                Mycelium.spawn(io.github.hcuadrado428.stormroot.entity.ModEntities.guardian(), level, at);
+        boolean spawned = guardian != null;
+        boolean asleep = spawned && !guardian.isAwake();
+        float health = spawned ? guardian.getMaxHealth() : 0;
+        boolean fights = false;
+        if (spawned) {
+            net.minecraft.world.entity.Entity victim = Mycelium.spawnSporeling(level, at.east(3));
+            if (victim instanceof net.minecraft.world.entity.LivingEntity living) {
+                guardian.wake(living);
+                net.minecraft.world.entity.AreaEffectCloud cloud = guardian.sporeCloud(level);
+                io.github.hcuadrado428.stormroot.entity.MyceliumGuardian.roots(level, living);
+                //? if >=1.21.11 {
+                boolean rooted = living.hasEffect(net.minecraft.world.effect.MobEffects.SLOWNESS);
+                //?} else {
+                /*boolean rooted = living.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+                *///?}
+                fights = guardian.isAwake() && guardian.getTarget() == living && cloud.isAlive() && rooted;
+                cloud.discard();
+                victim.discard();
+            }
+            guardian.discard();
+        }
+        SelfTest.check("mycelium guardian sleeps and fights", spawned && asleep && health == 60.0F && fights,
+                "aparece=" + spawned + ", dormido=" + asleep + ", vida=" + health + ", pelea=" + fights);
+
+        // La red del túnel: al vencer al guardián se calma; con el corazón, domesticada.
+        BlockPos node = tunnel(11, FLOOR);
+        if (!Mycelium.isNode(level.getBlockState(node))) {
+            level.setBlock(node, ModBlocks.MYCELIUM_NODE.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        MyceliumNetworks networks = Mycelium.networks(level);
+        long chunk = SeepageField.key(bx >> 4, bz >> 4);
+        if (networks.networkAt(chunk) == 0) {
+            networks.create(chunk);
+        }
+        boolean calmed = Mycelium.onGuardianDefeated(level, node) && networks.stateAt(chunk) == MyceliumNetworks.State.CALM;
+        boolean stopped;
+        Mycelium.setAnywhereForTest(true);
+        try {
+            stopped = !Mycelium.growInto(level, node, tunnel(12, FLOOR + 1), false);
+            boolean tamed = Mycelium.tame(level, node) && networks.stateAt(chunk) == MyceliumNetworks.State.TAMED;
+            // Domesticada: no se agarra a tablones (construcción), sí a la piedra.
+            BlockPos gap = tunnel(13, FLOOR + 1);
+            level.setBlock(gap.below(), Blocks.OAK_PLANKS.defaultBlockState(), Block.UPDATE_CLIENTS);
+            net.minecraft.world.level.block.state.properties.BooleanProperty down =
+                    net.minecraft.world.level.block.MultifaceBlock.getFaceProperty(net.minecraft.core.Direction.DOWN);
+            BlockState onWood = Mycelium.veinStateAt(level, gap, true);
+            boolean noPlanks = onWood == null || !onWood.getValue(down);
+            level.setBlock(gap.below(), Blocks.STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
+            BlockState onRock = Mycelium.veinStateAt(level, gap, true);
+            boolean onStone = onRock != null && onRock.getValue(down);
+            SelfTest.check("defeating the guardian calms the network and the heart tames it",
+                    calmed && stopped && tamed && noPlanks && onStone,
+                    "calmada=" + calmed + ", no crece=" + stopped + ", domesticada=" + tamed + ", no trepa por tablones=" + noPlanks
+                            + ", sí por piedra=" + onStone);
+        } finally {
+            Mycelium.setAnywhereForTest(false);
+        }
+        boolean eggs = ModItems.SPORELING_SPAWN_EGG instanceof net.minecraft.world.item.SpawnEggItem
+                && ModItems.WEAVER_SPAWN_EGG instanceof net.minecraft.world.item.SpawnEggItem
+                && ModItems.GUARDIAN_SPAWN_EGG instanceof net.minecraft.world.item.SpawnEggItem
+                && ModItems.MYCELIUM_HEART != null;
+        SelfTest.check("spawn eggs for the network's inhabitants", eggs, "faltan huevos o el corazón");
     }
 
     private static boolean checkNetworks() {
