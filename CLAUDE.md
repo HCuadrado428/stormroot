@@ -143,14 +143,12 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   desde 1.21.2 (`setupAnim(state)`); renderer `MobRenderer<E, M>` / `MobRenderer<E, S, M>` con `createRenderState`.
   Registro: Fabric `EntityModelLayerRegistry` + `EntityRendererRegistry`; Forge/NeoForge `EntityRenderersEvent`
   (`StormrootClient.register(modBus)` en NeoForge). Aparición propia (no por bioma) en `Mycelium.maybeSpawnSporeling`
-  con `EntityType.spawn(level, pos, EntitySpawnReason/MobSpawnType)`. `Weaver` (tejedor, neutral: `RepairGoal` teje la red, `HurtByTargetGoal`, golpes con lentitud: `doHurtTarget(ServerLevel, Entity)` desde 1.21.2, `MobEffects.SLOWNESS` en 1.21.11 / `MOVEMENT_SLOWDOWN` antes; romper un nodo → `MyceliumNodeBlock.playerDestroy` → `Mycelium.onNodeBroken`). Objetivo común `entity/goal/FleeLightGoal`. Sin huevos de generación aún (`/summon stormroot:sporeling`, `stormroot:weaver`).
-  Plan: guardián de micelio (mob fuerte, sin barra de jefe; al vencerlo la red
-  se calma; da el corazón de micelio para domesticar redes).
+  con `EntityType.spawn(level, pos, EntitySpawnReason/MobSpawnType)`. `Weaver` (tejedor, neutral: `RepairGoal` teje la red, `HurtByTargetGoal`, golpes con lentitud: `doHurtTarget(ServerLevel, Entity)` desde 1.21.2, `MobEffects.SLOWNESS` en 1.21.11 / `MOVEMENT_SLOWDOWN` antes; romper un nodo → `MyceliumNodeBlock.playerDestroy` → `Mycelium.onNodeBroken`). Objetivo común `entity/goal/FleeLightGoal`. `MyceliumGuardian` (Monster, 60 de vida, duerme hasta que le atacan o rompes nodos: `wake`; nube de esporas `AreaEffectCloud`, raíces; luz → debilidad; `die` → `Mycelium.onGuardianDefeated` calma la red). Estado de cada red en `MyceliumNetworks.State` (WILD/CALM/TAMED, guardado como `state`): CALM no crece; TAMED solo se agarra a roca/tierra (`veinStateAt(..., naturalOnly)`) y sus tejedores atacan monstruos. `item/MyceliumHeartItem` (`useOn` sobre un nodo → `Mycelium.tame`). Huevos: `ModItems.createSpawnEgg` (`SpawnEggItem(type, c1, c2, props)` hasta 1.21.1; `Properties.spawnEgg(type)` + textura propia en 1.21.11, `items/*_spawn_egg.json` → `*_icon`). Los tipos se crean al pedirlos (`ModEntities.sporeling()`...) porque en Forge/NeoForge los objetos se registran antes que las entidades. En el self-test del cliente el mundo es pacífico (pon `difficulty normal` para monstruos).
 - `research` también saca JSON de datos y recursos vanilla (loot tables, modelos) de los jars del juego.
 - Fuentes decompiladas desde la CI: `gh api -X POST repos/HCuadrado428/stormroot/actions/workflows/research.yml/dispatches`
   con `inputs[classes]` y `inputs[pattern]` (workflow `research`).
-- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 54 comprobaciones; cliente con
-  un jugador en pantalla virtual: 18 más, incluidas las de Bloomberto y las del cielo).
+- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 57 comprobaciones; cliente con
+  un jugador en pantalla virtual: 19 más, incluidas las de Bloomberto y las del cielo).
 - En el self-test, el clima se lee de `server.getWorldData().overworldData()`: `level.isRaining()/isThundering()` son la
   intensidad visual, que sube tick a tick. Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.
 - **Self-test** (`selftest/SelfTest`, `client/ClientSelfTest`, `scripts/selftest.sh`, job `selftest` de la CI): cuando
