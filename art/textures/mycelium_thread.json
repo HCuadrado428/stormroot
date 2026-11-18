@@ -1,0 +1,33 @@
+{
+  "size": [
+    16,
+    16
+  ],
+  "palette": {
+    ".": "transparent",
+    "o": "#2f3a24",
+    "d": "#7f8f60",
+    "g": "#a9ba86",
+    "G": "#cdd9ae",
+    "L": "#e6efcf",
+    "w": "#fbffee"
+  },
+  "rows": [
+    "................",
+    "................",
+    "......oooo......",
+    "....ooLwLGoo....",
+    "...oLwGdLGgdo...",
+    "...oLGdLGgdgo...",
+    "..oLGdLGgdGgdo..",
+    "..oGdLGgdGgdgo..",
+    "..odLGgdGgdgdo..",
+    "..oLGgdGgdgddo..",
+    "...oGgdGgdgdo...",
+    "...ogdGgdgddo...",
+    "....oodgddoo.o..",
+    "......oooo..oGo.",
+    ".......oGGooGo..",
+    "........oooo...."
+  ]
+}

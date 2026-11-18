@@ -20,6 +20,8 @@ public final class ModItems {
     public static Item RAINBOW_SHARD;
     /** Esporas: las sueltan los nodos de la red de micelio (ingrediente, más adelante). */
     public static Item SPORES;
+    /** Hilo de micelio: lo sueltan los tejedores (3 hilos → 2 de cuerda). */
+    public static Item MYCELIUM_THREAD;
     /** Gafas de arena: protegen de la tormenta de arena. */
     public static Item SAND_GOGGLES;
 

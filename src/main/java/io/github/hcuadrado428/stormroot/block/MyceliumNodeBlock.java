@@ -23,6 +23,17 @@ public class MyceliumNodeBlock extends Block {
         Mycelium.nodeTick(level, pos, random);
     }
 
+    /** Romper un nodo enfada a los tejedores de alrededor. */
+    @Override
+    public void playerDestroy(Level level, net.minecraft.world.entity.player.Player player, BlockPos pos, BlockState state,
+                              net.minecraft.world.level.block.entity.BlockEntity blockEntity,
+                              net.minecraft.world.item.ItemStack tool) {
+        super.playerDestroy(level, player, pos, state, blockEntity, tool);
+        if (level instanceof ServerLevel server) {
+            Mycelium.onNodeBroken(server, pos, player);
+        }
+    }
+
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         if (random.nextInt(3) == 0) {

@@ -61,6 +61,7 @@ final class MyceliumSelfTest {
         checkLight(level);
         checkBrokenNode(level);
         checkSporeling(level);
+        checkWeaver(level);
         checkMistRules();
         checkLoot(level);
         checkCodec(level);
@@ -196,6 +197,43 @@ final class MyceliumSelfTest {
                 && !io.github.hcuadrado428.stormroot.entity.Sporeling.scaredOfLight(level, at);
         SelfTest.check("sporelings live on the network", spawned && health == 6.0F && fed && scared,
                 "aparece=" + spawned + ", vida=" + health + ", alimenta la red=" + fed + ", huye de la luz=" + scared);
+    }
+
+    /** Tejedor: aparece, repara la red y sus golpes enredan (lentitud). */
+    private void checkWeaver(ServerLevel level) {
+        BlockPos at = tunnel(10, FLOOR + 1);
+        if (!Mycelium.isVein(level.getBlockState(at))) {
+            level.setBlock(at, Mycelium.veinStateAt(level, at), Block.UPDATE_CLIENTS);
+        }
+        io.github.hcuadrado428.stormroot.entity.Weaver weaver =
+                Mycelium.spawn(io.github.hcuadrado428.stormroot.entity.ModEntities.WEAVER, level, at);
+        boolean spawned = weaver != null;
+        float health = spawned ? weaver.getMaxHealth() : 0;
+        boolean repaired = false;
+        boolean entangled = false;
+        if (spawned) {
+            Mycelium.setAnywhereForTest(true);
+            try {
+                for (int i = 0; i < 30 && !repaired; i++) {
+                    repaired = weaver.repairNear(level);
+                }
+            } finally {
+                Mycelium.setAnywhereForTest(false);
+            }
+            net.minecraft.world.entity.Entity victim = Mycelium.spawnSporeling(level, tunnel(8, FLOOR + 1));
+            if (victim instanceof net.minecraft.world.entity.LivingEntity living) {
+                io.github.hcuadrado428.stormroot.entity.Weaver.entangle(living);
+                //? if >=1.21.11 {
+                entangled = living.hasEffect(net.minecraft.world.effect.MobEffects.SLOWNESS);
+                //?} else {
+                /*entangled = living.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+                *///?}
+                victim.discard();
+            }
+            weaver.discard();
+        }
+        SelfTest.check("weavers repair the network and entangle", spawned && health == 16.0F && repaired && entangled,
+                "aparece=" + spawned + ", vida=" + health + ", repara=" + repaired + ", enreda=" + entangled);
     }
 
     /** Reglas: humedad y niebla aceleran, la sequía para; respirar la bruma 30 s marea. */

@@ -30,6 +30,7 @@ public final class ClientSelfTest {
     private static int stageStart;
     private static boolean done;
     private static long windPushesBefore;
+    private static volatile int weaverAngry = -1;
     private static long nextFrontId = 10_000;
     /** Captura pendiente: se coloca la cámara, se espera a que se dibuje y se avisa al script (que hace la captura). */
     private static String pendingShot;
@@ -305,7 +306,38 @@ public final class ClientSelfTest {
                 }
             }
             case 73 -> {
+                // Un tejedor delante; en supervivencia, "rompes" un nodo a su lado: tiene que ir a por ti.
                 mc.options.hideGui = false;
+                weaverAngry = -1;
+                server.execute(() -> {
+                    net.minecraft.commands.CommandSourceStack src = server.createCommandSourceStack().withSuppressedOutput();
+                    server.getCommands().performPrefixedCommand(src, "kill @e[type=stormroot:sporeling]");
+                    server.getCommands().performPrefixedCommand(src, "gamemode survival @a");
+                    server.getCommands().performPrefixedCommand(src, "execute as @a at @s run summon stormroot:weaver ~3 ~ ~");
+                    net.minecraft.server.level.ServerPlayer sp = server.getPlayerList().getPlayers().get(0);
+                    weaverAngry = io.github.hcuadrado428.stormroot.mycel.Mycelium.onNodeBroken(server.overworld(),
+                            sp.blockPosition(), sp);
+                });
+                stage = 74;
+                stageStart = ticks;
+            }
+            case 74 -> {
+                long frames = io.github.hcuadrado428.stormroot.client.entity.WeaverModel.frames;
+                if ((frames > 0 && weaverAngry >= 0 && waited > 60) || waited > 400) {
+                    SelfTest.report("weaver is drawn and defends the network", frames > 0 && weaverAngry > 0,
+                            "fotogramas=" + frames + ", tejedores enfadados=" + weaverAngry);
+                    stage = 75;
+                    stageStart = ticks;
+                    requestShot(mc, "tejedor", -90f, 30f);
+                }
+            }
+            case 75 -> {
+                mc.options.hideGui = false;
+                server.execute(() -> {
+                    net.minecraft.commands.CommandSourceStack src = server.createCommandSourceStack().withSuppressedOutput();
+                    server.getCommands().performPrefixedCommand(src, "kill @e[type=stormroot:weaver]");
+                    server.getCommands().performPrefixedCommand(src, "gamemode creative @a");
+                });
                 finish(mc);
             }
             case 20 -> {

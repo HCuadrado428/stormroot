@@ -241,6 +241,7 @@ public final class Mycelium {
                 continue;
             }
             maybeSpawnSporeling(level, player, random);
+            maybeSpawnWeaver(level, player, random);
             for (int i = 0; i < BIRTH_TRIES; i++) {
                 if (random.nextDouble() >= BIRTH_CHANCE) {
                     continue;
@@ -278,17 +279,63 @@ public final class Mycelium {
         }
     }
 
-    /** Hace aparecer un esporín en {@code pos} si cabe y está a oscuras. */
-    public static Entity spawnSporeling(ServerLevel level, BlockPos pos) {
+    /** Tejedores como mucho a 32 bloques de un jugador. */
+    public static final int MAX_WEAVERS = 2;
+    private static final double WEAVER_CHANCE = 0.05;
+    /** Radio en el que los tejedores se enteran de que rompes un nodo. */
+    public static final int WEAVER_ALERT = 16;
+
+    /** Un tejedor aparece a veces sobre un hilo cerca de un nodo (nunca con sequía). */
+    private static void maybeSpawnWeaver(ServerLevel level, ServerPlayer player, RandomSource random) {
+        AABB around = player.getBoundingBox().inflate(32);
+        if (level.getEntities(ModEntities.WEAVER, around, e -> true).size() >= MAX_WEAVERS) {
+            return;
+        }
+        for (int i = 0; i < 4; i++) {
+            BlockPos pos = player.blockPosition().offset(random.nextInt(49) - 24, random.nextInt(17) - 8, random.nextInt(49) - 24);
+            if (!level.isLoaded(pos) || !isVein(level.getBlockState(pos)) || !nodeNear(level, pos, 6)) {
+                continue;
+            }
+            SeepageCell cell = SeepageSavedData.get(level.getServer()).field().get(pos.getX() >> 4, pos.getZ() >> 4);
+            if (cell != null && cell.deep() < MyceliumRules.DRY_AT) {
+                return;
+            }
+            if (random.nextDouble() < WEAVER_CHANCE && spawn(ModEntities.WEAVER, level, pos) != null) {
+                return;
+            }
+        }
+    }
+
+    /** Has roto un nodo: los tejedores de alrededor van a por ti. Devuelve cuántos se enfadan. */
+    public static int onNodeBroken(ServerLevel level, BlockPos pos, net.minecraft.world.entity.player.Player player) {
+        if (player.isCreative() || player.isSpectator()) {
+            return 0;
+        }
+        int angry = 0;
+        for (io.github.hcuadrado428.stormroot.entity.Weaver weaver : level.getEntities(ModEntities.WEAVER,
+                new AABB(pos).inflate(WEAVER_ALERT), e -> true)) {
+            weaver.setTarget(player);
+            angry++;
+        }
+        return angry;
+    }
+
+    /** Hace aparecer un habitante en {@code pos} si cabe y está a oscuras. */
+    public static <T extends Entity> T spawn(net.minecraft.world.entity.EntityType<T> type, ServerLevel level, BlockPos pos) {
         if (MyceliumRules.scaredBy(level.getBrightness(LightLayer.BLOCK, pos))
                 || !level.getBlockState(pos.above()).getCollisionShape(level, pos.above()).isEmpty()) {
             return null;
         }
         //? if >=1.21.2 {
-        return ModEntities.SPORELING.spawn(level, pos, net.minecraft.world.entity.EntitySpawnReason.NATURAL);
+        return type.spawn(level, pos, net.minecraft.world.entity.EntitySpawnReason.NATURAL);
         //?} else {
-        /*return ModEntities.SPORELING.spawn(level, pos, net.minecraft.world.entity.MobSpawnType.NATURAL);
+        /*return type.spawn(level, pos, net.minecraft.world.entity.MobSpawnType.NATURAL);
         *///?}
+    }
+
+    /** Hace aparecer un esporín en {@code pos} si cabe y está a oscuras. */
+    public static Entity spawnSporeling(ServerLevel level, BlockPos pos) {
+        return spawn(ModEntities.SPORELING, level, pos);
     }
 
     /** Nace una red con su primer nodo en el suelo de {@code air}, si se dan las condiciones. */

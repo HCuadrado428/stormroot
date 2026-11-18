@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "stormroot:mycelium_thread",
+    "stormroot:mycelium_thread",
+    "stormroot:mycelium_thread"
+  ],
+  "result": {
+    "id": "minecraft:string",
+    "count": 2
+  }
+}

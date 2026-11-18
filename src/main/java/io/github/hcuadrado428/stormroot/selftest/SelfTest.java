@@ -193,7 +193,8 @@ public final class SelfTest {
                 && ModBlocks.LIGHTNING_ROOT != null && ModBlocks.WEATHERVANE_ITEM != null && ModBlocks.BAROMETER_ITEM != null
                 && ModBlocks.LIGHTNING_ROOT_ITEM != null && ModBlocks.MYCELIUM_VEIN != null && ModBlocks.MYCELIUM_NODE != null
                 && ModBlocks.MYCELIUM_NODE_ITEM != null && ModItems.SPORES != null && ModBlocks.FROST_ICE != null && ModBlocks.SAND_LAYER != null && ModItems.SAND_GOGGLES != null
-                && io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING != null;
+                && io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING != null
+                && io.github.hcuadrado428.stormroot.entity.ModEntities.WEAVER != null && ModItems.MYCELIUM_THREAD != null;
         check("registries", ok, "algún item o bloque es null");
     }
 

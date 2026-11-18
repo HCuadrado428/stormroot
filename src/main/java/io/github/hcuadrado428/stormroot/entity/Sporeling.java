@@ -17,11 +17,8 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.PanicGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
-import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.phys.Vec3;
 
 /**
  * Esporín: bichito pasivo de la red de micelio. Corretea por los hilos, huye de los jugadores y de la luz, se queda
@@ -45,7 +42,7 @@ public class Sporeling extends PathfinderMob {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new DormantGoal());
         this.goalSelector.addGoal(2, new PanicGoal(this, 1.5));
-        this.goalSelector.addGoal(3, new FleeLightGoal());
+        this.goalSelector.addGoal(3, new io.github.hcuadrado428.stormroot.entity.goal.FleeLightGoal(this, 1.3));
         this.goalSelector.addGoal(4, new AvoidEntityGoal<>(this, Player.class, 6.0F, 1.0, 1.4));
         this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.8));
         this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
@@ -80,7 +77,7 @@ public class Sporeling extends PathfinderMob {
     }
 
     public static boolean scaredOfLight(Level level, BlockPos pos) {
-        return MyceliumRules.scaredBy(level.getBrightness(LightLayer.BLOCK, pos));
+        return io.github.hcuadrado428.stormroot.entity.goal.FleeLightGoal.scaredOfLight(level, pos);
     }
 
     /** Con la sequía se queda quieto, como un cascarón. */
@@ -97,41 +94,6 @@ public class Sporeling extends PathfinderMob {
         @Override
         public void start() {
             Sporeling.this.getNavigation().stop();
-        }
-    }
-
-    /** Si le da la luz de una antorcha, busca un sitio oscuro cerca. */
-    private final class FleeLightGoal extends Goal {
-        private Vec3 target;
-
-        FleeLightGoal() {
-            this.setFlags(EnumSet.of(Goal.Flag.MOVE));
-        }
-
-        @Override
-        public boolean canUse() {
-            Sporeling self = Sporeling.this;
-            if (!scaredOfLight(self.level(), self.blockPosition())) {
-                return false;
-            }
-            for (int i = 0; i < 10; i++) {
-                Vec3 pos = DefaultRandomPos.getPos(self, 10, 4);
-                if (pos != null && !scaredOfLight(self.level(), BlockPos.containing(pos))) {
-                    target = pos;
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        @Override
-        public boolean canContinueToUse() {
-            return !Sporeling.this.getNavigation().isDone();
-        }
-
-        @Override
-        public void start() {
-            Sporeling.this.getNavigation().moveTo(target.x, target.y, target.z, 1.3);
         }
     }
 }
