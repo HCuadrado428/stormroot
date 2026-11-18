@@ -35,5 +35,6 @@
   "item.stormroot.spores": "Esporas",
   "block.stormroot.frost_ice": "Hielo de helada",
   "block.stormroot.sand_layer": "Capa de arena",
-  "item.stormroot.sand_goggles": "Gafas de arena"
+  "item.stormroot.sand_goggles": "Gafas de arena",
+  "entity.stormroot.sporeling": "Esporín"
 }

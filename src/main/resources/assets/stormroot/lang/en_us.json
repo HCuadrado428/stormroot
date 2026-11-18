@@ -35,5 +35,6 @@
   "item.stormroot.spores": "Spores",
   "block.stormroot.frost_ice": "Frost Ice",
   "block.stormroot.sand_layer": "Sand Layer",
-  "item.stormroot.sand_goggles": "Sand Goggles"
+  "item.stormroot.sand_goggles": "Sand Goggles",
+  "entity.stormroot.sporeling": "Sporeling"
 }

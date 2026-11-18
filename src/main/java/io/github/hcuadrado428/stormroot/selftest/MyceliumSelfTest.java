@@ -60,6 +60,7 @@ final class MyceliumSelfTest {
         checkGrowth(level);
         checkLight(level);
         checkBrokenNode(level);
+        checkSporeling(level);
         checkMistRules();
         checkLoot(level);
         checkCodec(level);
@@ -166,6 +167,35 @@ final class MyceliumSelfTest {
         SelfTest.check("breaking a node kills its part of the network",
                 aliveBefore == 0 && killed == 3 && otherKilled == 0 && otherAlive && deadGone,
                 "antes=" + aliveBefore + ", muertos=" + killed + ", del otro nodo=" + otherKilled + ", el otro vive=" + otherAlive);
+    }
+
+    /** Esporín: aparece sobre un hilo a oscuras, alimenta la red y le asusta la luz. */
+    private void checkSporeling(ServerLevel level) {
+        BlockPos at = tunnel(9, FLOOR + 1);
+        if (!Mycelium.isVein(level.getBlockState(at))) {
+            level.setBlock(at, Mycelium.veinStateAt(level, at), Block.UPDATE_CLIENTS);
+        }
+        net.minecraft.world.entity.Entity entity = Mycelium.spawnSporeling(level, at);
+        boolean spawned = entity instanceof io.github.hcuadrado428.stormroot.entity.Sporeling;
+        boolean fed = false;
+        float health = 0;
+        if (spawned) {
+            io.github.hcuadrado428.stormroot.entity.Sporeling sporeling = (io.github.hcuadrado428.stormroot.entity.Sporeling) entity;
+            health = sporeling.getMaxHealth();
+            Mycelium.setAnywhereForTest(true);
+            try {
+                for (int i = 0; i < 30 && !fed; i++) {
+                    fed = sporeling.feedNetwork(level);
+                }
+            } finally {
+                Mycelium.setAnywhereForTest(false);
+            }
+            entity.discard();
+        }
+        boolean scared = io.github.hcuadrado428.stormroot.entity.Sporeling.scaredOfLight(level, new BlockPos(bx + 8, FLOOR + 1, bz + 8))
+                && !io.github.hcuadrado428.stormroot.entity.Sporeling.scaredOfLight(level, at);
+        SelfTest.check("sporelings live on the network", spawned && health == 6.0F && fed && scared,
+                "aparece=" + spawned + ", vida=" + health + ", alimenta la red=" + fed + ", huye de la luz=" + scared);
     }
 
     /** Reglas: humedad y niebla aceleran, la sequía para; respirar la bruma 30 s marea. */

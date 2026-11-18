@@ -79,6 +79,9 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
         MinecraftForge.EVENT_BUS.addListener(Stormroot::onServerTick);
         MinecraftForge.EVENT_BUS.addListener(Stormroot::onRegisterCommands);
         MinecraftForge.EVENT_BUS.addListener(Stormroot::onEntityJoin);
+        modBus.addListener((net.minecraftforge.event.entity.EntityAttributeCreationEvent e) -> e.put(
+                io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING,
+                io.github.hcuadrado428.stormroot.entity.Sporeling.createAttributes().build()));
         StormrootNetwork.init();
         if (FMLEnvironment.dist == Dist.CLIENT) {
             StormrootClient.register();
@@ -88,6 +91,9 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
     }
 
     private static void onRegister(RegisterEvent event) {
+        event.register(Registries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING_ID),
+                () -> io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING =
+                        io.github.hcuadrado428.stormroot.entity.ModEntities.createSporeling());
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.WEATHERVANE_ID),
                 () -> ModBlocks.WEATHERVANE = ModBlocks.createWeathervane());
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.BAROMETER_ID),
@@ -180,14 +186,20 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
         NeoForge.EVENT_BUS.addListener(Stormroot::onServerTick);
         NeoForge.EVENT_BUS.addListener(Stormroot::onRegisterCommands);
         NeoForge.EVENT_BUS.addListener(Stormroot::onEntityJoin);
+        modBus.addListener((net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent e) -> e.put(
+                io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING,
+                io.github.hcuadrado428.stormroot.entity.Sporeling.createAttributes().build()));
         if (dist.isClient()) {
-            StormrootClient.register();
+            StormrootClient.register(modBus);
         }
         Compat.initBloomberto(ModList.get().isLoaded("bloomberto"), dist.isClient());
         LOGGER.info("Stormroot cargado en NeoForge");
     }
 
     private static void onRegister(RegisterEvent event) {
+        event.register(Registries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING_ID),
+                () -> io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING =
+                        io.github.hcuadrado428.stormroot.entity.ModEntities.createSporeling());
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.WEATHERVANE_ID),
                 () -> ModBlocks.WEATHERVANE = ModBlocks.createWeathervane());
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.BAROMETER_ID),
@@ -297,6 +309,12 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 ModIds.id(ModBlocks.SAND_LAYER_ID), ModBlocks.createSandLayer());
         ModItems.LIGHTNING_CRYSTAL = Registry.register(BuiltInRegistries.ITEM,
                 ModIds.id("lightning_crystal"), ModItems.create("lightning_crystal"));
+        io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING = Registry.register(BuiltInRegistries.ENTITY_TYPE,
+                ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING_ID),
+                io.github.hcuadrado428.stormroot.entity.ModEntities.createSporeling());
+        net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(
+                io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING,
+                io.github.hcuadrado428.stormroot.entity.Sporeling.createAttributes());
         ModItems.HAILSTONE = Registry.register(BuiltInRegistries.ITEM, ModIds.id("hailstone"), ModItems.create("hailstone"));
         ModBlocks.WEATHERVANE_ITEM = Registry.register(BuiltInRegistries.ITEM, ModIds.id(ModBlocks.WEATHERVANE_ID),
                 ModBlocks.createBlockItem(ModBlocks.WEATHERVANE_ID, ModBlocks.WEATHERVANE));

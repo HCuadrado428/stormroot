@@ -284,8 +284,28 @@ public final class ClientSelfTest {
                 }
             }
             case 71 -> {
+                // Un esporín delante del jugador: tiene que dibujarse con su modelo.
                 mc.options.hideGui = false;
                 clear(server);
+                server.execute(() -> server.getCommands().performPrefixedCommand(
+                        server.createCommandSourceStack().withSuppressedOutput(),
+                        "execute as @a at @s run summon stormroot:sporeling ~3 ~ ~"));
+                mc.player.setYRot(-90f);
+                mc.player.setXRot(30f);
+                stage = 72;
+                stageStart = ticks;
+            }
+            case 72 -> {
+                long frames = io.github.hcuadrado428.stormroot.client.entity.SporelingModel.frames;
+                if ((frames > 0 && waited > 60) || waited > 400) {
+                    SelfTest.report("sporeling is drawn on the client", frames > 0, "fotogramas=" + frames);
+                    stage = 73;
+                    stageStart = ticks;
+                    requestShot(mc, "esporin", -90f, 30f);
+                }
+            }
+            case 73 -> {
+                mc.options.hideGui = false;
                 finish(mc);
             }
             case 20 -> {
