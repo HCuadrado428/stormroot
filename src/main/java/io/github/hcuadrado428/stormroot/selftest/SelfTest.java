@@ -573,8 +573,15 @@ public final class SelfTest {
     }
 
     private static void floodCave(ServerLevel level) {
-        // 400 rondas; si el azar no ha dado musgo (1 de cada 6 intentos en roca), hasta 400 más.
-        for (int i = 0; i < 800 && (i < 400 || cell.count(SeepageCell.Kind.MOSS) == 0); i++) {
+        // Primero con niebla y humedad media (barro y musgo, sin charcos): así los charcos no se quedan con toda la roca
+        // antes de que el azar dé musgo (1 de cada 6 intentos). Después, empapada: 400 rondas.
+        cell.setFoggyForTest(true);
+        for (int i = 0; i < 400 && cell.count(SeepageCell.Kind.MOSS) == 0; i++) {
+            cell.set((SeepageTicker.FOG_MOSS_AT + SeepageTicker.PUDDLE_AT) / 2);
+            SeepageTicker.applyEffectsForTest(level, CX, CZ, cell, 256);
+        }
+        cell.setFoggyForTest(false);
+        for (int i = 0; i < 400; i++) {
             cell.set(1);
             SeepageTicker.applyEffectsForTest(level, CX, CZ, cell, 256);
         }

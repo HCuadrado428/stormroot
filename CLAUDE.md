@@ -143,14 +143,14 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   desde 1.21.2 (`setupAnim(state)`); renderer `MobRenderer<E, M>` / `MobRenderer<E, S, M>` con `createRenderState`.
   Registro: Fabric `EntityModelLayerRegistry` + `EntityRendererRegistry`; Forge/NeoForge `EntityRenderersEvent`
   (`StormrootClient.register(modBus)` en NeoForge). Aparición propia (no por bioma) en `Mycelium.maybeSpawnSporeling`
-  con `EntityType.spawn(level, pos, EntitySpawnReason/MobSpawnType)`. Sin huevos de generación aún (`/summon stormroot:sporeling`).
-  Plan: tejedores (neutrales, reparan la red) y guardián de micelio (mob fuerte, sin barra de jefe; al vencerlo la red
+  con `EntityType.spawn(level, pos, EntitySpawnReason/MobSpawnType)`. `Weaver` (tejedor, neutral: `RepairGoal` teje la red, `HurtByTargetGoal`, golpes con lentitud: `doHurtTarget(ServerLevel, Entity)` desde 1.21.2, `MobEffects.SLOWNESS` en 1.21.11 / `MOVEMENT_SLOWDOWN` antes; romper un nodo → `MyceliumNodeBlock.playerDestroy` → `Mycelium.onNodeBroken`). Objetivo común `entity/goal/FleeLightGoal`. Sin huevos de generación aún (`/summon stormroot:sporeling`, `stormroot:weaver`).
+  Plan: guardián de micelio (mob fuerte, sin barra de jefe; al vencerlo la red
   se calma; da el corazón de micelio para domesticar redes).
 - `research` también saca JSON de datos y recursos vanilla (loot tables, modelos) de los jars del juego.
 - Fuentes decompiladas desde la CI: `gh api -X POST repos/HCuadrado428/stormroot/actions/workflows/research.yml/dispatches`
   con `inputs[classes]` y `inputs[pattern]` (workflow `research`).
-- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 53 comprobaciones; cliente con
-  un jugador en pantalla virtual: 17 más, incluidas las de Bloomberto y las del cielo).
+- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 54 comprobaciones; cliente con
+  un jugador en pantalla virtual: 18 más, incluidas las de Bloomberto y las del cielo).
 - En el self-test, el clima se lee de `server.getWorldData().overworldData()`: `level.isRaining()/isThundering()` son la
   intensidad visual, que sube tick a tick. Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.
 - **Self-test** (`selftest/SelfTest`, `client/ClientSelfTest`, `scripts/selftest.sh`, job `selftest` de la CI): cuando

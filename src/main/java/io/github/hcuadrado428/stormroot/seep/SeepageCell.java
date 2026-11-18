@@ -148,6 +148,11 @@ public final class SeepageCell {
     /** Hubo niebla encima en la última actualización (no se guarda). */
     private transient boolean foggy;
 
+    /** Para el self-test: niebla encima sin pasar por {@link #update}. */
+    public void setFoggyForTest(boolean value) {
+        foggy = value;
+    }
+
     public boolean foggy() {
         return foggy;
     }
