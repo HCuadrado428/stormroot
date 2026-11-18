@@ -97,7 +97,11 @@ final class FrostSelfTest {
     /** Con helada el trigo no crece (salvo con luz cerca); sin ella, sí. */
     private void checkCrops(ServerLevel level) {
         RandomSource random = RandomSource.create(5);
+        int startAge = level.getBlockState(crop()).getValue(CropBlock.AGE);
+        // Otras pruebas (monzón) dan ticks de más a los cultivos de la zona: se empieza con trigo recién plantado.
+        level.setBlock(crop(), Blocks.WHEAT.defaultBlockState(), Block.UPDATE_CLIENTS);
         Frost.forceForTest(true);
+        boolean stops = Frost.stopsGrowth(level, crop());
         for (int i = 0; i < 300; i++) {
             BlockState state = level.getBlockState(crop());
             state.randomTick(level, crop(), random);
@@ -110,7 +114,8 @@ final class FrostSelfTest {
             state.randomTick(level, crop(), random);
         }
         int thawedAge = level.getBlockState(crop()).getValue(CropBlock.AGE);
-        SelfTest.check("frost stops crops unless there is light", frozenAge == 0 && thawedAge > 0 && lightHelps,
-                "edad con helada=" + frozenAge + ", sin helada=" + thawedAge + ", con luz crece=" + lightHelps);
+        SelfTest.check("frost stops crops unless there is light", frozenAge == 0 && thawedAge > frozenAge && lightHelps,
+                "edad al empezar=" + startAge + ", para=" + stops + ", bloque=" + level.getBlockState(crop()).getBlock().getClass().getName()
+                        + ", edad con helada=" + frozenAge + ", sin helada=" + thawedAge + ", con luz crece=" + lightHelps);
     }
 }

@@ -217,6 +217,7 @@ public final class ClientSelfTest {
                 // Tormenta magnética encima, con una brújula en la mano: debe girar sin parar.
                 server.execute(io.github.hcuadrado428.stormroot.weather.Rainbows::clear);
                 spawnAt(server, FrontType.MAGNETIC_STORM, x, z);
+                mc.options.hideGui = false;
                 mc.player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,
                         new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.COMPASS));
                 stage = 66;
