@@ -110,6 +110,8 @@ final class MyceliumSelfTest {
         if (networks.networkAt(chunk) == 0) {
             networks.create(chunk);
         }
+        // El self-test se repite sobre el mismo mundo (tras reiniciar): la red empieza salvaje cada vez.
+        networks.setState(networks.networkAt(chunk), MyceliumNetworks.State.WILD);
         boolean calmed = Mycelium.onGuardianDefeated(level, node) && networks.stateAt(chunk) == MyceliumNetworks.State.CALM;
         boolean stopped;
         Mycelium.setAnywhereForTest(true);

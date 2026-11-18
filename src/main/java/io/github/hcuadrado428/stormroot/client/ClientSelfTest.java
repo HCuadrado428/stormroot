@@ -338,6 +338,8 @@ public final class ClientSelfTest {
                     net.minecraft.commands.CommandSourceStack src = server.createCommandSourceStack().withSuppressedOutput();
                     server.getCommands().performPrefixedCommand(src, "kill @e[type=stormroot:weaver]");
                     server.getCommands().performPrefixedCommand(src, "gamemode creative @a");
+                    // En pacífico los monstruos desaparecen al momento.
+                    server.getCommands().performPrefixedCommand(src, "difficulty normal");
                     server.getCommands().performPrefixedCommand(src, "execute as @a at @s run summon stormroot:mycelium_guardian ~5 ~ ~");
                 });
                 stage = 76;
@@ -356,6 +358,8 @@ public final class ClientSelfTest {
                 mc.options.hideGui = false;
                 server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput(),
                         "kill @e[type=stormroot:mycelium_guardian]"));
+                server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput(),
+                        "difficulty peaceful"));
                 finish(mc);
             }
             case 20 -> {
