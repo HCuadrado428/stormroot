@@ -40,8 +40,15 @@ final class FrostSelfTest {
         return new BlockPos(bx + 1, top + 1, bz + 6);
     }
 
+    /** Charco de "boca de cueva": con un saliente de piedra encima (llega luz del cielo de lado, pero no se ve el cielo). */
+    private BlockPos mouth() {
+        return new BlockPos(bx + 3, top, bz + 7);
+    }
+
     /** Fase 0: charcas y trigo (la luz del cielo necesita unos ticks). */
     void build(ServerLevel level) {
+        level.setBlock(mouth(), Blocks.WATER.defaultBlockState(), Block.UPDATE_CLIENTS);
+        level.setBlock(mouth().above(2), Blocks.STONE.defaultBlockState(), Block.UPDATE_ALL);
         level.setBlock(shallow(), Blocks.WATER.defaultBlockState(), Block.UPDATE_CLIENTS);
         level.setBlock(deep(), Blocks.WATER.defaultBlockState(), Block.UPDATE_CLIENTS);
         level.setBlock(deep().below(), Blocks.WATER.defaultBlockState(), Block.UPDATE_CLIENTS);
@@ -92,6 +99,16 @@ final class FrostSelfTest {
         boolean melted = level.getBlockState(shallow()).is(Blocks.WATER);
         SelfTest.check("frost freezes shallow water and melts it back", froze && deepStays && melted,
                 "se heló=" + froze + ", la honda no=" + deepStays + ", se derritió=" + melted);
+
+        Frost.forceForTest(true);
+        boolean cave = Frost.freezeCavePuddle(level, mouth()) && level.getBlockState(mouth()).is(ModBlocks.FROST_ICE);
+        boolean notOpenSky = !Frost.freezeCavePuddle(level, shallow());
+        Frost.forceForTest(false);
+        level.getBlockState(mouth()).randomTick(level, mouth(), RandomSource.create(4));
+        boolean caveMelted = level.getBlockState(mouth()).is(Blocks.WATER);
+        SelfTest.check("frost freezes puddles at cave mouths", cave && notOpenSky && caveMelted,
+                "boca de cueva=" + cave + ", a cielo abierto no=" + notOpenSky + ", se derritió=" + caveMelted
+                        + ", luz del cielo=" + level.getBrightness(net.minecraft.world.level.LightLayer.SKY, mouth().above()));
     }
 
     /** Con helada el trigo no crece (salvo con luz cerca); sin ella, sí. */

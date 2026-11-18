@@ -18,16 +18,26 @@ import net.minecraft.world.level.block.SnowLayerBlock;
 final class SandSelfTest {
     private final BlockPos sand;
     private final BlockPos planks;
+    private final int bx;
+    private final int bz;
+    private final int top;
 
     SandSelfTest(int bx, int bz, int top) {
         this.sand = new BlockPos(bx + 15, top, bz + 5);
         this.planks = new BlockPos(bx + 15, top, bz + 7);
+        this.bx = bx;
+        this.bz = bz;
+        this.top = top;
     }
 
     /** Fase 0: un bloque de arena y uno de tablones en la cima (la luz del cielo tarda unos ticks). */
     void build(ServerLevel level) {
         level.setBlock(sand, Blocks.SAND.defaultBlockState(), Block.UPDATE_CLIENTS);
         level.setBlock(planks, Blocks.OAK_PLANKS.defaultBlockState(), Block.UPDATE_CLIENTS);
+        // Un trozo de "desierto" en la cima para el fósil (x +9..+13, z +13..+15).
+        for (BlockPos pos : BlockPos.betweenClosed(bx + 9, top, bz + 13, bx + 13, top, bz + 15)) {
+            level.setBlock(pos, Blocks.SAND.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
     }
 
     void run(ServerLevel level) {
@@ -36,6 +46,11 @@ final class SandSelfTest {
         } finally {
             Sandstorms.forceForTest(null);
         }
+        int bones = Sandstorms.uncoverFossil(level, new BlockPos(bx + 11, top, bz + 14), true, RandomSource.create(2));
+        boolean spine = level.getBlockState(new BlockPos(bx + 11, top, bz + 14)).is(Blocks.BONE_BLOCK);
+        int onStone = Sandstorms.uncoverFossil(level, new BlockPos(bx + 4, top, bz + 2), true, RandomSource.create(2));
+        SelfTest.check("sandstorms uncover fossils in the sand", bones >= 5 && spine && onStone == 0,
+                "huesos=" + bones + ", columna=" + spine + ", sobre piedra=" + onStone);
         boolean blind = Sandstorms.blinds(0.8, true, false, 0.05) && !Sandstorms.blinds(0.8, true, true, 0.05)
                 && !Sandstorms.blinds(0.8, false, false, 0.05) && !Sandstorms.blinds(0.3, true, false, 0.05);
         SelfTest.check("sand blinds only without goggles", blind, "regla de la ceguera mal");

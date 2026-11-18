@@ -47,7 +47,7 @@ public final class ModEntities {
 
     public static EntityType<MyceliumGuardian> createGuardian() {
         EntityType.Builder<MyceliumGuardian> builder = EntityType.Builder.of(MyceliumGuardian::new, MobCategory.MONSTER)
-                .sized(1.4F, 2.4F).clientTrackingRange(10);
+                .sized(1.6F, 2.4F).clientTrackingRange(10);
         //? if >=1.21.2 {
         return builder.build(ResourceKey.create(Registries.ENTITY_TYPE, ModIds.id(GUARDIAN_ID)));
         //?} else {

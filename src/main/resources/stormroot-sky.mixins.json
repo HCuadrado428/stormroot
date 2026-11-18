@@ -5,7 +5,8 @@
   "compatibilityLevel": "JAVA_17",
   "client": [
     "OptionsCloudsMixin",
-    "MagneticCompassMixin"
+    "MagneticCompassMixin",
+    "FogColorMixin"
   ],
   "injectors": {
     "defaultRequire": 1

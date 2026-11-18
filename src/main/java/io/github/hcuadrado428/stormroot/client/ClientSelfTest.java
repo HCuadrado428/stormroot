@@ -275,16 +275,21 @@ public final class ClientSelfTest {
             }
             case 70 -> {
                 // Tormenta de arena encima de un bioma templado: muro marrón en el cielo y calima (polvo fino).
-                if ((SkyRenderer.dustCells() > 0 && ClientWeather.sandParticles > 0 && waited > 200) || waited > 700) {
+                ClientWeather.sandForcedForTest = 0.8;
+                if ((SkyRenderer.dustCells() > 0 && ClientWeather.sandParticles > 0 && ClientWeather.sandFogFrames() > 0
+                        && waited > 200) || waited > 700) {
                     SelfTest.report("sandstorm wall and calima on the client",
                             SkyRenderer.dustCells() > 0 && ClientWeather.sandParticles > 0,
                             "celdas de arena=" + SkyRenderer.dustCells() + ", partículas=" + ClientWeather.sandParticles);
+                    SelfTest.report("sandstorm fog turns brown", ClientWeather.sandFogFrames() > 0,
+                            "fotogramas con niebla marrón=" + ClientWeather.sandFogFrames());
                     stage = 71;
                     stageStart = ticks;
                     requestShot(mc, "tormenta_de_arena", 0f, -10f);
                 }
             }
             case 71 -> {
+                ClientWeather.sandForcedForTest = -1;
                 // Un esporín delante del jugador: tiene que dibujarse con su modelo.
                 mc.options.hideGui = false;
                 clear(server);

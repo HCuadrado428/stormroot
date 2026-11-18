@@ -45,19 +45,19 @@ public class MyceliumGuardianModel extends net.minecraft.client.model.EntityMode
         MeshDefinition mesh = new MeshDefinition();
         PartDefinition parts = mesh.getRoot();
         parts.addOrReplaceChild("body", CubeListBuilder.create().texOffs(0, 0)
-                .addBox(-6.0F, -14.0F, -4.0F, 12.0F, 14.0F, 8.0F), PartPose.offset(0.0F, 14.0F, 0.0F));
-        PartDefinition head = parts.addOrReplaceChild("head", CubeListBuilder.create().texOffs(40, 0)
+                .addBox(-7.0F, -14.0F, -5.0F, 14.0F, 14.0F, 10.0F), PartPose.offset(0.0F, 14.0F, 0.0F));
+        PartDefinition head = parts.addOrReplaceChild("head", CubeListBuilder.create().texOffs(48, 0)
                 .addBox(-5.0F, -8.0F, -4.0F, 10.0F, 8.0F, 8.0F), PartPose.offset(0.0F, 0.0F, 0.0F));
-        head.addOrReplaceChild("cap", CubeListBuilder.create().texOffs(0, 22)
+        head.addOrReplaceChild("cap", CubeListBuilder.create().texOffs(0, 24)
                 .addBox(-8.0F, -12.0F, -8.0F, 16.0F, 4.0F, 16.0F), PartPose.ZERO);
-        parts.addOrReplaceChild("left_arm", CubeListBuilder.create().texOffs(76, 0)
-                .addBox(-2.0F, -2.0F, -2.0F, 4.0F, 16.0F, 4.0F), PartPose.offset(8.0F, 2.0F, 0.0F));
-        parts.addOrReplaceChild("right_arm", CubeListBuilder.create().texOffs(76, 0).mirror()
-                .addBox(-2.0F, -2.0F, -2.0F, 4.0F, 16.0F, 4.0F), PartPose.offset(-8.0F, 2.0F, 0.0F));
-        parts.addOrReplaceChild("left_leg", CubeListBuilder.create().texOffs(92, 0)
-                .addBox(-2.5F, 0.0F, -2.5F, 5.0F, 10.0F, 5.0F), PartPose.offset(3.0F, 14.0F, 0.0F));
-        parts.addOrReplaceChild("right_leg", CubeListBuilder.create().texOffs(92, 0).mirror()
-                .addBox(-2.5F, 0.0F, -2.5F, 5.0F, 10.0F, 5.0F), PartPose.offset(-3.0F, 14.0F, 0.0F));
+        parts.addOrReplaceChild("left_arm", CubeListBuilder.create().texOffs(84, 0)
+                .addBox(-2.5F, -2.0F, -2.5F, 5.0F, 16.0F, 5.0F), PartPose.offset(9.5F, 2.0F, 0.0F));
+        parts.addOrReplaceChild("right_arm", CubeListBuilder.create().texOffs(84, 0).mirror()
+                .addBox(-2.5F, -2.0F, -2.5F, 5.0F, 16.0F, 5.0F), PartPose.offset(-9.5F, 2.0F, 0.0F));
+        parts.addOrReplaceChild("left_leg", CubeListBuilder.create().texOffs(104, 0)
+                .addBox(-2.5F, 0.0F, -2.5F, 5.0F, 10.0F, 5.0F), PartPose.offset(3.5F, 14.0F, 0.0F));
+        parts.addOrReplaceChild("right_leg", CubeListBuilder.create().texOffs(104, 0).mirror()
+                .addBox(-2.5F, 0.0F, -2.5F, 5.0F, 10.0F, 5.0F), PartPose.offset(-3.5F, 14.0F, 0.0F));
         return LayerDefinition.create(mesh, 128, 64);
     }
 

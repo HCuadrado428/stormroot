@@ -81,6 +81,14 @@ public final class Frost {
             if (!freezingAt(level, player.blockPosition())) {
                 continue;
             }
+            // Charcos de cueva cerca de la boca (llega algo de luz del cielo, pero no se ve el cielo).
+            for (int i = 0; i < TRIES; i++) {
+                BlockPos pos = player.blockPosition().offset(random.nextInt(33) - 16, random.nextInt(17) - 8,
+                        random.nextInt(33) - 16);
+                if (level.isLoaded(pos)) {
+                    freezeCavePuddle(level, pos);
+                }
+            }
             for (int i = 0; i < TRIES; i++) {
                 BlockPos column = player.blockPosition().offset(random.nextInt(RANGE * 2 + 1) - RANGE, 0,
                         random.nextInt(RANGE * 2 + 1) - RANGE);
@@ -89,6 +97,25 @@ public final class Frost {
                 }
             }
         }
+    }
+
+    /** En las cuevas, solo los charcos de la boca: hasta allí llega el frío de la noche. */
+    public static final int CAVE_MOUTH_SKY_LIGHT = 6;
+
+    /** Congela un charco poco hondo de una cueva, cerca de la boca (con luz del cielo, pero sin ver el cielo). */
+    public static boolean freezeCavePuddle(ServerLevel level, BlockPos pos) {
+        FluidState fluid = level.getFluidState(pos);
+        if (!level.getBlockState(pos).is(Blocks.WATER) || !fluid.isSource()) {
+            return false;
+        }
+        BlockPos above = pos.above();
+        if (!level.getBlockState(above).isAir() || level.canSeeSky(above)
+                || level.getBrightness(LightLayer.SKY, above) < CAVE_MOUTH_SKY_LIGHT
+                || level.getFluidState(pos.below()).isSource() || level.getBlockState(pos.below()).isAir()) {
+            return false;
+        }
+        level.setBlock(pos, ModBlocks.FROST_ICE.defaultBlockState(), Block.UPDATE_ALL);
+        return true;
     }
 
     /** Congela {@code pos} si es agua quieta de un bloque de hondo, con aire encima y a cielo abierto. */

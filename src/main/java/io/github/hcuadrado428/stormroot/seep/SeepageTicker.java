@@ -659,7 +659,9 @@ public final class SeepageTicker {
         cell.changes().remove(index);
         BlockState state = level.getBlockState(pos);
         boolean unchanged = switch (change.kind()) {
-            case PUDDLE, POOL -> state.is(Blocks.WATER) && level.getFluidState(pos).isSource();
+            // Un charco helado por la helada sigue siendo "su" charco: al secarse vuelve al material de antes.
+            case PUDDLE, POOL -> (state.is(Blocks.WATER) && level.getFluidState(pos).isSource())
+                    || state.is(io.github.hcuadrado428.stormroot.registry.ModBlocks.FROST_ICE);
             case MUD -> state.is(Blocks.MUD);
             case MOSS -> state.is(Blocks.MOSS_BLOCK);
             case CRACKED -> state.is(Blocks.COARSE_DIRT);

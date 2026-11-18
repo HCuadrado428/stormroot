@@ -106,6 +106,34 @@ public final class ClientWeather {
         return sandHere;
     }
 
+    /** Marrón de la arena para la niebla (0–1 por canal). */
+    public static final float SAND_RED = 0.66F;
+    public static final float SAND_GREEN = 0.50F;
+    public static final float SAND_BLUE = 0.32F;
+    private static long sandFogFrames;
+
+    /** Cuánto se tiñe la niebla de marrón (0–1): fuerte en la tormenta, menos con gafas. */
+    public static float sandFogTint() {
+        double sand = sandForcedForTest >= 0 ? sandForcedForTest : sandHere;
+        return (float) Math.min(0.85, sand * 1.2);
+    }
+
+    /** Para el self-test (el mundo de pruebas no es desierto): fuerza la arena de la niebla; -1 = normal. */
+    public static volatile double sandForcedForTest = -1;
+
+    public static float tint(float base, float target, float t) {
+        return base * (1 - t) + target * t;
+    }
+
+    public static void markSandFog() {
+        sandFogFrames++;
+    }
+
+    /** Fotogramas con la niebla teñida de arena (para el self-test). */
+    public static long sandFogFrames() {
+        return sandFogFrames;
+    }
+
     public static boolean wearsGoggles(LocalPlayer player) {
         return player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD)
                 .is(io.github.hcuadrado428.stormroot.registry.ModItems.SAND_GOGGLES);

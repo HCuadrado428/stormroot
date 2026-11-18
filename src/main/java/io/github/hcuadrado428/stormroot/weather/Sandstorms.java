@@ -12,7 +12,10 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -35,6 +38,8 @@ public final class Sandstorms {
     /** Probabilidad por segundo de ceguera en el centro mirando contra el viento. */
     public static final double BLIND_CHANCE = 0.12;
     public static final int BLIND_TICKS = 50;
+    /** Probabilidad por segundo, en el centro de la tormenta, de que el viento destape un fósil cerca. */
+    public static final double FOSSIL_CHANCE = 0.003;
     private static final int INTERVAL = 20;
     private static final int RANGE = 24;
     private static final int TRIES = 12;
@@ -87,6 +92,13 @@ public final class Sandstorms {
                     addLayer(level, level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, column));
                 }
             }
+            if (intensity >= CORE_AT && random.nextDouble() < FOSSIL_CHANCE) {
+                BlockPos column = player.blockPosition().offset(random.nextInt(49) - 24, 0, random.nextInt(49) - 24);
+                if (level.isLoaded(column) && BiomeClimate.isDry(level, column)) {
+                    uncoverFossil(level, level.getHeightmapPos(Heightmap.Types.WORLD_SURFACE, column).below(),
+                            random.nextBoolean(), random);
+                }
+            }
             if (intensity >= CORE_AT && level.canSeeSky(BlockPos.containing(player.getEyePosition()))) {
                 FrontSimulation sim = FrontTicker.simulationIfRunning();
                 double angle = sim == null ? 0 : sim.windAngle();
@@ -121,6 +133,40 @@ public final class Sandstorms {
             return false;
         }
         level.setBlock(pos, ModBlocks.SAND_LAYER.defaultBlockState(), Block.UPDATE_ALL);
+        return true;
+    }
+
+    /**
+     * El viento se lleva la arena de encima de un fósil: una columna de huesos (5–7 bloques) con costillas, a ras del
+     * suelo. Solo sustituye arena natural a cielo abierto. Devuelve cuántos bloques de hueso ha puesto.
+     */
+    public static int uncoverFossil(ServerLevel level, BlockPos surface, boolean alongX, RandomSource random) {
+        int length = 5 + random.nextInt(3);
+        Direction.Axis spine = alongX ? Direction.Axis.X : Direction.Axis.Z;
+        Direction.Axis rib = alongX ? Direction.Axis.Z : Direction.Axis.X;
+        int placed = 0;
+        for (int i = 0; i < length; i++) {
+            int along = i - length / 2;
+            BlockPos p = alongX ? surface.offset(along, 0, 0) : surface.offset(0, 0, along);
+            placed += placeBone(level, p, spine) ? 1 : 0;
+            if (i % 2 == 1 && i < length - 1) {
+                int ribLength = 1 + random.nextInt(2);
+                for (int r = 1; r <= ribLength; r++) {
+                    BlockPos left = alongX ? p.offset(0, 0, r) : p.offset(r, 0, 0);
+                    BlockPos right = alongX ? p.offset(0, 0, -r) : p.offset(-r, 0, 0);
+                    placed += placeBone(level, left, rib) ? 1 : 0;
+                    placed += placeBone(level, right, rib) ? 1 : 0;
+                }
+            }
+        }
+        return placed;
+    }
+
+    private static boolean placeBone(ServerLevel level, BlockPos pos, Direction.Axis axis) {
+        if (!level.isLoaded(pos) || !level.getBlockState(pos).is(BlockTags.SAND) || !level.canSeeSky(pos.above())) {
+            return false;
+        }
+        level.setBlock(pos, Blocks.BONE_BLOCK.defaultBlockState().setValue(RotatedPillarBlock.AXIS, axis), Block.UPDATE_ALL);
         return true;
     }
 
