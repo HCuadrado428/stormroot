@@ -19,6 +19,10 @@ public final class WorldSettings {
     public static volatile boolean lightningRoots = true;
     /** El granizo puede romper cristal a la intemperie. */
     public static volatile boolean hailBreaksGlass = true;
+    /** El viento desvía flechas, tridentes, bolas de nieve... (modo "suave"). */
+    public static volatile boolean windProjectiles = true;
+    /** ...también los que disparan los jugadores (apagado = modo "sin jugadores", para servidores de PvP). */
+    public static volatile boolean windPlayerShots = true;
 
     private WorldSettings() {
     }
@@ -30,6 +34,8 @@ public final class WorldSettings {
         map.put("cave_changes", caveChanges);
         map.put("lightning_roots", lightningRoots);
         map.put("hail_breaks_glass", hailBreaksGlass);
+        map.put("wind_projectiles", windProjectiles);
+        map.put("wind_player_shots", windPlayerShots);
         return map;
     }
 
@@ -40,6 +46,8 @@ public final class WorldSettings {
             case "cave_changes" -> caveChanges = value;
             case "lightning_roots" -> lightningRoots = value;
             case "hail_breaks_glass" -> hailBreaksGlass = value;
+            case "wind_projectiles" -> windProjectiles = value;
+            case "wind_player_shots" -> windPlayerShots = value;
             default -> {
                 return false;
             }
@@ -52,5 +60,7 @@ public final class WorldSettings {
         caveChanges = true;
         lightningRoots = true;
         hailBreaksGlass = true;
+        windProjectiles = true;
+        windPlayerShots = true;
     }
 }

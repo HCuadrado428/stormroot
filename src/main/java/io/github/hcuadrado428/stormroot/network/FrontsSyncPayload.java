@@ -40,6 +40,8 @@ public final class FrontsSyncPayload /*? if >=1.20.5 {*/ implements CustomPacket
     /** Arcoíris cerca del jugador. */
     private final List<io.github.hcuadrado428.stormroot.sky.Rainbow> rainbows;
     private static final int MAX_RAINBOWS = 8;
+    /** Bits de los ajustes del viento: 1 = desvía proyectiles, 2 = también los de los jugadores. */
+    private final int windFlags;
 
     public FrontsSyncPayload(boolean controlsWeather, double windAngle, float seep, long skySeed, List<WeatherFront> fronts) {
         this(controlsWeather, windAngle, seep, skySeed, fronts, List.of());
@@ -47,6 +49,8 @@ public final class FrontsSyncPayload /*? if >=1.20.5 {*/ implements CustomPacket
 
     public FrontsSyncPayload(boolean controlsWeather, double windAngle, float seep, long skySeed, List<WeatherFront> fronts,
                              List<io.github.hcuadrado428.stormroot.sky.Rainbow> rainbows) {
+        this.windFlags = (io.github.hcuadrado428.stormroot.config.StormrootConfig.windProjectilesActive() ? 1 : 0)
+                | (io.github.hcuadrado428.stormroot.config.StormrootConfig.windPlayerShotsActive() ? 2 : 0);
         this.rainbows = new ArrayList<>(rainbows.subList(0, Math.min(rainbows.size(), MAX_RAINBOWS)));
         this.controlsWeather = controlsWeather;
         this.windAngle = windAngle;
@@ -83,6 +87,7 @@ public final class FrontsSyncPayload /*? if >=1.20.5 {*/ implements CustomPacket
             this.rainbows.add(new io.github.hcuadrado428.stormroot.sky.Rainbow(buf.readLong(), buf.readDouble(), buf.readDouble(),
                     buf.readDouble(), buf.readDouble(), buf.readLong(), buf.readLong()));
         }
+        this.windFlags = buf.readByte();
     }
 
     public void write(FriendlyByteBuf buf) {
@@ -112,6 +117,7 @@ public final class FrontsSyncPayload /*? if >=1.20.5 {*/ implements CustomPacket
             buf.writeLong(rainbow.startTick());
             buf.writeLong(rainbow.endTick());
         }
+        buf.writeByte(windFlags);
     }
 
     public List<io.github.hcuadrado428.stormroot.sky.Rainbow> rainbows() {
@@ -126,6 +132,7 @@ public final class FrontsSyncPayload /*? if >=1.20.5 {*/ implements CustomPacket
     public static void handleOnClient(FrontsSyncPayload payload) {
         ClientFronts.accept(payload.controlsWeather, payload.windAngle, payload.seep, payload.skySeed, payload.fronts);
         ClientFronts.acceptRainbows(payload.rainbows);
+        ClientFronts.acceptWind((payload.windFlags & 1) != 0, (payload.windFlags & 2) != 0);
     }
 
     //? if >=1.20.5 {

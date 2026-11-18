@@ -36,6 +36,22 @@ public final class ClientFronts {
     }
 
     private static final List<io.github.hcuadrado428.stormroot.sky.Rainbow> RAINBOWS = new ArrayList<>();
+    private static volatile boolean windProjectiles = true;
+    private static volatile boolean windPlayerShots = true;
+
+    /** Ajustes del viento del servidor (para empujar los proyectiles igual que él). */
+    public static void acceptWind(boolean projectiles, boolean playerShots) {
+        windProjectiles = projectiles;
+        windPlayerShots = playerShots;
+    }
+
+    public static boolean windProjectiles() {
+        return windProjectiles;
+    }
+
+    public static boolean windPlayerShots() {
+        return windPlayerShots;
+    }
 
     public static synchronized void acceptRainbows(List<io.github.hcuadrado428.stormroot.sky.Rainbow> rainbows) {
         RAINBOWS.clear();

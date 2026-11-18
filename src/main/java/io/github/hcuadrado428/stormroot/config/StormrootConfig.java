@@ -37,6 +37,10 @@ public final class StormrootConfig {
      */
     /** El granizo puede romper cristal y paneles de cristal normales a la intemperie. */
     public static volatile BooleanSupplier hailBreaksGlass = () -> true;
+    /** El viento desvía proyectiles (con Bloomberto; se combina con el ajuste del mundo {@code wind_projectiles}). */
+    public static volatile BooleanSupplier windProjectiles = () -> true;
+    /** El viento desvía también los disparos de los jugadores ({@code wind_player_shots}). */
+    public static volatile BooleanSupplier windPlayerShots = () -> true;
     public static volatile BooleanSupplier customClouds = ClientSettingsFile::customClouds;
     /** Sombra de las nubes en el suelo. Sin Bloomberto: {@code cloud_shadows} en {@code config/stormroot-client.properties}. */
     public static volatile BooleanSupplier cloudShadows = ClientSettingsFile::cloudShadows;
@@ -55,6 +59,16 @@ public final class StormrootConfig {
     /** El granizo rompe cristal: lo permiten la config (Bloomberto) y el ajuste del mundo. */
     public static boolean hailBreaksGlassActive() {
         return hailBreaksGlass.getAsBoolean() && WorldSettings.hailBreaksGlass;
+    }
+
+    /** El viento empuja proyectiles: config Y ajuste del mundo. */
+    public static boolean windProjectilesActive() {
+        return windProjectiles.getAsBoolean() && WorldSettings.windProjectiles;
+    }
+
+    /** ...también los de los jugadores. */
+    public static boolean windPlayerShotsActive() {
+        return windPlayerShots.getAsBoolean() && WorldSettings.windPlayerShots;
     }
 
     public static boolean caveChangesActive() {

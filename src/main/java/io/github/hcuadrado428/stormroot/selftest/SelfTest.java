@@ -175,6 +175,7 @@ public final class SelfTest {
                 run("hail hurts crops and glass and leaves hailstones", () -> checkHailGround(level));
                 run("mycelium network", () -> MYCELIUM.run(level));
                 run("frost and aurora", () -> FROST.run(level));
+                run("wind", WindSelfTest::run);
                 finish(server);
             }
             default -> {

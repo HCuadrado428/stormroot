@@ -86,6 +86,7 @@ public final class ClientWeather {
         spawnHail(level, player);
         spawnCaveParticles(level, player);
         spawnFrost(level, player);
+        ClientWind.tick(level, player);
     }
 
     /** ¿Hiela donde está el jugador? (mismas reglas que el servidor: {@code weather/Frost}). */

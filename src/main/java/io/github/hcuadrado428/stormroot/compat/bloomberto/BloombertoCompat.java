@@ -70,6 +70,10 @@ public final class BloombertoCompat {
                 "Nubes de Stormroot en vez de las vanilla (desactívalo si tu shader pack dibuja sus propias nubes)");
         ConfigValue<Boolean> hailGlass = b.defineBoolean("hail_breaks_glass", true,
                 "El granizo puede romper cristal y paneles de cristal normales a la intemperie");
+        ConfigValue<Boolean> windShots = b.defineBoolean("wind_projectiles", true,
+                "El viento desvía un poco las flechas, tridentes y bolas de nieve en tiros largos");
+        ConfigValue<Boolean> windPlayers = b.defineBoolean("wind_player_shots", true,
+                "El viento afecta también a lo que disparan los jugadores (apágalo en servidores de PvP)");
         ConfigValue<Boolean> shadows = b.defineBoolean("cloud_shadows", true,
                 "Sombra de las nubes de Stormroot en el suelo");
         ConfigValue<Boolean> hud = b.defineBoolean("weather_hud", false,
@@ -92,6 +96,8 @@ public final class BloombertoCompat {
         StormrootConfig.customClouds = clouds::get;
         StormrootConfig.cloudShadows = shadows::get;
         StormrootConfig.hailBreaksGlass = hailGlass::get;
+        StormrootConfig.windProjectiles = windShots::get;
+        StormrootConfig.windPlayerShots = windPlayers::get;
 
         if (client) {
             BloombertoClientCompat.init();

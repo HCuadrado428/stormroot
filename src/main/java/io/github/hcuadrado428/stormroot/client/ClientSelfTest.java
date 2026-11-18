@@ -29,6 +29,7 @@ public final class ClientSelfTest {
     private static int stage;
     private static int stageStart;
     private static boolean done;
+    private static long windPushesBefore;
     private static long nextFrontId = 10_000;
     /** Captura pendiente: se coloca la cámara, se espera a que se dibuje y se avisa al script (que hace la captura). */
     private static String pendingShot;
@@ -239,10 +240,36 @@ public final class ClientSelfTest {
                 }
             }
             case 67 -> {
+                // Viento: tormenta encima y unas flechas lanzadas; el viento tiene que empujarlas.
                 server.execute(() -> server.getCommands().performPrefixedCommand(
                         server.createCommandSourceStack().withSuppressedOutput(), "item replace entity @a weapon.mainhand with minecraft:air"));
-                clear(server);
-                finish(mc);
+                spawnAt(server, FrontType.THUNDERSTORM, x, z);
+                stage = 68;
+                stageStart = ticks;
+            }
+            case 68 -> {
+                if (ClientFronts.intensity(FrontType.THUNDERSTORM, x, z) > 0.3 || waited > 400) {
+                    windPushesBefore = io.github.hcuadrado428.stormroot.weather.Wind.pushes();
+                    server.execute(() -> {
+                        net.minecraft.commands.CommandSourceStack src = server.createCommandSourceStack().withSuppressedOutput();
+                        for (int i = 0; i < 4; i++) {
+                            server.getCommands().performPrefixedCommand(src,
+                                    "execute as @a at @s run summon minecraft:arrow ~ ~2 ~ {Motion:[0.0d,0.3d,1.5d]}");
+                        }
+                    });
+                    stage = 69;
+                    stageStart = ticks;
+                }
+            }
+            case 69 -> {
+                if (waited > 80) {
+                    long pushed = io.github.hcuadrado428.stormroot.weather.Wind.pushes() - windPushesBefore;
+                    double wind = ClientWind.here();
+                    SelfTest.report("wind pushes arrows in a storm", pushed > 0 && wind >= 0.5,
+                            "empujes=" + pushed + ", viento aquí=" + wind);
+                    clear(server);
+                    finish(mc);
+                }
             }
             case 20 -> {
                 clear(server);

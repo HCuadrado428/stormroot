@@ -6,7 +6,8 @@
   "mixins": [
     "BiomePrecipitationMixin",
     "LightningBoltFireMixin",
-    "CropFrostMixin"
+    "CropFrostMixin",
+    "ProjectileWindMixin"
   ],
   "injectors": {
     "defaultRequire": 1

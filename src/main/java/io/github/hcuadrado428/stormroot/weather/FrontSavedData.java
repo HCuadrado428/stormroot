@@ -62,7 +62,9 @@ public class FrontSavedData extends SavedData {
             Codec.BOOL.optionalFieldOf("seepage", true).forGetter(d -> d.seepage),
             Codec.BOOL.optionalFieldOf("cave_changes", true).forGetter(d -> d.caveChanges),
             Codec.BOOL.optionalFieldOf("lightning_roots", true).forGetter(d -> d.lightningRoots),
-            Codec.BOOL.optionalFieldOf("hail_breaks_glass", true).forGetter(d -> d.hailBreaksGlass)
+            Codec.BOOL.optionalFieldOf("hail_breaks_glass", true).forGetter(d -> d.hailBreaksGlass),
+            Codec.BOOL.optionalFieldOf("wind_projectiles", true).forGetter(d -> d.windProjectiles),
+            Codec.BOOL.optionalFieldOf("wind_player_shots", true).forGetter(d -> d.windPlayerShots)
     ).apply(i, FrontSavedData::new));
 
     //? if >=1.21.5 {
@@ -84,14 +86,16 @@ public class FrontSavedData extends SavedData {
     private boolean caveChanges;
     private boolean lightningRoots;
     private boolean hailBreaksGlass;
+    private boolean windProjectiles;
+    private boolean windPlayerShots;
 
     public FrontSavedData() {
-        this(new ArrayList<>(), 0.0, 1L, true, false, true, true, true, true);
+        this(new ArrayList<>(), 0.0, 1L, true, false, true, true, true, true, true, true);
     }
 
     private FrontSavedData(List<WeatherFront> fronts, double windAngle, long nextId, boolean controlsWeather,
                            boolean initialized, boolean seepage, boolean caveChanges, boolean lightningRoots,
-                           boolean hailBreaksGlass) {
+                           boolean hailBreaksGlass, boolean windProjectiles, boolean windPlayerShots) {
         this.fronts = new ArrayList<>(fronts);
         this.windAngle = windAngle;
         this.nextId = nextId;
@@ -101,6 +105,8 @@ public class FrontSavedData extends SavedData {
         this.caveChanges = caveChanges;
         this.lightningRoots = lightningRoots;
         this.hailBreaksGlass = hailBreaksGlass;
+        this.windProjectiles = windProjectiles;
+        this.windPlayerShots = windPlayerShots;
     }
 
     /** Datos guardados del Overworld (los crea vacíos si el mundo aún no tiene). */
@@ -126,6 +132,8 @@ public class FrontSavedData extends SavedData {
         this.caveChanges = WorldSettings.caveChanges;
         this.lightningRoots = WorldSettings.lightningRoots;
         this.hailBreaksGlass = WorldSettings.hailBreaksGlass;
+        this.windProjectiles = WorldSettings.windProjectiles;
+        this.windPlayerShots = WorldSettings.windPlayerShots;
         setDirty();
     }
 
@@ -139,6 +147,8 @@ public class FrontSavedData extends SavedData {
         WorldSettings.caveChanges = caveChanges;
         WorldSettings.lightningRoots = lightningRoots;
         WorldSettings.hailBreaksGlass = hailBreaksGlass;
+        WorldSettings.windProjectiles = windProjectiles;
+        WorldSettings.windPlayerShots = windPlayerShots;
         return true;
     }
 
