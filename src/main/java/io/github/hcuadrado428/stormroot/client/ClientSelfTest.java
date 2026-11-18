@@ -312,6 +312,8 @@ public final class ClientSelfTest {
                 server.execute(() -> {
                     net.minecraft.commands.CommandSourceStack src = server.createCommandSourceStack().withSuppressedOutput();
                     server.getCommands().performPrefixedCommand(src, "kill @e[type=stormroot:sporeling]");
+                    // Al suelo antes de pasar a supervivencia (si no, cae desde y=70 y muere).
+                    server.getCommands().performPrefixedCommand(src, "execute as @a at @s positioned over world_surface run tp @s ~ ~ ~");
                     server.getCommands().performPrefixedCommand(src, "gamemode survival @a");
                     server.getCommands().performPrefixedCommand(src, "execute as @a at @s run summon stormroot:weaver ~3 ~ ~");
                     net.minecraft.server.level.ServerPlayer sp = server.getPlayerList().getPlayers().get(0);
