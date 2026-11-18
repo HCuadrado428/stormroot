@@ -28,6 +28,8 @@ Primera versión jugable. Minecraft 1.20.1 (Fabric, Forge; también NeoForge 1.2
   vuelve a su sitio al irse.
 - **Aurora** de noche en biomas fríos (polvo de aurora) y **tormenta magnética** (instrumentos locos, roca magnetizada).
 - **Arcoíris** tras la lluvia, con un tesoro en su extremo (fragmento de arcoíris y esmeraldas).
+- **Tormenta de arena** en biomas secos: muro marrón en el cielo, capas de arena que se van, ceguera sin **gafas de
+  arena** (nuevo objeto) y calima anaranjada alrededor.
 - **Viento**: desvía un poco los tiros largos (nunca los de cerca), más con tormenta y nada bajo techo; empuja elytras y
   barcos. Ajustes `wind_projectiles` y `wind_player_shots` para servidores de PvP.
 - **Helada** en noches despejadas de biomas fríos y templados: hiela el agua poco honda y para los cultivos sin luz.

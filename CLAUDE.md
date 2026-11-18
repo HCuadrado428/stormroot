@@ -131,11 +131,16 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   proyectiles cambian de paquete en 1.21.11). Ajustes `wind_projectiles`/`wind_player_shots` en `WorldSettings`,
   `FrontSavedData`, Bloomberto y en el paquete (`windFlags`). Elytras y barcos (`AbstractBoat` en 1.21.11, `Boat` antes)
   en `ClientWind`.
+- **Tormenta de arena**: `FrontType.SANDSTORM` (solo `ClimateZone.DRY`), `CloudCover.Kind.DUST` (muro bajo en
+  `SkyRenderer`, `DUST_Y`; no llueve debajo: `SkyWeather.noRainCloudAt`), `CloudCover.calima` (nubes anaranjadas y polvo
+  fuera de los biomas secos), `weather/Sandstorms` (capas `block/SandLayerBlock` extiende `SnowLayerBlock`, se van en
+  sus ticks aleatorios; ceguera `MobEffects.BLINDNESS`), `item/SandGogglesItem` (`Equipable` hasta 1.21.1,
+  `Item.Properties.equippable(HEAD)` desde 1.21.2), niebla y arena en `ClientWeather.spawnSand`.
 - `research` también saca JSON de datos y recursos vanilla (loot tables, modelos) de los jars del juego.
 - Fuentes decompiladas desde la CI: `gh api -X POST repos/HCuadrado428/stormroot/actions/workflows/research.yml/dispatches`
   con `inputs[classes]` y `inputs[pattern]` (workflow `research`).
-- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 49 comprobaciones; cliente con
-  un jugador en pantalla virtual: 15 más, incluidas las de Bloomberto y las del cielo).
+- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 52 comprobaciones; cliente con
+  un jugador en pantalla virtual: 16 más, incluidas las de Bloomberto y las del cielo).
 - En el self-test, el clima se lee de `server.getWorldData().overworldData()`: `level.isRaining()/isThundering()` son la
   intensidad visual, que sube tick a tick. Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.
 - **Self-test** (`selftest/SelfTest`, `client/ClientSelfTest`, `scripts/selftest.sh`, job `selftest` de la CI): cuando
