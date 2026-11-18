@@ -90,7 +90,7 @@ public final class WeatherFront {
 
     /** Choques: se deshace ya (pasa a su último 10 % de vida, que se desvanece poco a poco). */
     public void fadeOut() {
-        ageSeconds = Math.max(ageSeconds, maxAgeSeconds * 0.9);
+        ageSeconds = Math.max(ageSeconds, maxAgeSeconds * 0.905);
     }
 
     /** Choques: vive {@code seconds} más (sin pasar de {@code maxTotal}). */
