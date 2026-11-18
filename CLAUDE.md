@@ -136,11 +136,21 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   fuera de los biomas secos), `weather/Sandstorms` (capas `block/SandLayerBlock` extiende `SnowLayerBlock`, se van en
   sus ticks aleatorios; ceguera `MobEffects.BLINDNESS`), `item/SandGogglesItem` (`Equipable` hasta 1.21.1,
   `Item.Properties.equippable(HEAD)` desde 1.21.2), niebla y arena en `ClientWeather.spawnSand`.
+- **Mobs** (`entity/`, primero: `Sporeling`, esporín de la red de micelio). Tipo en `entity/ModEntities`
+  (`EntityType.Builder.build(String)` hasta 1.21.1, `build(ResourceKey)` desde 1.21.2); registro en `Stormroot.java`
+  (Fabric `Registry.register` + `FabricDefaultAttributeRegistry`; Forge/NeoForge `RegisterEvent` + `EntityAttributeCreationEvent`
+  en el bus del mod). Cliente en `client/entity/`: modelo `HierarchicalModel<E>` hasta 1.21.1 y `EntityModel<LivingEntityRenderState>`
+  desde 1.21.2 (`setupAnim(state)`); renderer `MobRenderer<E, M>` / `MobRenderer<E, S, M>` con `createRenderState`.
+  Registro: Fabric `EntityModelLayerRegistry` + `EntityRendererRegistry`; Forge/NeoForge `EntityRenderersEvent`
+  (`StormrootClient.register(modBus)` en NeoForge). Aparición propia (no por bioma) en `Mycelium.maybeSpawnSporeling`
+  con `EntityType.spawn(level, pos, EntitySpawnReason/MobSpawnType)`. Sin huevos de generación aún (`/summon stormroot:sporeling`).
+  Plan: tejedores (neutrales, reparan la red) y guardián de micelio (mob fuerte, sin barra de jefe; al vencerlo la red
+  se calma; da el corazón de micelio para domesticar redes).
 - `research` también saca JSON de datos y recursos vanilla (loot tables, modelos) de los jars del juego.
 - Fuentes decompiladas desde la CI: `gh api -X POST repos/HCuadrado428/stormroot/actions/workflows/research.yml/dispatches`
   con `inputs[classes]` y `inputs[pattern]` (workflow `research`).
-- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 52 comprobaciones; cliente con
-  un jugador en pantalla virtual: 16 más, incluidas las de Bloomberto y las del cielo).
+- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 53 comprobaciones; cliente con
+  un jugador en pantalla virtual: 17 más, incluidas las de Bloomberto y las del cielo).
 - En el self-test, el clima se lee de `server.getWorldData().overworldData()`: `level.isRaining()/isThundering()` son la
   intensidad visual, que sube tick a tick. Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.
 - **Self-test** (`selftest/SelfTest`, `client/ClientSelfTest`, `scripts/selftest.sh`, job `selftest` de la CI): cuando
