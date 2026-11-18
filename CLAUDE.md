@@ -125,11 +125,17 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
 - Brújulas en la tormenta magnética: `client/mixin/sky/MagneticCompassMixin` sobre `isValidCompassTargetPos`
   (`CompassItemPropertyFunction` hasta 1.21.1, `CompassAngleState` estático en 1.21.11) + `client/MagneticCompass`.
 - Aurora: `weather/AuroraCalm` impide el 80 % de los hostiles al aire libre de noche (junto a `LightningCrystals.onEntityAdded`).
+- **Viento**: `weather/WindRules` (Java pura: fuerza por frentes, resguardo, aceleración de proyectiles tras
+  `GRACE_TICKS`), `weather/Wind` (mundo; `Source` del servidor = simulación, del cliente = `client/ClientWind` con el
+  paquete) y `mixin/ProjectileWindMixin` (HEAD de `Projectile#tick`, ambos lados). Tipos por `EntityType` (las clases de
+  proyectiles cambian de paquete en 1.21.11). Ajustes `wind_projectiles`/`wind_player_shots` en `WorldSettings`,
+  `FrontSavedData`, Bloomberto y en el paquete (`windFlags`). Elytras y barcos (`AbstractBoat` en 1.21.11, `Boat` antes)
+  en `ClientWind`.
 - `research` también saca JSON de datos y recursos vanilla (loot tables, modelos) de los jars del juego.
 - Fuentes decompiladas desde la CI: `gh api -X POST repos/HCuadrado428/stormroot/actions/workflows/research.yml/dispatches`
   con `inputs[classes]` y `inputs[pattern]` (workflow `research`).
-- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 45 comprobaciones; cliente con
-  un jugador en pantalla virtual: 14 más, incluidas las de Bloomberto y las del cielo).
+- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 49 comprobaciones; cliente con
+  un jugador en pantalla virtual: 15 más, incluidas las de Bloomberto y las del cielo).
 - En el self-test, el clima se lee de `server.getWorldData().overworldData()`: `level.isRaining()/isThundering()` son la
   intensidad visual, que sube tick a tick. Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.
 - **Self-test** (`selftest/SelfTest`, `client/ClientSelfTest`, `scripts/selftest.sh`, job `selftest` de la CI): cuando
