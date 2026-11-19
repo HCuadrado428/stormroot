@@ -164,10 +164,12 @@ src/versioned/<versión>/  → recetas, loot tables y tags (su formato cambia en
 
 ## 🔜 Siguientes pasos
 
-1. **Revisión a ojo** de la ventisca, las cuevas de hielo, la ola de calor y la red de micelio; luego probarlo a ojo en el juego.
-2. **Revisión a ojo** de lo visual (ver "Pruebas dentro del juego") y **publicar la 0.1** (crear los proyectos en Modrinth/CurseForge y los secretos de la CI).
-3. **Texturas definitivas** (encargadas; guía en `stormroot-texturas`).
-4. Del diseño: más frentes (granizo, calor, polvo, ventisca, aurora), corrientes de aire y bolsas de gas, red de micelio, ruinas de los Tempestarios, más instrumentos, muestras y frascos, el jugador y el clima, fauna y flora, eventos raros y progresión.
+1. **Probarlo a ojo en el juego**: nubes, nieblas, partículas, mobs y texturas (ver "Pruebas dentro del juego").
+2. **Publicar la 0.1**: crear los proyectos en Modrinth y CurseForge, poner en GitHub los secretos `MODRINTH_TOKEN` y
+   `CURSEFORGE_TOKEN` y las variables `MODRINTH_ID`, `CURSEFORGE_ID` y `CURSEFORGE_SLUG`, y publicar una *release*
+   (la CI sube los jars sola).
+3. Del diseño, aún sin hacer: corrientes de aire y bolsas de gas, ruinas de los Tempestarios, más instrumentos,
+   muestras y frascos, el jugador y el clima, más fauna y flora, y progresión.
 
 ### Limitaciones conocidas de la 0.1
 - Los frentes solo existen en el **Overworld** (decisión de diseño: el Nether y el End no tienen clima).
