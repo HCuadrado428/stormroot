@@ -9,6 +9,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.AreaEffectCloud;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -81,9 +82,47 @@ public class MyceliumGuardian extends Monster {
         return FleeLightGoal.scaredOfLight(level, pos);
     }
 
+    /** Ticks que le quedan a la animación del golpe (como el gólem de hierro: el servidor la avisa con el evento 4). */
+    private int attackAnimationTick;
+
+    public int getAttackAnimationTick() {
+        return attackAnimationTick;
+    }
+
+    //? if >=1.21.2 {
+    @Override
+    public boolean doHurtTarget(ServerLevel level, Entity target) {
+        startAttackAnimation();
+        return super.doHurtTarget(level, target);
+    }
+    //?} else {
+    /*@Override
+    public boolean doHurtTarget(Entity target) {
+        startAttackAnimation();
+        return super.doHurtTarget(target);
+    }
+    *///?}
+
+    private void startAttackAnimation() {
+        this.attackAnimationTick = 10;
+        this.level().broadcastEntityEvent(this, (byte) 4);
+    }
+
+    @Override
+    public void handleEntityEvent(byte id) {
+        if (id == 4) {
+            this.attackAnimationTick = 10;
+        } else {
+            super.handleEntityEvent(id);
+        }
+    }
+
     @Override
     public void aiStep() {
         super.aiStep();
+        if (this.attackAnimationTick > 0) {
+            this.attackAnimationTick--;
+        }
         if (!(this.level() instanceof ServerLevel server)) {
             return;
         }

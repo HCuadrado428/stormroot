@@ -34,6 +34,10 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
 - Texturas: spec en `art/textures/<nombre>.json` → PNG en `src/main/resources/assets/stormroot/textures/...` con `texgen.py`.
   Mobs: `art/entity/make_mob_textures.py` (UV de caja de `client/entity/*Model.java`), `preview_mobs.py` (vista 3D)
   y `make_mob_bbmodels.py` (Blockbench). Si cambias la geometría de un modelo, cámbiala también en `preview_mobs.py`.
+  Los mobs copian la forma de mobs vanilla (piezas, pivotes y animación sacados de las fuentes, texturas propias):
+  esporín = creeper ×0,35, tejedora = araña ×0,7 con setas, guardián = gólem de hierro ×0,9 (golpe con el evento 4,
+  `MyceliumGuardianModel.State` en 1.21.2+). Brillo con `client/entity/GlowLayer` (`EyesLayer`; `RenderTypes.eyes` en
+  1.21.11, `RenderType.eyes` antes) y `textures/entity/*_glow.png`.
 - Mappings: **Mojang (official)** en todos los loaders. No usar Yarn.
 
 ## Comandos

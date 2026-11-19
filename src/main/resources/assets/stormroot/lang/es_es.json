@@ -37,11 +37,11 @@
   "block.stormroot.sand_layer": "Capa de arena",
   "item.stormroot.sand_goggles": "Gafas de arena",
   "entity.stormroot.sporeling": "Esporín",
-  "entity.stormroot.weaver": "Tejedor",
+  "entity.stormroot.weaver": "Tejedora",
   "item.stormroot.mycelium_thread": "Hilo de micelio",
   "entity.stormroot.mycelium_guardian": "Guardián de micelio",
   "item.stormroot.mycelium_heart": "Corazón de micelio",
   "item.stormroot.sporeling_spawn_egg": "Huevo de esporín",
-  "item.stormroot.weaver_spawn_egg": "Huevo de tejedor",
+  "item.stormroot.weaver_spawn_egg": "Huevo de tejedora",
   "item.stormroot.mycelium_guardian_spawn_egg": "Huevo de guardián de micelio"
 }

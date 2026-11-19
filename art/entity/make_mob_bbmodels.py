@@ -87,24 +87,8 @@ def build(name, parts, tex_path):
             "elements": elements, "outliner": outliner, "textures": [tex]}
 
 
-def named(parts, names):
-    for p, n in zip(parts, names):
-        p["name"] = n
-    return parts
-
-
 def models():
-    s = named(pm.sporeling(), ["body", "left_front", "right_front", "left_back", "right_back"])
-    s[0]["children"][0]["name"] = "cap"
-    w = pm.weaver()
-    leg_names = []
-    for i in range(3):
-        leg_names += [f"left_leg_{i}", f"right_leg_{i}"]
-    named(w, ["body", "head"] + leg_names)
-    w[1]["children"][0]["name"] = "cap"
-    g = named(pm.guardian(), ["body", "head", "left_arm", "right_arm", "left_leg", "right_leg"])
-    g[1]["children"][0]["name"] = "cap"
-    return {"sporeling": s, "weaver": w, "mycelium_guardian": g}
+    return {"sporeling": pm.sporeling(), "weaver": pm.weaver(), "mycelium_guardian": pm.guardian()}
 
 
 if __name__ == "__main__":

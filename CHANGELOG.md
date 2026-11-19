@@ -34,6 +34,10 @@ Primera versión jugable. Minecraft 1.20.1 (Fabric, Forge; también NeoForge 1.2
 - Guardián de micelio más robusto.
 - **Guardián de micelio**: defensor de las redes grandes; al vencerlo la red se calma y suelta el **corazón de micelio**,
   que domestica redes. **Huevos de generación** de esporín, tejedor y guardián.
+- Mobs rehechos sobre mobs vanilla: el esporín es un creeper en miniatura con sombrero de seta; la **tejedora** (antes
+  tejedor) es una araña del tamaño de la de cueva con setas por el cuerpo y ocho ojos verdes que brillan; el guardián es
+  un gólem de corteza con nariz de raíz, sombrero enorme y setas en los hombros, que golpea alzando los brazos. Ojos,
+  vetas y motas brillan a oscuras.
 - Texturas definitivas de los tres mobs: esporín con sombrero morado moteado y láminas, tejedor peludo con rombo
   en el lomo, cuatro ojos que brillan y patas a franjas, y guardián de corteza con vetas verdes desde el pecho,
   ojos hundidos, manos de raíz y un sombrero de seta rojiza con láminas.
