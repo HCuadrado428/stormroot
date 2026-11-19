@@ -32,6 +32,8 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
 - Bloques: `registry/ModBlocks` + `block/`. `FACING` es `EnumProperty<Direction>` desde 1.21.2 (`DirectionProperty` antes);
   interacción con `useWithoutItem` desde 1.20.5 (`use` en 1.20.1).
 - Texturas: spec en `art/textures/<nombre>.json` → PNG en `src/main/resources/assets/stormroot/textures/...` con `texgen.py`.
+  Mobs: `art/entity/make_mob_textures.py` (UV de caja de `client/entity/*Model.java`), `preview_mobs.py` (vista 3D)
+  y `make_mob_bbmodels.py` (Blockbench). Si cambias la geometría de un modelo, cámbiala también en `preview_mobs.py`.
 - Mappings: **Mojang (official)** en todos los loaders. No usar Yarn.
 
 ## Comandos

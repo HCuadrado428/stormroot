@@ -34,6 +34,9 @@ Primera versión jugable. Minecraft 1.20.1 (Fabric, Forge; también NeoForge 1.2
 - Guardián de micelio más robusto.
 - **Guardián de micelio**: defensor de las redes grandes; al vencerlo la red se calma y suelta el **corazón de micelio**,
   que domestica redes. **Huevos de generación** de esporín, tejedor y guardián.
+- Texturas definitivas de los tres mobs: esporín con sombrero morado moteado y láminas, tejedor peludo con rombo
+  en el lomo, cuatro ojos que brillan y patas a franjas, y guardián de corteza con vetas verdes desde el pecho,
+  ojos hundidos, manos de raíz y un sombrero de seta rojiza con láminas.
 - **Tejedores**: neutrales; reparan la red y te enredan si rompes nodos cerca. Sueltan **hilo de micelio**.
 - **Esporines**: el primer habitante de la red de micelio (pasivo; huye de la luz, duerme con la sequía, hace crecer la red).
 - Texturas mejoradas: gafas de arena, esporas, polvo de aurora, granizo, roca magnetizada y micelio.
@@ -74,4 +77,5 @@ Primera versión jugable. Minecraft 1.20.1 (Fabric, Forge; también NeoForge 1.2
 
 ### Para desarrolladores
 - Comandos de depuración `/stormroot front|here|seep`.
+- `art/entity/`: generador de las texturas de los mobs, vista previa 3D y modelos de Blockbench (`.bbmodel`).
 - Self-test dentro del juego (`-Dstormroot.selfTest=server|client|all`) que la CI ejecuta en los 6 targets.
