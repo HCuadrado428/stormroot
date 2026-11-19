@@ -389,30 +389,27 @@ Incluye **logros (advancements)** para cada paso y otros ocultos para eventos ra
 
 ---
 
-## 🚀 MVP (primera versión jugable)
-
-- [x] Simulación de **frentes** con 3 tipos: lluvia, tormenta eléctrica y niebla (núcleo, sin efectos visibles aún)
-- [x] Frentes que cambian el clima donde están (por zonas en el cliente)
-- [ ] Frentes que se ven llegar en el horizonte
-- [ ] **Veleta** y **barómetro**
-- [ ] **Filtración básica**: inundación de cuevas tras lluvia
-- [x] Item **Cristal de rayo**
-- [x] Cristal de rayo que se forma al caer un rayo
-- [ ] Raíces de rayo que crecen hacia abajo
-- [ ] 2 mobs: polilla de tormenta y medusa de cueva
-- [x] Comandos de depuración
-- [ ] Config básica
-- [x] Compila en los 6 targets · [ ] probado en el juego en los 6 (1.20.1 Fabric/Forge, 1.21.1 y 1.21.11 Fabric/NeoForge)
-
 ## 🗺️ Roadmap
 
-- **v0.1, "Primeras nubes"**: MVP
-- **v0.2, "Bajo la lluvia"**: charcos, estado empapado, capa, invernadero y contraventanas
-- **v0.3, "Raíces"**: red de micelio, guardianes, sequía y grietas
-- **v0.4, "Tempestarios"**: ruinas, tablillas y cuaderno completo
-- **v0.5, "Alquimia del cielo"**: muestras, frascos y destilador
-- **v0.6, "Todos los vientos"**: granizo, calor, polvo, ventisca, viento sobre proyectiles y paravela
-- **v1.0, "Domador de frentes"**: corazón de la red, aurora, faro climático y eventos raros
+Plan acordado el 19-11-2026: una actualización por tema (unas 4–6 semanas cada una), parches 0.X.Y solo con
+arreglos, una beta pública de al menos un mes antes de la 1.0 y las tres versiones de Minecraft actuales hasta la 1.0.
+Desde la 0.1, un mundo de una versión anterior siempre carga en la siguiente.
+
+| Versión | Nombre | Contenido |
+|---|---|---|
+| **0.1** | Primeras nubes | Lo que hay hoy (ver "Qué hay ya hecho"): se prueba a ojo y se publica |
+| **0.2** | Bajo la lluvia | Empapado y a cubierto, capa, botas de barro, gafas de niebla, campamento, canalones, invernadero, contraventanas |
+| **0.3** | Ojos en el cielo | Pluviómetro, catalejo, mapa sinóptico, campana de niebla, pararrayos tempestario, molino, cuaderno |
+| **0.4** | Alquimia del cielo | Muestras, frascos de clima, destilador y fallos útiles |
+| **0.5** | Bajo tierra | Corrientes de aire, bolsas de gas, estalactitas, cuevas inundadas, medusa, cangrejo, topo; la red oye el ruido |
+| **0.6** | Fauna y flora | Caracol, polilla, halcón, espectro de niebla, plantas del clima y bloques que cambian con él |
+| **0.7** | Tempestarios | Las 6 ruinas, tablillas, mecanismos y centinela |
+| **0.8** | Cielos raros | Tormenta perfecta, eclipse de niebla, erupción de esporas, gran sequía, noche de aurora |
+| **0.9** | Domador de frentes (beta) | Progresión y logros, faro climático, datapacks, ajustes por sistema, compatibilidades |
+| **1.0** | Domador de frentes | Sin funciones nuevas: probada, equilibrada, texturas definitivas, formatos congelados |
+
+Después: versiones 1.X con contenido que no rompe mundos; una 2.0 solo si hay que romper el guardado, los datapacks
+o la API.
 
 ---
 
