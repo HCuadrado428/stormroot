@@ -293,11 +293,14 @@ public final class ClientSelfTest {
                 // Un esporín delante del jugador: tiene que dibujarse con su modelo.
                 mc.options.hideGui = false;
                 clear(server);
-                server.execute(() -> server.getCommands().performPrefixedCommand(
-                        server.createCommandSourceStack().withSuppressedOutput(),
-                        "execute as @a at @s run summon stormroot:sporeling ~3 ~ ~"));
+                server.execute(() -> {
+                    net.minecraft.commands.CommandSourceStack src = server.createCommandSourceStack().withSuppressedOutput();
+                    // En el suelo y con el esporín a 3 bloques, para que la captura lo enseñe de cerca.
+                    server.getCommands().performPrefixedCommand(src, "execute as @a at @s positioned over world_surface run tp @s ~ ~1 ~");
+                    server.getCommands().performPrefixedCommand(src, "execute as @a at @s run summon stormroot:sporeling ~3 ~-1 ~");
+                });
                 mc.player.setYRot(-90f);
-                mc.player.setXRot(30f);
+                mc.player.setXRot(25f);
                 stage = 72;
                 stageStart = ticks;
             }
@@ -307,7 +310,7 @@ public final class ClientSelfTest {
                     SelfTest.report("sporeling is drawn on the client", frames > 0, "fotogramas=" + frames);
                     stage = 73;
                     stageStart = ticks;
-                    requestShot(mc, "esporin", -90f, 30f);
+                    requestShot(mc, "esporin", -90f, 25f);
                 }
             }
             case 73 -> {
@@ -347,7 +350,7 @@ public final class ClientSelfTest {
                     server.getCommands().performPrefixedCommand(src, "gamemode creative @a");
                     // En pacífico los monstruos desaparecen al momento.
                     server.getCommands().performPrefixedCommand(src, "difficulty normal");
-                    server.getCommands().performPrefixedCommand(src, "execute as @a at @s run summon stormroot:mycelium_guardian ~5 ~ ~");
+                    server.getCommands().performPrefixedCommand(src, "execute as @a at @s run summon stormroot:mycelium_guardian ~4 ~ ~");
                 });
                 stage = 76;
                 stageStart = ticks;
