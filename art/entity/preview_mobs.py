@@ -86,11 +86,11 @@ def collect(p, m, out):
         collect(ch, m, out)
 
 
-def render(parts, tex, yaw, scale):
+def render(parts, tex, yaw, scale, pitch=0.45):
     faces = []
     for p in parts:
         collect(p, translate(0, 0, 0), faces)
-    view = mat_mul(rx(0.45), ry(yaw))  # mirar un poco desde arriba
+    view = mat_mul(rx(pitch), ry(yaw))  # mirar un poco desde arriba
     quads = []
     for rect, m, o, eu, ev, mirror in faces:
         tx, ty, tw, th = rect
@@ -140,12 +140,11 @@ def shroom(name, size, x, y, z, tx, tz, stem_uv, cap_uv):
 
 
 def sporeling():
-    """Creeper en miniatura (mismas piezas que CreeperModel) con sombrero de seta."""
-    cap = part(boxes=[box(0, 32, -6, -10, -6, 12, 2, 12), box(0, 46, -4, -13, -4, 8, 3, 8)], name="cap")
-    leg = lambda n, x, z: part((x, 18, z), boxes=[box(0, 16, -2, 0, -2, 4, 6, 4)], name=n)
-    return [part((0, 6, 0), boxes=[box(0, 0, -4, -8, -4, 8, 8, 8)], children=[cap], name="head"),
-            part((0, 6, 0), boxes=[box(16, 16, -4, 0, -2, 8, 12, 4)], name="body"),
-            leg("right_hind_leg", -2, 4), leg("left_hind_leg", 2, 4), leg("right_front_leg", -2, -4), leg("left_front_leg", 2, -4)]
+    """Cuerpo 6×6×6 con sombrero de seta (ala y cúpula) y cuatro patitas."""
+    cap = part((0, -6, 0), boxes=[box(0, 12, -4, -2, -4, 8, 2, 8), box(8, 22, -3, -4, -3, 6, 2, 6)], name="cap")
+    leg = lambda n, x, z: part((x, 22, z), boxes=[box(0, 22, -0.5, 0, -0.5, 1, 2, 1)], name=n)
+    return [part((0, 22, 0), boxes=[box(0, 0, -3, -6, -3, 6, 6, 6)], children=[cap], name="body"),
+            leg("left_front", 2, -2), leg("right_front", -2, -2), leg("left_back", 2, 2), leg("right_back", -2, 2)]
 
 
 def weaver():
@@ -169,24 +168,21 @@ def weaver():
 
 
 def guardian():
-    """Gólem de hierro (IronGolemModel) de corteza, con sombrero y setas en los hombros."""
-    big = lambda n, x, z, tx, tz: part((x, -2, z), (tx, 0, tz), [box(108, 0, -1, -3, -1, 2, 3, 2), box(84, 0, -3, -5, -3, 6, 2, 6)], name=n)
-    small = lambda n, x, z, tx, tz: part((x, -2, z), (tx, 0, tz), [box(100, 10, -0.5, -2, -0.5, 1, 2, 1), box(84, 10, -2, -3, -2, 4, 1, 4)], name=n)
-    cap = part(boxes=[box(0, 90, -8, -14, -9.5, 16, 2, 16), box(64, 96, -5, -18, -6.5, 10, 4, 10)], name="cap")
-    return [part((0, -7, -2), boxes=[box(0, 0, -4, -12, -5.5, 8, 10, 8), box(24, 0, -1, -5, -7.5, 2, 4, 2)], children=[cap], name="head"),
-            part((0, -7, 0), boxes=[box(0, 40, -9, -2, -6, 18, 12, 11), box(0, 70, -4.5, 10, -3, 9, 5, 6)], name="body",
-                 children=[big("mushroom_shoulder", 6, -0.5, 0.05, 0.2), small("mushroom_shoulder_small", -6.5, 1, -0.1, -0.25),
-                           small("mushroom_back", 2.5, 3.5, 0.3, 0.1)]),
-            part((0, -7, 0), boxes=[box(60, 21, -13, -2.5, -3, 4, 30, 6)], name="right_arm"),
-            part((0, -7, 0), boxes=[box(60, 58, 9, -2.5, -3, 4, 30, 6)], name="left_arm"),
-            part((-4, 11, 0), boxes=[box(37, 0, -3.5, -3, -3, 6, 16, 5)], name="right_leg"),
-            part((5, 11, 0), boxes=[box(60, 0, -3.5, -3, -3, 6, 16, 5, True)], name="left_leg")]
+    """Seta gigante que anda: pie con cara y anillo, sombrero de tres pisos, brazos y patas de raíz."""
+    small = lambda n, x, y, z, tx, tz: part((x, y, z), (tx, 0, tz), [box(20, 82, -1, -3, -1, 2, 3, 2), box(28, 82, -3, -5, -3, 6, 2, 6)], name=n)
+    cap = part((0, -16, 0), boxes=[box(0, 0, -13, -4, -13, 26, 4, 26), box(0, 30, -10, -8, -10, 20, 4, 20), box(80, 30, -6, -11, -6, 12, 3, 12)],
+               children=[small("mushroom_brim", 11.5, -4, 0, 0, 0.15)], name="cap")
+    arm = lambda n, x, zr: part((x, -13, 0), (0, 0, zr), [box(96, 54, -2, -1, -2, 4, 13, 4), box(112, 54, -2, 12, -2, 2, 4, 2), box(112, 60, 0, 12, 0, 2, 3, 2)], name=n)
+    body = part((0, 18, 0), boxes=[box(0, 54, -6, -16, -5, 12, 16, 10), box(44, 54, -7, -7, -6, 14, 2, 12)],
+                children=[cap, small("mushroom_ring", 5.5, -7, 3, 0.15, 0.25), arm("right_arm", -8, 0.08), arm("left_arm", 8, -0.08)], name="body")
+    leg = lambda n, x: part((x, 18, 0), boxes=[box(0, 82, -2.5, 0, -2.5, 5, 6, 5)], name=n)
+    return [body, leg("right_leg", -3.5), leg("left_leg", 3.5)]
 
 
 if __name__ == "__main__":
     out = sys.argv[1] if len(sys.argv) > 1 else "/tmp/mobs_preview.png"
     rows = []
-    for name, model, scale in (("sporeling", sporeling(), 16), ("weaver", weaver(), 14), ("mycelium_guardian", guardian(), 8)):
+    for name, model, scale in (("sporeling", sporeling(), 26), ("weaver", weaver(), 14), ("mycelium_guardian", guardian(), 10)):
         tex = Image.open(os.path.join(TEX, name + ".png")).convert("RGBA")
         views = [render(model, tex, yaw, scale) for yaw in (0.6, -0.6, math.pi + 0.6)]
         w = sum(v.width for v in views) + 20 * (len(views) - 1)

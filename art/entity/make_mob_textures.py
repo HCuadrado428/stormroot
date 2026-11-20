@@ -1,8 +1,8 @@
 """Genera las texturas de los mobs de Stormroot y sus capas de brillo.
 
-- Esporín (sporeling.png, 64×64): distribución del creeper vanilla (cabeza, cuerpo, patas) + sombrero de seta abajo.
+- Esporín (sporeling.png, 32×32): cuerpo cúbico con sombrero de seta (ala y cúpula) y cuatro patitas.
 - Tejedora (weaver.png, 64×64): distribución de la araña vanilla + setas abajo.
-- Guardián de micelio (mycelium_guardian.png, 128×128): distribución del gólem de hierro + sombrero y setas.
+- Guardián de micelio (mycelium_guardian.png, 128×128): una seta gigante que anda (pie con cara, sombrero, raíces).
 - *_glow.png: lo que brilla a oscuras (ojos, vetas, motas), transparente en lo demás.
 
 Todo pintado de cero: solo se toma de vanilla la forma de las piezas (client/entity/*Model.java).
@@ -131,73 +131,71 @@ def mushroom_painter(t, cap, gills, stem, spot, seed, glow_spots=None):
     return cap_p, stem_p
 
 
-# ---------------------------------------------------------------------------------------------- esporín (creeper)
+# ---------------------------------------------------------------------------------------------- esporín
 def sporeling():
-    t = Tex(64, 64, 11)
+    """32×32: cuerpo 6×6×6 en (0, 0), ala del sombrero 8×2×8 en (0, 12), cúpula 6×2×6 en (8, 22), patas 1×2×1 en (0, 22)."""
+    t = Tex(32, 32, 11)
     n = Noise(3, 2)
-    skin = ramp("#e9f2c6", "#d6e4ab", "#bfd193", "#a6bb7b", "#8ba264", "#6f854f")
+    skin = ramp("#eef6cf", "#dde9b6", "#c8d99c", "#b0c483", "#95ab6a", "#7a8f54")
 
     def body(face, x, y, w, h, X, Y):
-        v = n.at(X, Y) * 0.55 + LIGHT[face] * 0.35 + (y / max(1, h - 1)) * 0.25 * (face != "top")
+        v = n.at(X, Y) * 0.4 + LIGHT[face] * 0.35 + (y / max(1, h - 1)) * 0.3 * (face not in ("top", "bottom"))
         c = pick(skin, v)
-        if face != "top" and face != "bottom" and y == h - 1:
-            c = pick(skin, v + 0.18)
+        if face in ("left", "right", "back") and (x * 5 + y * 3) % 11 == 0 and 0 < y < h - 1:
+            t.glow.putpixel((X, Y), hexc("#d8ffb4"))
+            return hexc("#f4ffe2")
         return c
 
-    t.box(0, 0, 8, 8, 8, body)                 # cabeza
-    t.box(16, 16, 8, 12, 4, body)              # cuerpo
-    leg = ramp("#a6bb7b", "#8ba264", "#6f854f", "#5a6d40")
-    t.box(0, 16, 4, 6, 4, lambda f, x, y, w, h, X, Y: pick(leg, y / h + n.at(X, Y) * 0.3 if f != "bottom" else 0.9))
+    fs = t.box(0, 0, 6, 6, 6, body)
+    fx, fy = fs["front"][0], fs["front"][1]
+    eye, white, blush, mouth = hexc("#1f2a17"), hexc("#ffffff"), hexc("#efb592"), hexc("#8a9f62")
+    for ex in (1, 4):
+        t.px(fx + ex, fy + 1, eye)
+        t.px(fx + ex, fy + 2, eye)
+        t.px(fx + ex + 1, fy + 2, eye)
+        t.px(fx + ex + 1, fy + 1, white)
+    t.px(fx + 0, fy + 3, blush)
+    t.px(fx + 5, fy + 3, blush)
+    t.px(fx + 2, fy + 4, mouth)
+    t.px(fx + 3, fy + 4, mouth)
 
-    # Cara (delante de la cabeza, 8×8 en (8, 8)): ojos grandes con brillo, mofletes y boquita.
-    fx, fy = 8, 8
-    eye, white, blush, mouth = hexc("#1f2a17"), hexc("#ffffff"), hexc("#e9b896"), hexc("#55663a")
-    for ex in (1, 5):
-        for dx in (0, 1):
-            for dy in (2, 3, 4):
-                t.px(fx + ex + dx, fy + dy, eye)
-        t.px(fx + ex, fy + 2, white)
-    t.px(fx + 0, fy + 5, blush)
-    t.px(fx + 7, fy + 5, blush)
-    for dx in (3, 4):
-        t.px(fx + dx, fy + 6, mouth)
-    # Motas de espora en el cuerpo, que brillan un poco.
-    for (X, Y) in ((22, 23), (25, 26), (20, 30), (27, 22), (35, 25), (38, 29)):
-        t.gl(X, Y, hexc("#c9f7a2"))
-
-    cap = ramp("#b28ccc", "#9670b2", "#7a5797", "#5f417a", "#4a3260")
-    spot, gill = hexc("#f4ffe0"), ramp("#efdec6", "#d5bf9f", "#b39b78")
+    cap = ramp("#c29ddb", "#a682c2", "#8a66a7", "#6f4f8b", "#573c70", "#432d58")
+    spot, gill = hexc("#f6ffe4"), ramp("#efdec6", "#d8c2a2", "#b9a07c")
     glows = []
 
     def brim(face, x, y, w, h, X, Y):
         if face == "top":
-            if (x * 5 + y * 7) % 11 == 0 and min(x, y, w - 1 - x, h - 1 - y) >= 1:
+            # El centro lo tapa la cúpula: aquí solo se ve el borde del ala.
+            if (x, y) in ((0, 3), (7, 5), (2, 7), (5, 0), (7, 1), (0, 6)):
                 glows.append((X, Y))
                 return spot
-            d = max(abs(x - 5.5), abs(y - 5.5))
-            return pick(cap, 0.25 + d / 12 + n.at(X, Y) * 0.25)
+            return pick(cap, 0.3 + n.at(X, Y) * 0.35)
         if face == "bottom":
-            cx, cy = x - 5.5, y - 5.5
-            if abs(cx) < 4.5 and abs(cy) < 4.5 and abs(cx) < 2 and abs(cy) < 2:
+            cx, cy = x - 3.5, y - 3.5
+            if abs(cx) < 1.5 and abs(cy) < 1.5:
                 return gill[2]
-            return gill[0] if (abs(cx) > abs(cy) and y % 2) or (abs(cx) <= abs(cy) and x % 2) else gill[1]
-        return cap[2] if y == 0 else cap[4]
+            return gill[0] if ((abs(cx) > abs(cy)) and y % 2) or ((abs(cx) <= abs(cy)) and x % 2) else gill[1]
+        if y == 0:
+            return spot if (x * 3 + (face == "front")) % 5 == 0 else cap[2]
+        return cap[4]
 
     def dome(face, x, y, w, h, X, Y):
         if face == "top":
-            if (x, y) in ((2, 2), (5, 1), (4, 5), (1, 5), (6, 4)):
+            if (x, y) in ((1, 1), (4, 1), (2, 3), (5, 4), (1, 5)):
                 glows.append((X, Y))
                 return spot
-            return pick(cap, abs(x - 3.5) / 8 + abs(y - 3.5) / 8 + n.at(X, Y) * 0.3)
+            return pick(cap, abs(x - 2.5) / 9 + abs(y - 2.5) / 9 + n.at(X, Y) * 0.3)
         if face == "bottom":
             return gill[1]
-        if (x + 2 * y) % 7 == 0 and y < h - 1:
+        if (x * 2 + y + (face == "left")) % 5 == 0 and y == 0:
             glows.append((X, Y))
             return spot
-        return pick(cap, 0.2 + y * 0.18 + n.at(X, Y) * 0.2)
+        return pick(cap, 0.15 + y * 0.25 + n.at(X, Y) * 0.2)
 
-    t.box(0, 32, 12, 2, 12, brim)
-    t.box(0, 46, 8, 3, 8, dome)
+    t.box(0, 12, 8, 2, 8, brim)
+    t.box(8, 22, 6, 2, 6, dome)
+    leg = ramp("#b0c483", "#95ab6a", "#7a8f54", "#5f7240")
+    t.box(0, 22, 1, 2, 1, lambda f, x, y, w, h, X, Y: leg[min(3, y + (1 if f in ("right", "back") else 0))] if f != "bottom" else leg[3])
     for (X, Y) in glows:
         t.gl(X, Y, hexc("#e6ffd0"))
     t.save("sporeling")
@@ -308,168 +306,126 @@ def weaver():
     return t
 
 
-# ---------------------------------------------------------------------------------------------- guardián (gólem)
+# ---------------------------------------------------------------------------------------------- guardián (seta gigante)
 def guardian():
+    """128×128: sombrero de tres pisos (0,0)/(0,30)/(80,30), pie (0,54), anillo (44,54), brazo (96,54) con dedos
+    (112,54)/(112,60), pata (0,82) y seta pequeña (20,82)/(28,82)."""
     t = Tex(128, 128, 47)
     n = Noise(9, 3)
-    bark = ramp("#8e6e50", "#7a5d43", "#664c37", "#533d2c", "#412f22", "#302219")
-    moss = ramp("#7d9b45", "#64823a", "#4f6a2f")
-    vein, vein2 = hexc("#c6ff7a"), hexc("#86c24c")
-    grooves = {}
+    cap = ramp("#d8805a", "#c46a48", "#ab573a", "#8f4630", "#733727", "#57291e")
+    spot, spot2 = hexc("#f6ecd6"), hexc("#e3d2b2")
+    gill = ramp("#eadbc0", "#d4c09f", "#b9a27f", "#8f7a5b")
+    stem = ramp("#f1e8d4", "#e2d6bb", "#cfc0a0", "#b7a684", "#9a8a6a")
+    root = ramp("#a88a64", "#8f744f", "#765e3f", "#5e4a31", "#463724")
+    moss = ramp("#8fae55", "#76964a")
+    gill_glow = hexc("#6fa04a")
 
-    def barkp(tag):
+    def spots(w, h, count, seed):
+        r = random.Random(seed)
+        out = set()
+        tries = 0
+        while len(out) < count * 3 and tries < 500:
+            tries += 1
+            x, y = r.randrange(1, w - 2), r.randrange(1, h - 2)
+            cells = [(x, y), (x + 1, y), (x, y + 1)] if r.random() < 0.6 else [(x, y)]
+            if all(abs(cx - a) > 1 or abs(cy - b) > 1 for a, b in out for cx, cy in cells if (a, b) not in cells):
+                out.update(cells)
+        return out
+
+    def cap_tier(tier, seed):
+        sp = spots(*{0: (26, 26), 1: (20, 20), 2: (12, 12)}[tier], {0: 22, 1: 14, 2: 6}[tier], seed)
+
         def p(face, x, y, w, h, X, Y):
             if face == "top":
-                ring = int(max(abs(x - (w - 1) / 2), abs(y - (h - 1) / 2)))
-                c = bark[1] if ring % 2 else bark[0]
-                if n.at(X * 1.5, Y * 1.5) > 0.6:
-                    c = pick(moss, n.at(X, Y))
-                return c
+                if (x, y) in sp:
+                    return spot if (x + y) % 3 else spot2
+                d = max(abs(x - (w - 1) / 2), abs(y - (h - 1) / 2)) / (w / 2)
+                return pick(cap, 0.05 + d * 0.45 + n.at(X, Y) * 0.3 + tier * -0.05)
             if face == "bottom":
-                return pick(bark, 0.7 + n.at(X, Y) * 0.3)
-            key = (tag, face)
-            if key not in grooves:
-                grooves[key] = {i for i in range(w) if t.r.random() < 0.3}
-            v = n.at(X, Y * 0.5) * 0.45 + LIGHT[face] * 0.4 + (0.3 if x in grooves[key] else 0)
-            c = pick(bark, v)
-            if y < 2 and n.at(X * 2, Y) > 0.45:
-                c = pick(moss, n.at(Y, X))
+                cx, cy = x - (w - 1) / 2, y - (h - 1) / 2
+                if tier == 0 and abs(cx) < 6 and abs(cy) < 5:
+                    return stem[3]
+                # láminas en radios; algunas brillan tenues
+                radial = (abs(cx) > abs(cy) and y % 2 == 0) or (abs(cx) <= abs(cy) and x % 2 == 0)
+                if radial and tier == 0 and (x * 3 + y) % 7 == 0:
+                    t.glow.putpixel((X, Y), gill_glow)
+                edge = min(x, y, w - 1 - x, h - 1 - y)
+                return gill[0] if radial else (gill[1] if edge > 1 else gill[2])
+            # borde: claro arriba con motas, se oscurece hacia abajo
+            if y == 0:
+                return spot if (x * 5 + tier) % 7 == 0 else cap[1]
+            return pick(cap, 0.35 + y / h * 0.6 + n.at(X, Y) * 0.15)
+        return p
+
+    t.box(0, 0, 26, 4, 26, cap_tier(0, 1))
+    t.box(0, 30, 20, 4, 20, cap_tier(1, 2))
+    t.box(80, 30, 12, 3, 12, cap_tier(2, 3))
+
+    def stem_p(face, x, y, w, h, X, Y):
+        if face == "top":
+            return stem[2]
+        if face == "bottom":
+            return stem[4]
+        fiber = (x * 7 + 3) % 5 == 0
+        v = LIGHT[face] * 0.3 + n.at(X, Y * 0.4) * 0.3 + (0.2 if fiber else 0) + (y / h) * 0.35
+        c = pick(stem, v)
+        if y >= h - 3 and n.at(X * 2, Y * 2) > 0.45:
+            c = pick(moss, n.at(Y, X))
+        return c
+
+    fs = t.box(0, 54, 12, 16, 10, stem_p)
+    fx, fy = fs["front"][0], fs["front"][1]
+    # Cara: ceño, ojos hundidos que brillan (2×2) y una boca como una grieta.
+    for x in range(1, 11):
+        t.px(fx + x, fy + 3, stem[3])
+    for ex in (2, 7):
+        for dx in (-1, 0, 1, 2):
+            t.px(fx + ex + dx, fy + 4, stem[4])
+            t.px(fx + ex + dx, fy + 7, stem[3])
+        for dy in (5, 6):
+            t.px(fx + ex - 1, fy + dy, stem[4])
+            t.px(fx + ex + 2, fy + dy, stem[4])
+        t.gl(fx + ex, fy + 5, hexc("#f2ffd8"))
+        t.gl(fx + ex + 1, fy + 5, hexc("#c8ff7c"))
+        t.gl(fx + ex, fy + 6, hexc("#c8ff7c"))
+        t.gl(fx + ex + 1, fy + 6, hexc("#8fd450"))
+    for (x, y) in ((4, 11), (5, 11), (6, 11), (7, 11), (3, 10), (8, 10), (5, 12), (6, 12)):
+        t.px(fx + x, fy + y, stem[4] if y == 11 else stem[3])
+
+    def ring_p(face, x, y, w, h, X, Y):
+        if face == "top":
+            return stem[1] if (x + y) % 4 else stem[2]
+        if face == "bottom":
+            return stem[3]
+        return stem[0] if y == 0 else (stem[2] if x % 3 else stem[3])
+
+    t.box(44, 54, 14, 2, 12, ring_p)
+
+    def root_p(tip):
+        def p(face, x, y, w, h, X, Y):
+            if face in ("top", "bottom"):
+                return root[2] if face == "top" else root[4]
+            v = LIGHT[face] * 0.3 + n.at(X * 1.3, Y * 0.5) * 0.35 + (0.25 if (x + X) % 3 == 0 else 0)
+            c = pick(root, v + (y / h) * 0.25)
+            if tip and y >= h - 1:
+                c = root[4]
             return c
         return p
 
-    def vein_line(x0, y0, steps, rng, bounds):
-        bx0, by0, bx1, by1 = bounds
-        x, y = x0, y0
-        for k in range(steps):
-            t.gl(x, y, vein if k % 3 else vein2)
-            y += 1
-            if rng.random() < 0.4:
-                x = max(bx0, min(bx1, x + rng.choice((-1, 1))))
-            if y > by1:
-                break
+    t.box(96, 54, 4, 13, 4, root_p(False))
+    t.box(112, 54, 2, 4, 2, root_p(True))
+    t.box(112, 60, 2, 3, 2, root_p(True))
 
-    # Cabeza (8×10×8 en (0, 0)) y nariz de raíz (2×4×2 en (24, 0)).
-    fs = t.box(0, 0, 8, 10, 8, barkp("head"))
-    hx, hy = fs["front"][0], fs["front"][1]
-    brow = bark[5]
-    for x in range(8):
-        t.px(hx + x, hy + 3, brow if 1 <= x <= 6 else bark[4])
-    for ex in (1, 5):
-        t.px(hx + ex, hy + 4, bark[5])
-        t.px(hx + ex + 1, hy + 4, bark[5])
-        t.gl(hx + ex, hy + 5, vein)
-        t.gl(hx + ex + 1, hy + 5, hexc("#f2ffd8"))
-    for x in (2, 3, 4, 5):
-        t.px(hx + x, hy + 8, bark[5])
-    t.gl(hx + 2, hy + 9, vein2)
-    t.gl(hx + 5, hy + 9, vein2)
-    root = ramp("#b59a76", "#9a7f5d", "#7d6447")
-    t.box(24, 0, 2, 4, 2, lambda f, x, y, w, h, X, Y: pick(root, y / 4 + LIGHT[f] * 0.3))
+    def leg_p(face, x, y, w, h, X, Y):
+        c = root_p(False)(face, x, y, w, h, X, Y)
+        if face not in ("top", "bottom") and y >= h - 2:
+            c = root[4] if (x + y) % 2 else root[3]
+        return c
 
-    # Cuerpo (18×12×11 en (0, 40)) con un núcleo de vetas en el pecho, y cintura (9×5×6 en (0, 70)).
-    fs = t.box(0, 40, 18, 12, 11, barkp("body"))
-    cx, cy = fs["front"][0] + 9, fs["front"][1] + 4
-    rng = random.Random(5)
-    for (dx, dy) in ((0, 0), (-1, 0), (1, 0), (0, -1), (0, 1)):
-        t.gl(cx + dx, cy + dy, vein if (dx or dy) else hexc("#f6ffe0"))
-    t.gl(cx - 1, cy - 1, vein2)
-    t.gl(cx + 1, cy + 1, vein2)
-    paths = [[(-1, -1), (-2, -2), (-3, -2), (-4, -3), (-5, -3), (-6, -4)],
-             [(1, -1), (2, -2), (3, -2), (4, -3), (6, -4), (7, -4)],
-             [(-2, 1), (-3, 2), (-4, 3), (-5, 4), (-5, 5), (-6, 6), (-7, 7)],
-             [(2, 1), (3, 2), (3, 3), (4, 4), (5, 5), (5, 6), (6, 7)],
-             [(0, 2), (0, 3), (-1, 4), (-1, 5), (0, 6), (0, 7)]]
-    for p in paths:
-        for k, (dx, dy) in enumerate(p):
-            t.gl(cx + dx, cy + dy, vein if k < len(p) - 2 else vein2)
-    for face in ("right", "left", "back"):
-        sx, sy, sw, sh = fs[face]
-        vein_line(sx + rng.randrange(2, sw - 2), sy + 1, sh - 2, rng, (sx + 1, sy, sx + sw - 2, sy + sh - 1))
-    t.box(0, 70, 9, 5, 6, barkp("waist"))
-
-    # Brazos (4×30×6): corteza que acaba en manos de raíz claras, con una veta que baja.
-    root_hand = ramp("#dcc9a5", "#c3ad86", "#a58f6a", "#7c6748")
-
-    def armp(tag):
-        base = barkp(tag)
-
-        def p(face, x, y, w, h, X, Y):
-            if face == "bottom":
-                return pick(root_hand, 0.3 + ((x + y) % 2) * 0.3)
-            if face != "top" and y >= h - 5:
-                k = y - (h - 5)
-                finger = (x % 2 == 0)
-                if k == 4:
-                    return root_hand[3] if finger else bark[5]
-                return pick(root_hand, (0.0 if finger else 0.55) + k * 0.06)
-            return base(face, x, y, w, h, X, Y)
-        return p
-
-    for tag, (u, v) in (("rarm", (60, 21)), ("larm", (60, 58))):
-        fs = t.box(u, v, 4, 30, 6, armp(tag))
-        fx, fy, fw, fh = fs["front"]
-        vein_line(fx + 1, fy + 3, 18, random.Random(u + v), (fx, fy, fx + fw - 1, fy + 22))
-
-    # Piernas (6×16×5): tocones con raíces oscuras en el pie.
-    def legp(tag):
-        base = barkp(tag)
-
-        def p(face, x, y, w, h, X, Y):
-            if face not in ("top", "bottom") and y >= h - 3:
-                return bark[5] if (x + y) % 2 else bark[4]
-            return base(face, x, y, w, h, X, Y)
-        return p
-
-    t.box(37, 0, 6, 16, 5, legp("rleg"))
-    t.box(60, 0, 6, 16, 5, legp("lleg"))
-
-    # Sombrero: ala de 16×2×16 en (0, 90) y cúpula de 10×4×10 en (64, 96), rojizo con motas y láminas.
-    cap = ramp("#cf7a55", "#b66244", "#9a4e36", "#7c3d2c", "#5e2e22")
-    spot = hexc("#f2e6cd")
-    gill = ramp("#e6d4b3", "#c9b08b", "#a38a67")
-    sp = set()
-    while len(sp) < 12:
-        s = (t.r.randrange(1, 15), t.r.randrange(1, 15))
-        if all(abs(s[0] - a) + abs(s[1] - b) > 2 for a, b in sp):
-            sp.add(s)
-    glows = []
-
-    def brim(face, x, y, w, h, X, Y):
-        if face == "top":
-            if (x, y) in sp:
-                if (x + y) % 3 == 0:
-                    glows.append((X, Y))
-                return spot
-            d = max(abs(x - 7.5), abs(y - 7.5))
-            return pick(cap, 0.2 + d / 14 + n.at(X, Y) * 0.25)
-        if face == "bottom":
-            cx_, cy_ = x - 7.5, y - 7.5
-            if abs(cx_) < 4.5 and abs(cy_) < 4.5:
-                return gill[2]
-            return gill[0] if ((abs(cx_) > abs(cy_)) and y % 2) or ((abs(cx_) <= abs(cy_)) and x % 2) else gill[1]
-        return spot if (y == 0 and (x * 3) % 7 == 0) else (cap[1] if y == 0 else cap[4])
-
-    def dome(face, x, y, w, h, X, Y):
-        if face == "top":
-            if (x * 3 + y * 5) % 9 == 0 and 0 < x < w - 1 and 0 < y < h - 1:
-                glows.append((X, Y))
-                return spot
-            return pick(cap, abs(x - 4.5) / 12 + abs(y - 4.5) / 12 + n.at(X, Y) * 0.25)
-        if face == "bottom":
-            return gill[2]
-        if (x * 2 + y * 3) % 7 == 0 and y < h - 1:
-            return spot
-        return pick(cap, 0.15 + y * 0.12 + n.at(X, Y) * 0.2)
-
-    t.box(0, 90, 16, 2, 16, brim)
-    t.box(64, 96, 10, 4, 10, dome)
-    stem = ramp("#e9dcc0", "#cbb894")
-    for (cu, cv, cw, ch, su, sv, sw, sh, seed) in ((84, 0, 6, 2, 108, 0, 2, 3, 3), (84, 10, 4, 1, 100, 10, 1, 2, 4)):
-        cap_p, stem_p = mushroom_painter(t, cap[:1] + cap[1:3], gill, stem, spot, seed, glows)
-        t.box(cu, cv, cw, ch, cw, cap_p)
-        t.box(su, sv, sw, sh, sw, stem_p)
-    for (X, Y) in glows:
-        t.gl(X, Y, hexc("#ffe7b8"))
+    t.box(0, 82, 5, 6, 5, leg_p)
+    cap_p, stem_small = mushroom_painter(t, cap[1:4], gill, stem[:2], spot, 5)
+    t.box(28, 82, 6, 2, 6, cap_p)
+    t.box(20, 82, 2, 3, 2, stem_small)
     t.save("mycelium_guardian")
     return t
 
@@ -489,6 +445,6 @@ def preview(texs, out_dir):
 
 
 if __name__ == "__main__":
-    texs = [("sporeling", sporeling(), 8), ("weaver", weaver(), 8), ("mycelium_guardian", guardian(), 5)]
+    texs = [("sporeling", sporeling(), 12), ("weaver", weaver(), 8), ("mycelium_guardian", guardian(), 5)]
     if len(sys.argv) > 1:
         preview(texs, sys.argv[1])

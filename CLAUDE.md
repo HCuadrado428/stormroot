@@ -34,9 +34,10 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
 - Texturas: spec en `art/textures/<nombre>.json` → PNG en `src/main/resources/assets/stormroot/textures/...` con `texgen.py`.
   Mobs: `art/entity/make_mob_textures.py` (UV de caja de `client/entity/*Model.java`), `preview_mobs.py` (vista 3D)
   y `make_mob_bbmodels.py` (Blockbench). Si cambias la geometría de un modelo, cámbiala también en `preview_mobs.py`.
-  Los mobs copian la forma de mobs vanilla (piezas, pivotes y animación sacados de las fuentes, texturas propias):
-  esporín = creeper ×0,35, tejedora = araña ×0,7 con setas, guardián = gólem de hierro ×0,9 (golpe con el evento 4,
-  `MyceliumGuardianModel.State` en 1.21.2+). Brillo con `client/entity/GlowLayer` (`EyesLayer`; `RenderTypes.eyes` en
+  Esporín: cubo con sombrero de seta (ala + cúpula), textura 32×32. Tejedora: forma y animación de la araña vanilla
+  ×0,7 (sacadas de las fuentes) con setas. Guardián: seta gigante que anda ×1,25 (pie con cara, sombrero de tres pisos,
+  brazos de raíz hijos del cuerpo; golpe con el evento 4 como el gólem, `MyceliumGuardianModel.State` en 1.21.2+).
+  Texturas propias, nunca las de Mojang. Brillo con `client/entity/GlowLayer` (`EyesLayer`; `RenderTypes.eyes` en
   1.21.11, `RenderType.eyes` antes) y `textures/entity/*_glow.png`.
 - Mappings: **Mojang (official)** en todos los loaders. No usar Yarn.
 

@@ -11,9 +11,8 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.util.Mth;
 
 /**
- * Modelo del esporín: un creeper en miniatura (mismas piezas y pivotes que {@code CreeperModel}) con un sombrero de
- * seta de ala ancha y cúpula. El renderer lo encoge a 0,35. Textura 64×64 ({@code textures/entity/sporeling.png}):
- * arriba la distribución del creeper, abajo el sombrero.
+ * Modelo del esporín: cuerpo redondo con un sombrerito de seta y cuatro patitas. Textura 32×32
+ * ({@code textures/entity/sporeling.png}). Hasta 1.21.1 se anima con la entidad; desde 1.21.2, con su estado de render.
  */
 //? if >=1.21.2 {
 public class SporelingModel extends net.minecraft.client.model.EntityModel<net.minecraft.client.renderer.entity.state.LivingEntityRenderState> {
@@ -21,65 +20,66 @@ public class SporelingModel extends net.minecraft.client.model.EntityModel<net.m
 /*public class SporelingModel extends net.minecraft.client.model.HierarchicalModel<io.github.hcuadrado428.stormroot.entity.Sporeling> {
 *///?}
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(ModIds.id("sporeling"), "main");
+    /** Veces que se ha animado (para el self-test: el modelo se usa al dibujar). */
     public static long frames;
 
     private final ModelPart root;
-    private final ModelPart head;
+    private final ModelPart body;
     private final ModelPart cap;
-    private final ModelPart rightHindLeg;
-    private final ModelPart leftHindLeg;
-    private final ModelPart rightFrontLeg;
-    private final ModelPart leftFrontLeg;
+    private final ModelPart leftFront;
+    private final ModelPart rightFront;
+    private final ModelPart leftBack;
+    private final ModelPart rightBack;
 
     public SporelingModel(ModelPart root) {
         //? if >=1.21.2 {
         super(root);
         //?}
         this.root = root;
-        this.head = root.getChild("head");
-        this.cap = head.getChild("cap");
-        this.rightHindLeg = root.getChild("right_hind_leg");
-        this.leftHindLeg = root.getChild("left_hind_leg");
-        this.rightFrontLeg = root.getChild("right_front_leg");
-        this.leftFrontLeg = root.getChild("left_front_leg");
+        this.body = root.getChild("body");
+        this.cap = this.body.getChild("cap");
+        this.leftFront = root.getChild("left_front");
+        this.rightFront = root.getChild("right_front");
+        this.leftBack = root.getChild("left_back");
+        this.rightBack = root.getChild("right_back");
     }
 
     public static LayerDefinition createLayer() {
         MeshDefinition mesh = new MeshDefinition();
         PartDefinition parts = mesh.getRoot();
-        PartDefinition head = parts.addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 0)
-                .addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F), PartPose.offset(0.0F, 6.0F, 0.0F));
-        head.addOrReplaceChild("cap", CubeListBuilder.create()
-                .texOffs(0, 32).addBox(-6.0F, -10.0F, -6.0F, 12.0F, 2.0F, 12.0F)
-                .texOffs(0, 46).addBox(-4.0F, -13.0F, -4.0F, 8.0F, 3.0F, 8.0F), PartPose.ZERO);
-        parts.addOrReplaceChild("body", CubeListBuilder.create().texOffs(16, 16)
-                .addBox(-4.0F, 0.0F, -2.0F, 8.0F, 12.0F, 4.0F), PartPose.offset(0.0F, 6.0F, 0.0F));
-        CubeListBuilder leg = CubeListBuilder.create().texOffs(0, 16).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 6.0F, 4.0F);
-        parts.addOrReplaceChild("right_hind_leg", leg, PartPose.offset(-2.0F, 18.0F, 4.0F));
-        parts.addOrReplaceChild("left_hind_leg", leg, PartPose.offset(2.0F, 18.0F, 4.0F));
-        parts.addOrReplaceChild("right_front_leg", leg, PartPose.offset(-2.0F, 18.0F, -4.0F));
-        parts.addOrReplaceChild("left_front_leg", leg, PartPose.offset(2.0F, 18.0F, -4.0F));
-        return LayerDefinition.create(mesh, 64, 64);
+        PartDefinition body = parts.addOrReplaceChild("body", CubeListBuilder.create().texOffs(0, 0)
+                .addBox(-3.0F, -6.0F, -3.0F, 6.0F, 6.0F, 6.0F), PartPose.offset(0.0F, 22.0F, 0.0F));
+        // Sombrero: ala de 8×2×8 y una cúpula de 6×2×6 encima, para que tenga silueta de seta.
+        body.addOrReplaceChild("cap", CubeListBuilder.create()
+                .texOffs(0, 12).addBox(-4.0F, -2.0F, -4.0F, 8.0F, 2.0F, 8.0F)
+                .texOffs(8, 22).addBox(-3.0F, -4.0F, -3.0F, 6.0F, 2.0F, 6.0F), PartPose.offset(0.0F, -6.0F, 0.0F));
+        CubeListBuilder leg = CubeListBuilder.create().texOffs(0, 22).addBox(-0.5F, 0.0F, -0.5F, 1.0F, 2.0F, 1.0F);
+        parts.addOrReplaceChild("left_front", leg, PartPose.offset(2.0F, 22.0F, -2.0F));
+        parts.addOrReplaceChild("right_front", leg, PartPose.offset(-2.0F, 22.0F, -2.0F));
+        parts.addOrReplaceChild("left_back", leg, PartPose.offset(2.0F, 22.0F, 2.0F));
+        parts.addOrReplaceChild("right_back", leg, PartPose.offset(-2.0F, 22.0F, 2.0F));
+        return LayerDefinition.create(mesh, 32, 32);
     }
 
-    /** Las patas andan como las del creeper; el sombrero se mece un poco. */
-    private void animate(float f, float g, float age, float headYaw, float headPitch) {
+    /** Patitas que se mueven al andar y un sombrero que se balancea un poco. */
+    private void animate(float walkPos, float walkSpeed, float age) {
         frames++;
-        this.head.yRot = headYaw * Mth.DEG_TO_RAD;
-        this.head.xRot = headPitch * Mth.DEG_TO_RAD;
-        this.rightHindLeg.xRot = Mth.cos(f * 0.6662F) * 1.4F * g;
-        this.leftHindLeg.xRot = Mth.cos(f * 0.6662F + Mth.PI) * 1.4F * g;
-        this.rightFrontLeg.xRot = Mth.cos(f * 0.6662F + Mth.PI) * 1.4F * g;
-        this.leftFrontLeg.xRot = Mth.cos(f * 0.6662F) * 1.4F * g;
-        this.cap.zRot = Mth.sin(age * 0.08F) * 0.05F;
-        this.cap.xRot = Mth.cos(age * 0.06F) * 0.03F;
+        float swing = Mth.cos(walkPos * 1.6F) * 1.2F * walkSpeed;
+        this.leftFront.xRot = swing;
+        this.rightBack.xRot = swing;
+        this.rightFront.xRot = -swing;
+        this.leftBack.xRot = -swing;
+        this.body.y = 22.0F + Mth.abs(Mth.sin(walkPos * 1.6F)) * -0.6F * walkSpeed;
+        this.cap.zRot = Mth.sin(age * 0.08F) * 0.06F;
+        // Al andar se balancea de lado a lado, como un patito.
+        this.body.zRot = Mth.sin(walkPos * 1.6F) * 0.12F * walkSpeed;
     }
 
     //? if >=1.21.2 {
     @Override
     public void setupAnim(net.minecraft.client.renderer.entity.state.LivingEntityRenderState state) {
         super.setupAnim(state);
-        animate(state.walkAnimationPos, state.walkAnimationSpeed, state.ageInTicks, state.yRot, state.xRot);
+        animate(state.walkAnimationPos, state.walkAnimationSpeed, state.ageInTicks);
     }
     //?} else {
     /*@Override
@@ -91,7 +91,7 @@ public class SporelingModel extends net.minecraft.client.model.EntityModel<net.m
     public void setupAnim(io.github.hcuadrado428.stormroot.entity.Sporeling entity, float limbSwing, float limbSwingAmount,
                           float ageInTicks, float netHeadYaw, float headPitch) {
         this.root().getAllParts().forEach(ModelPart::resetPose);
-        animate(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+        animate(limbSwing, limbSwingAmount, ageInTicks);
     }
     *///?}
 }

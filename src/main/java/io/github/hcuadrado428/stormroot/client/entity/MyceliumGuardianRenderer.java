@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
 
-/** Dibuja el guardián de micelio con {@link MyceliumGuardianModel}, a 0,9, con sus vetas y ojos que brillan. */
+/** Dibuja el guardián de micelio (una seta gigante) con {@link MyceliumGuardianModel}, a 1,25, con lo que brilla. */
 //? if >=1.21.2 {
 public class MyceliumGuardianRenderer extends MobRenderer<MyceliumGuardian, MyceliumGuardianModel.State, MyceliumGuardianModel> {
 //?} else {
@@ -15,10 +15,10 @@ public class MyceliumGuardianRenderer extends MobRenderer<MyceliumGuardian, Myce
 *///?}
     private static final Identifier TEXTURE = ModIds.id("textures/entity/mycelium_guardian.png");
     private static final Identifier GLOW = ModIds.id("textures/entity/mycelium_guardian_glow.png");
-    public static final float SCALE = 0.9F;
+    public static final float SCALE = 1.25F;
 
     public MyceliumGuardianRenderer(EntityRendererProvider.Context context) {
-        super(context, new MyceliumGuardianModel(context.bakeLayer(MyceliumGuardianModel.LAYER)), 0.7F * SCALE);
+        super(context, new MyceliumGuardianModel(context.bakeLayer(MyceliumGuardianModel.LAYER)), 0.8F * SCALE);
         this.addLayer(new GlowLayer<>(this, GLOW));
     }
 

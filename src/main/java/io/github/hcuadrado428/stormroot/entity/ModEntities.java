@@ -47,7 +47,7 @@ public final class ModEntities {
 
     public static EntityType<MyceliumGuardian> createGuardian() {
         EntityType.Builder<MyceliumGuardian> builder = EntityType.Builder.of(MyceliumGuardian::new, MobCategory.MONSTER)
-                .sized(1.3F, 2.5F).clientTrackingRange(10);
+                .sized(1.6F, 2.4F).clientTrackingRange(10);
         //? if >=1.21.2 {
         return builder.build(ResourceKey.create(Registries.ENTITY_TYPE, ModIds.id(GUARDIAN_ID)));
         //?} else {
@@ -66,7 +66,7 @@ public final class ModEntities {
     }
 
     public static EntityType<Sporeling> createSporeling() {
-        EntityType.Builder<Sporeling> builder = EntityType.Builder.of(Sporeling::new, MobCategory.AMBIENT).sized(0.4F, 0.7F)
+        EntityType.Builder<Sporeling> builder = EntityType.Builder.of(Sporeling::new, MobCategory.AMBIENT).sized(0.5F, 0.5F)
                 .clientTrackingRange(8);
         //? if >=1.21.2 {
         return builder.build(ResourceKey.create(Registries.ENTITY_TYPE, ModIds.id(SPORELING_ID)));
