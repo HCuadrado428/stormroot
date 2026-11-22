@@ -158,3 +158,19 @@ publishMods {
         if (mod.isFabric) requires("fabric-api")
     }
 }
+
+// Prueba multijugador (scripts/selftest-mp.sh): la línea de órdenes exacta de runClient, una palabra por línea, para
+// arrancar un segundo cliente a la vez sin otro Gradle (dos Gradle en el mismo proyecto se bloquean).
+tasks.register("stormrootClientCommand") {
+    val runClient = tasks.named<JavaExec>("runClient")
+    dependsOn(runClient.map { it.taskDependencies.getDependencies(it) })
+    val out = layout.buildDirectory.file("client-command.txt")
+    outputs.upToDateWhen { false }
+    doLast {
+        val r = runClient.get()
+        val java = r.javaLauncher.get().executablePath.asFile.absolutePath
+        val words = listOf(java) + r.allJvmArgs + listOf("-cp", r.classpath.asPath, r.mainClass.get()) + r.args.orEmpty()
+        out.get().asFile.apply { parentFile.mkdirs() }.writeText(words.joinToString("\n") + "\n")
+        logger.lifecycle("[stormroot] orden del cliente en ${out.get().asFile}")
+    }
+}
