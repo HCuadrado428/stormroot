@@ -82,6 +82,12 @@ if (mod.isFabric && renderMods.isNotEmpty()) {
             val key = if (m == "sodium" && "iris" in renderMods) "sodium_iris_version" else "${m}_version"
             "modLocalRuntime"("maven.modrinth:$m:${project.mod.prop(key)}")
         }
+        if ("iris" in renderMods) {
+            // Librerías que Iris lleva dentro de su jar pero que en el entorno de desarrollo no se cargan (hacen falta
+            // al encender un pack de shaders): las mismas que declara Iris en su POM.
+            "runtimeOnly"("org.anarres:jcpp:1.4.14")
+            "runtimeOnly"("io.github.douira:glsl-transformer:2.0.1")
+        }
     }
     logger.lifecycle("[stormroot] ${stonecutter.current.project}: runClient con ${renderMods.joinToString()}")
 }
