@@ -82,6 +82,8 @@ public final class ClientWeather {
         double sand = dryHere ? ClientFronts.intensity(FrontType.SANDSTORM, x, z) : 0;
         double sandFog = sand * (wearsGoggles(player) ? 0.45 : 0.9);
         fog = approach(fog, (float) Math.min(1.0, Math.max(Math.max(Math.max(mist, blizzard * 0.8), monsoon * 0.45), sandFog) * 2));
+        // Solo los bancos de niebla de verdad sueltan jirones blancos (no la arena, la ventisca ni el monzón).
+        mistFog = approach(mistFog, (float) Math.min(1.0, mist * 2));
         sandHere = sand;
 
         level.setRainLevel(rain);
@@ -315,16 +317,19 @@ public final class ClientWeather {
      * Niebla que rueda: dentro de un banco de niebla, jirones bajos pegados al suelo que avanzan con el viento.
      * Más cuanto más espesa es la niebla.
      */
+    /** Niebla de los frentes de niebla (sin la de la arena, la ventisca o el monzón), 0–1. */
+    private static float mistFog;
+
     private static void spawnRollingFog(ClientLevel level, LocalPlayer player) {
-        if (fog < 0.15f) {
+        if (mistFog < 0.15f) {
             return;
         }
         RandomSource random = level.getRandom();
         double wind = ClientFronts.windAngle();
-        double speed = 0.04 + 0.03 * fog;
+        double speed = 0.04 + 0.03 * mistFog;
         double vx = Math.cos(wind) * speed;
         double vz = Math.sin(wind) * speed;
-        int count = 1 + (int) (fog * 4);
+        int count = 1 + (int) (mistFog * 4);
         for (int i = 0; i < count; i++) {
             double x = player.getX() + (random.nextDouble() - 0.5) * 40;
             double z = player.getZ() + (random.nextDouble() - 0.5) * 40;
