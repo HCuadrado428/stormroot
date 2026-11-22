@@ -317,7 +317,7 @@ public final class SelfTest {
         // /weather rain 600 (600 ticks = 30 s): nace un frente de lluvia que dura 30 s y Stormroot sigue al mando.
         server.getCommands().performPrefixedCommand(source, "weather rain 600");
         WeatherFront rain = sim.fronts().stream().filter(f -> f.type() == FrontType.RAIN).findFirst().orElse(null);
-        boolean rainOk = rain != null && Math.abs(rain.maxAgeSeconds() - 33.0) < 0.01 && rain.lifeFactor() > 0.99
+        boolean rainOk = rain != null && Math.abs(rain.maxAgeSeconds() - rain.ageSeconds() - 30.0) < 0.01 && rain.lifeFactor() > 0.99
                 && !FrontTicker.weatherOverridden();
         server.getCommands().performPrefixedCommand(source, "weather thunder 600");
         boolean thunderOk = sim.fronts().stream().anyMatch(f -> f.type() == FrontType.THUNDERSTORM);

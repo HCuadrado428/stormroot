@@ -167,9 +167,10 @@ public final class FrontTicker {
             noSpawnUntil = Long.MIN_VALUE;
             for (double[] at : weatherAnchors(level)) {
                 WeatherFront base = sim.create(type, at[0], at[1]);
-                // Nace ya crecido (10 % de su vida) para que llueva enseguida, y dura `seconds` a partir de ahora.
+                // Nace ya crecido (al 10 % de su vida) para que llueva enseguida, y le quedan `seconds` a partir de ahora.
+                double life = seconds / 0.9;
                 sim.add(new WeatherFront(base.id(), type, base.x(), base.z(), base.radius(), base.vx(), base.vz(),
-                        seconds * 0.1, seconds * 1.1));
+                        life * 0.1, life));
             }
             Stormroot.LOGGER.info("[Stormroot] /weather {}: nuevo frente durante {} s", thunder ? "thunder" : "rain", seconds);
         }
