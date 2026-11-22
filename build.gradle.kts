@@ -1,4 +1,5 @@
 import gg.meza.stonecraft.mod
+import java.util.zip.ZipFile
 
 plugins {
     id("gg.meza.stonecraft")
@@ -94,7 +95,7 @@ if (mod.isFabric && renderMods.isNotEmpty()) {
         val libsDir = layout.buildDirectory.dir("iris-libs").get().asFile.apply { mkdirs() }
         val prefixes = listOf("glsl-transformer", "glsl-preprocessor", "jcpp", "antlr4-runtime")
         val libs = mutableListOf<File>()
-        java.util.zip.ZipFile(irisJar).use { zip ->
+        ZipFile(irisJar).use { zip ->
             for (entry in zip.entries().asSequence()) {
                 val name = entry.name.substringAfterLast('/')
                 if (entry.name.startsWith("META-INF/jars/") && name.endsWith(".jar")) {

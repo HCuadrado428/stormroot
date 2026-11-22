@@ -105,7 +105,7 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   `Biome#getPrecipitationAt` (`(BlockPos)` hasta 1.21.1, `(BlockPos, int seaLevel)` en 1.21.11), solo en los hilos
   principales. Tormenta seca: `weather/DryStorms` (rayos con daño; `mixin/LightningBoltFireMixin` cancela su `spawnFire`) y fuego del clima `block/StormFireBlock` (solo hojas no persistentes, `SPREAD` ≤ 4, `AGE` 15; render cutout: Fabric `BlockRenderLayerMap`, Forge/NeoForge `render_type` del modelo). La niebla del cliente se deshace en biomas sin lluvia. Frentes por bioma:
   `weather/ClimateZone` (pesos) + `weather/BiomeClimate`. Niebla: humedece hasta `SeepageCell.FOG_CAP`. Cliente:
-  sombras (una por bloque sobre la cara de arriba, con su forma; alturas cacheadas en `SkyRenderer.refreshShadowHeights`),
+  sombras (una por bloque sobre la cara de arriba, con su forma; alturas cacheadas en `SkyRenderer.updateShadowHeights`: se desplazan al moverse y se releen 4 filas por fotograma),
   aviso de tormenta (`CloudCover.approach`), capa alta, niebla que rueda (`ClientWeather.spawnRollingFog`, solo con
   frentes de niebla: `mistFog`). Partículas: nunca pegadas a la cámara; el polvo de arena normal sale blanco (se usa
   arena roja y tierra); `END_ROD` de la aurora solo de noche; el muro de arena tiene altura fija y degradado (`wall`). Nubarrones de lluvia,
@@ -172,13 +172,22 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   su charco al deshacer (`SeepageTicker.undo`). Fósiles: `Sandstorms.uncoverFossil` (huesos sobre arena natural).
   Niebla marrón: `client/mixin/sky/FogColorMixin` (`FogRenderer.setupColor` TAIL hasta 1.21.1, `computeFogColor`
   RETURN en 1.21.11; 3 loaders) + `ClientWeather.sandFogTint`.
+- **Rendimiento**: `Perf` (Java puro, raíz del paquete) cronometra `cliente.cielo.*`, `cliente.sombras*`, `cliente.tick`,
+  `servidor.tick`, `servidor.paso*`; solo mide con `-Dstormroot.perf=true` o en el self-test. Escena 11 de la galería
+  del self-test = peor caso; escribe `[selftest] PERF` y comprueba límites holgados. `CloudCover.Kind.values()` se
+  guarda en `SkyRenderer.KINDS` (crea un array por llamada).
+- **Sodium/Iris**: `-Pstormroot.renderMods=sodium,iris` añade esos mods a `runClient` de Fabric (Modrinth maven;
+  versiones `sodium_version`, `iris_version`, `sodium_iris_version` en `versions/dependencies`). Job `selftest-render`
+  de la CI (+ un pack de shaders en 1.21.11 con `SHADER_PACK_URL`, sin bloquear). En desarrollo hace falta
+  `-Dsodium.checks.issue2561=false` (LWJGL de 1.20.1) y las librerías de `META-INF/jars` de Iris en el classpath.
+  Si el juego crashea en la CI, el informe de crash sale en el log.
 - La CI sube los jars (Stormroot y Bloomberto) en el artefacto `jars` y además en el log, en trozos de 60 000 caracteres
   (`JAR-B64 <nombre> <n.º> <base64>`; GitHub descarta las líneas más largas).
 - `research` también saca JSON de datos y recursos vanilla (loot tables, modelos) de los jars del juego.
 - Fuentes decompiladas desde la CI: `gh api -X POST repos/HCuadrado428/stormroot/actions/workflows/research.yml/dispatches`
   con `inputs[classes]` y `inputs[pattern]` (workflow `research`).
 - Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 62 comprobaciones; cliente con
-  un jugador en pantalla virtual: 20 más, incluidas las de Bloomberto y las del cielo).
+  un jugador en pantalla virtual: 23 más, incluidas las de Bloomberto y las del cielo).
 - En el self-test, el clima se lee de `server.getWorldData().overworldData()`: `level.isRaining()/isThundering()` son la
   intensidad visual, que sube tick a tick. Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.
 - **Self-test** (`selftest/SelfTest`, `client/ClientSelfTest`, `scripts/selftest.sh`, job `selftest` de la CI): cuando
