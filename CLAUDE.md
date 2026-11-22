@@ -105,7 +105,10 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   `Biome#getPrecipitationAt` (`(BlockPos)` hasta 1.21.1, `(BlockPos, int seaLevel)` en 1.21.11), solo en los hilos
   principales. Tormenta seca: `weather/DryStorms` (rayos con daño; `mixin/LightningBoltFireMixin` cancela su `spawnFire`) y fuego del clima `block/StormFireBlock` (solo hojas no persistentes, `SPREAD` ≤ 4, `AGE` 15; render cutout: Fabric `BlockRenderLayerMap`, Forge/NeoForge `render_type` del modelo). La niebla del cliente se deshace en biomas sin lluvia. Frentes por bioma:
   `weather/ClimateZone` (pesos) + `weather/BiomeClimate`. Niebla: humedece hasta `SeepageCell.FOG_CAP`. Cliente:
-  sombras, aviso de tormenta (`CloudCover.approach`), capa alta, niebla que rueda (`ClientWeather.spawnRollingFog`).
+  sombras (una por bloque sobre la cara de arriba, con su forma; alturas cacheadas en `SkyRenderer.refreshShadowHeights`),
+  aviso de tormenta (`CloudCover.approach`), capa alta, niebla que rueda (`ClientWeather.spawnRollingFog`, solo con
+  frentes de niebla: `mistFog`). Partículas: nunca pegadas a la cámara; el polvo de arena normal sale blanco (se usa
+  arena roja y tierra); `END_ROD` de la aurora solo de noche; el muro de arena tiene altura fija y degradado (`wall`).
 - **Ventisca y cuevas de hielo**: `FrontType.BLIZZARD` (pesos en `ClimateZone`), `weather/BlizzardSnow` (capas hasta 4),
   `SeepageCell.frost` (guardado; `updateFrost`, deshielo lento/masivo) y efectos en `SeepageTicker.freeze` (tipos
   `SNOW_FLOOR`, `ICE_FLOOR`, `FROZEN`, `ICICLE`, `ICE_CRYSTAL`, reversibles), bloques `block/IcicleBlock` (cae con luz
