@@ -7,6 +7,9 @@ t="$1"; log="$2"
 tag="${RENDER_MODS:++${RENDER_MODS//,/+}}"
 shots="build/selftest-shots"
 mkdir -p "$shots"
+# Sodium comprueba que LWJGL sea la de Minecraft; el entorno de desarrollo de 1.20.1 trae otra (3.3.2-snapshot) y
+# Sodium no arrancaría. Los jugadores sí tienen la buena, así que aquí se salta esa comprobación.
+[ -n "${RENDER_MODS:-}" ] && export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:-} -Dsodium.checks.issue2561=false"
 ./gradlew ":$t:runClient" ${RENDER_MODS:+-Pstormroot.renderMods=$RENDER_MODS} --args="--quickPlaySingleplayer testworld" > "$log" 2>&1 &
 pid=$!
 taken=" "

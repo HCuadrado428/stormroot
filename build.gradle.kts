@@ -78,7 +78,9 @@ if (mod.isFabric && renderMods.isNotEmpty()) {
     }
     dependencies {
         for (m in renderMods) {
-            "modLocalRuntime"("maven.modrinth:$m:${project.mod.prop("${m}_version")}")
+            // Iris exige una versión concreta de Sodium (sodium_iris_version), que puede no ser la última.
+            val key = if (m == "sodium" && "iris" in renderMods) "sodium_iris_version" else "${m}_version"
+            "modLocalRuntime"("maven.modrinth:$m:${project.mod.prop(key)}")
         }
     }
     logger.lifecycle("[stormroot] ${stonecutter.current.project}: runClient con ${renderMods.joinToString()}")
