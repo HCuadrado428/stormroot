@@ -144,18 +144,12 @@ public final class ClientWeather {
         RandomSource random = level.getRandom();
         net.minecraft.core.particles.BlockParticleOption dust = new net.minecraft.core.particles.BlockParticleOption(
                 ParticleTypes.FALLING_DUST, net.minecraft.world.level.block.Blocks.SAND.defaultBlockState());
-        double angle = ClientFronts.windAngle();
-        double dx = io.github.hcuadrado428.stormroot.weather.WindRules.dirX(angle);
-        double dz = io.github.hcuadrado428.stormroot.weather.WindRules.dirZ(angle);
-        int count = (int) Math.round(sand * 14);
+        int count = (int) Math.round(sand * 22);
         for (int i = 0; i < count; i++) {
             double px = player.getX() + (random.nextDouble() - 0.5) * 20;
             double py = player.getY() + random.nextDouble() * 5 - 1;
             double pz = player.getZ() + (random.nextDouble() - 0.5) * 20;
             level.addParticle(dust, px, py, pz, 0, 0, 0);
-            if (random.nextInt(3) == 0) {
-                level.addParticle(ParticleTypes.CLOUD, px, py, pz, dx * 0.4, 0, dz * 0.4);
-            }
             sandParticles++;
         }
         if (calima > 0.05 && random.nextDouble() < calima * 0.6) {

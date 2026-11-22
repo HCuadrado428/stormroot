@@ -50,9 +50,14 @@ public final class SkyRenderer {
 
     /** Capa alta (velos finos, solo decorativa). */
     private static final double HIGH_Y = 262;
-    /** Sombras: trozos de 2×2 bloques, hasta 6 celdas (72 bloques) alrededor de la cámara. */
-    private static final int SHADOW_STEP = 2;
-    private static final int SHADOW_CELLS = 6;
+    /** Sombras: una por bloque, hasta {@code SHADOW_RANGE} bloques alrededor de la cámara. */
+    private static final int SHADOW_RANGE = 64;
+    private static final int SHADOW_SIZE = SHADOW_RANGE * 2 + 1;
+    /** Altura de la cara de arriba de cada columna (cacheada unos fotogramas), relativa a nada: y del mundo. */
+    private static final float[] SHADOW_TOP = new float[SHADOW_SIZE * SHADOW_SIZE];
+    private static long shadowOriginX = Long.MIN_VALUE;
+    private static long shadowOriginZ;
+    private static int shadowAge;
 
     private static final byte[][] GRID = new byte[SIZE + 2][SIZE + 2];
     /** Por celda: intensidad del frente (nubarrones) o aviso de tormenta (buen tiempo), 0–1. */
@@ -212,7 +217,7 @@ public final class SkyRenderer {
                         r = (int) (204 - 30 * amount);
                         g = (int) (168 - 34 * amount);
                         b = (int) (116 - 30 * amount);
-                        alpha = 200 + (int) (40 * amount);
+                        alpha = 150 + (int) (50 * amount);
                     }
                     case RAIN -> {
                         bottom = FAIR_Y - 6;
@@ -252,8 +257,10 @@ public final class SkyRenderer {
                             shade(alpha, r, g, b, day * 0.72f, hr, hg, hb, haze));
                 }
                 if (y1 < 0) {
+                    // El techo del polvo, más transparente que los lados: se ve como una bruma, no como una tapa.
+                    int topAlpha = kind == CloudCover.Kind.DUST ? alpha / 2 : alpha;
                     quad(vc, pose, x0, y1, z0, x0, y1, z1, x1, y1, z1, x1, y1, z0,
-                            shade(alpha, r, g, b, day, hr, hg, hb, haze));
+                            shade(topAlpha, r, g, b, day, hr, hg, hb, haze));
                 }
                 int sideX = shade(alpha, r, g, b, day * 0.9f, hr, hg, hb, haze);
                 int sideZ = shade(alpha, r, g, b, day * 0.82f, hr, hg, hb, haze);
@@ -394,7 +401,7 @@ public final class SkyRenderer {
             case STORM, HAIL -> 5 + 9 * amount;
             case SNOW -> 6 + 6 * amount;
             case RAIN -> 4 + 3 * amount;
-            case DUST -> 40 + 60 * amount;
+            case DUST -> 56; // altura fija: sin caras interiores ni escalones entre celdas
             default -> 4;
         };
     }
@@ -409,56 +416,94 @@ public final class SkyRenderer {
     }
 
     /**
-     * Sombra de las nubes: manchas oscuras sobre el terreno (en trozos de {@link #SHADOW_STEP} bloques a la altura del
-     * bloque más alto de cada trozo), justo debajo de cada nube cercana. Se desvanece con la distancia.
+     * Sombra de las nubes: un velo oscuro pegado a la cara de arriba de cada bloque (siguiendo su forma: losas, capas de
+     * nieve o de arena), bajo cada nube cercana. Se desvanece con la distancia. Los bloques seguidos de una fila a la misma
+     * altura y con la misma sombra se dibujan juntos.
      */
     private static void drawShadows(VertexConsumer vc, PoseStack.Pose pose, ClientLevel level, Vec3 cam,
                                     long camCellX, long camCellZ, double driftX, double driftZ, float day) {
-        int sub = C / SHADOW_STEP;
-        for (int i = RADIUS - SHADOW_CELLS; i <= RADIUS + SHADOW_CELLS; i++) {
-            for (int j = RADIUS - SHADOW_CELLS; j <= RADIUS + SHADOW_CELLS; j++) {
-                byte k = GRID[i + 1][j + 1];
-                if (k == 0) {
-                    continue;
+        long ox = (long) Math.floor(cam.x) - SHADOW_RANGE;
+        long oz = (long) Math.floor(cam.z) - SHADOW_RANGE;
+        if (ox != shadowOriginX || oz != shadowOriginZ || ++shadowAge > 40) {
+            refreshShadowHeights(level, ox, oz);
+        }
+        double gridX0 = (camCellX - RADIUS) * C + driftX;
+        double gridZ0 = (camCellZ - RADIUS) * C + driftZ;
+        for (int c = 0; c < SHADOW_SIZE; c++) {
+            long wz = oz + c;
+            int runStart = -1;
+            float runTop = 0;
+            int runAlpha = 0;
+            for (int a = 0; a <= SHADOW_SIZE; a++) {
+                int alpha = 0;
+                float top = 0;
+                if (a < SHADOW_SIZE) {
+                    long wx = ox + a;
+                    top = SHADOW_TOP[c * SHADOW_SIZE + a];
+                    alpha = shadowAlpha(wx + 0.5 - gridX0, wz + 0.5 - gridZ0, wx + 0.5 - cam.x, wz + 0.5 - cam.z, top - cam.y, day);
                 }
-                CloudCover.Kind kind = CloudCover.Kind.values()[k];
-                double darkness = switch (kind) {
-                    case STORM, HAIL -> 0.42;
-                    case RAIN, SNOW -> 0.32;
-                    case DUST -> 0.25 + 0.15 * SHADE[i + 1][j + 1];
-                    default -> 0.2 + 0.12 * SHADE[i + 1][j + 1];
-                };
-                double wx0 = (camCellX - RADIUS + i) * C + driftX;
-                double wz0 = (camCellZ - RADIUS + j) * C + driftZ;
-                for (int a = 0; a < sub; a++) {
-                    for (int c = 0; c < sub; c++) {
-                        double wx = wx0 + a * SHADOW_STEP;
-                        double wz = wz0 + c * SHADOW_STEP;
-                        double dx = wx + SHADOW_STEP / 2.0 - cam.x;
-                        double dz = wz + SHADOW_STEP / 2.0 - cam.z;
-                        double fade = 1 - Math.sqrt(dx * dx + dz * dz) / (SHADOW_CELLS * C);
-                        if (fade <= 0) {
-                            continue;
-                        }
-                        int top = level.getHeight(Heightmap.Types.MOTION_BLOCKING, (int) Math.floor(wx + SHADOW_STEP / 2.0),
-                                (int) Math.floor(wz + SHADOW_STEP / 2.0));
-                        float y = (float) (top + 0.03 - cam.y);
-                        if (y > 0) {
-                            // Más alta que la cámara: no se ve desde abajo y taparía la vista.
-                            continue;
-                        }
-                        int alpha = (int) (255 * darkness * day * Math.min(1, fade * 2));
-                        if (alpha <= 2) {
-                            continue;
-                        }
-                        float x0 = (float) (wx - cam.x);
-                        float z0 = (float) (wz - cam.z);
-                        float x1 = x0 + SHADOW_STEP;
-                        float z1 = z0 + SHADOW_STEP;
-                        quad(vc, pose, x0, y, z0, x0, y, z1, x1, y, z1, x1, y, z0, (alpha << 24) | 0x0A0C14);
-                        shadowQuads++;
-                    }
+                if (runStart >= 0 && (alpha != runAlpha || top != runTop)) {
+                    float x0 = (float) (ox + runStart - cam.x);
+                    float x1 = (float) (ox + a - cam.x);
+                    float z0 = (float) (wz - cam.z);
+                    float y = (float) (runTop + 0.02 - cam.y);
+                    quad(vc, pose, x0, y, z0, x0, y, z0 + 1, x1, y, z0 + 1, x1, y, z0, (runAlpha << 24) | 0x0A0C14);
+                    shadowQuads++;
+                    runStart = -1;
                 }
+                if (runStart < 0 && alpha > 2) {
+                    runStart = a;
+                    runTop = top;
+                    runAlpha = alpha;
+                }
+            }
+        }
+    }
+
+    /** Opacidad de la sombra en un punto ({@code gx, gz}: relativo al borde de la rejilla de nubes; {@code dx, dz, dy}: a la cámara). */
+    private static int shadowAlpha(double gx, double gz, double dx, double dz, double dy, float day) {
+        if (dy > 0) {
+            return 0; // más alto que la cámara: no se ve desde abajo y taparía la vista
+        }
+        int i = (int) Math.floor(gx / C);
+        int j = (int) Math.floor(gz / C);
+        if (i < 0 || j < 0 || i >= SIZE || j >= SIZE) {
+            return 0;
+        }
+        byte k = GRID[i + 1][j + 1];
+        if (k == 0) {
+            return 0;
+        }
+        CloudCover.Kind kind = CloudCover.Kind.values()[k];
+        double darkness = switch (kind) {
+            case STORM, HAIL -> 0.42;
+            case RAIN, SNOW -> 0.32;
+            case DUST -> 0.25 + 0.15 * SHADE[i + 1][j + 1];
+            default -> 0.2 + 0.12 * SHADE[i + 1][j + 1];
+        };
+        double fade = 1 - Math.sqrt(dx * dx + dz * dz) / SHADOW_RANGE;
+        if (fade <= 0) {
+            return 0;
+        }
+        // En escalones de 8 para que las filas se puedan juntar.
+        return ((int) (255 * darkness * day * Math.min(1, fade * 2)) >> 3) << 3;
+    }
+
+    /** Altura exacta de la cara de arriba de cada columna (bloque más alto que para el paso, con su forma). */
+    private static void refreshShadowHeights(ClientLevel level, long ox, long oz) {
+        shadowOriginX = ox;
+        shadowOriginZ = oz;
+        shadowAge = 0;
+        net.minecraft.core.BlockPos.MutableBlockPos pos = new net.minecraft.core.BlockPos.MutableBlockPos();
+        for (int c = 0; c < SHADOW_SIZE; c++) {
+            for (int a = 0; a < SHADOW_SIZE; a++) {
+                int x = (int) (ox + a);
+                int z = (int) (oz + c);
+                int top = level.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z);
+                pos.set(x, top - 1, z);
+                net.minecraft.world.phys.shapes.VoxelShape shape = level.getBlockState(pos).getShape(level, pos);
+                float height = shape.isEmpty() ? 1.0f : (float) shape.max(net.minecraft.core.Direction.Axis.Y);
+                SHADOW_TOP[c * SHADOW_SIZE + a] = top - 1 + height;
             }
         }
     }

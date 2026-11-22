@@ -283,9 +283,26 @@ public final class ClientSelfTest {
                             "celdas de arena=" + SkyRenderer.dustCells() + ", partículas=" + ClientWeather.sandParticles);
                     SelfTest.report("sandstorm fog turns brown", ClientWeather.sandFogFrames() > 0,
                             "fotogramas con niebla marrón=" + ClientWeather.sandFogFrames());
-                    stage = 71;
+                    stage = 170;
                     stageStart = ticks;
                     requestShot(mc, "tormenta_de_arena", 0f, -10f);
+                }
+            }
+            case 170 -> {
+                // La misma tormenta de arena vista desde fuera: a 380 bloques al este, mirando hacia ella (oeste).
+                ClientWeather.sandForcedForTest = -1;
+                if (waited == 5) {
+                    server.execute(() -> server.getCommands().performPrefixedCommand(
+                            server.createCommandSourceStack().withSuppressedOutput(), "execute as @a at @s run tp @s ~380 ~ ~"));
+                }
+                if (waited == 120) {
+                    requestShot(mc, "tormenta_de_arena_desde_fuera", 90f, -4f);
+                }
+                if (waited > 200) {
+                    server.execute(() -> server.getCommands().performPrefixedCommand(
+                            server.createCommandSourceStack().withSuppressedOutput(), "execute as @a at @s run tp @s ~-380 ~ ~"));
+                    stage = 71;
+                    stageStart = ticks;
                 }
             }
             case 71 -> {
