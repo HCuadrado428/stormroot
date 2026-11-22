@@ -73,14 +73,20 @@ jobs:
             libs/bloomberto/*.jar
             versions/*/build/reports/**/*
 
-      # Los jars también van al log en base64 ("JAR-B64 <nombre> <datos>"), para quien no puede bajar artefactos.
+      # Los jars también van al log en base64, en trozos ("JAR-B64 <nombre> <n.º> <datos>"), para quien no puede bajar
+      # artefactos. GitHub descarta las líneas muy largas, así que cada trozo tiene 60 000 caracteres como mucho.
       - name: Jars en el log
         if: success()
         run: |
           for jar in build/libs/*.jar libs/bloomberto/*.jar; do
             [ -f "$jar" ] || continue
             case "$jar" in *-sources.jar|*-dev.jar) continue;; esac
-            echo "JAR-B64 $(basename "$jar") $(base64 -w0 "$jar")"
+            name=$(basename "$jar")
+            i=0
+            base64 -w 60000 "$jar" | while read -r chunk; do
+              echo "JAR-B64 $name $i $chunk"
+              i=$((i + 1))
+            done
           done
 
       # Publicación: crea una Release en GitHub y se publica en Modrinth/CurseForge.

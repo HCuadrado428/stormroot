@@ -165,7 +165,8 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   su charco al deshacer (`SeepageTicker.undo`). Fósiles: `Sandstorms.uncoverFossil` (huesos sobre arena natural).
   Niebla marrón: `client/mixin/sky/FogColorMixin` (`FogRenderer.setupColor` TAIL hasta 1.21.1, `computeFogColor`
   RETURN en 1.21.11; 3 loaders) + `ClientWeather.sandFogTint`.
-- La CI sube los jars (Stormroot y Bloomberto) en el artefacto `jars` y además en el log (`JAR-B64 <nombre> <base64>`).
+- La CI sube los jars (Stormroot y Bloomberto) en el artefacto `jars` y además en el log, en trozos de 60 000 caracteres
+  (`JAR-B64 <nombre> <n.º> <base64>`; GitHub descarta las líneas más largas).
 - `research` también saca JSON de datos y recursos vanilla (loot tables, modelos) de los jars del juego.
 - Fuentes decompiladas desde la CI: `gh api -X POST repos/HCuadrado428/stormroot/actions/workflows/research.yml/dispatches`
   con `inputs[classes]` y `inputs[pattern]` (workflow `research`).
