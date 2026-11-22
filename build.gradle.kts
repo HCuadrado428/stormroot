@@ -1,5 +1,5 @@
 import gg.meza.stonecraft.mod
-import java.util.zip.ZipFile
+import java.util.concurrent.Callable
 
 plugins {
     id("gg.meza.stonecraft")
@@ -86,30 +86,27 @@ if (mod.isFabric && renderMods.isNotEmpty()) {
     }
     if ("iris" in renderMods) {
         // Iris lleva dentro de su jar (META-INF/jars) librerías que en el entorno de desarrollo no se cargan y hacen
-        // falta al encender un pack de shaders. Se sacan del propio jar, para que sean justo las versiones que usa.
-        val irisJar =
-            configurations
-                .detachedConfiguration(dependencies.create("maven.modrinth:iris:${project.mod.prop("iris_version")}"))
-                .apply { isTransitive = false }
-                .singleFile
-        val libsDir = layout.buildDirectory.dir("iris-libs").get().asFile.apply { mkdirs() }
-        val prefixes = listOf("glsl-transformer", "glsl-preprocessor", "jcpp", "antlr4-runtime")
-        val libs = mutableListOf<File>()
-        ZipFile(irisJar).use { zip ->
-            for (entry in zip.entries().asSequence()) {
-                val name = entry.name.substringAfterLast('/')
-                if (entry.name.startsWith("META-INF/jars/") && name.endsWith(".jar")) {
-                    logger.lifecycle("[stormroot] Iris lleva dentro: $name")
-                    if (prefixes.any { name.startsWith(it) }) {
-                        val out = File(libsDir, name)
-                        zip.getInputStream(entry).use { input -> out.outputStream().use { input.copyTo(it) } }
-                        libs += out
-                    }
+        // falta al encender un pack de shaders. Se sacan del propio jar (son compilaciones suyas: las de Maven Central
+        // no sirven). Todo perezoso: resolver dependencias al configurar rompe Loom.
+        val irisJar = configurations.create("stormrootIrisJar") { isTransitive = false }
+        dependencies { "stormrootIrisJar"("maven.modrinth:iris:${project.mod.prop("iris_version")}") }
+        val irisLibsDir = layout.buildDirectory.dir("iris-libs")
+        val irisLibs =
+            tasks.register<Sync>("stormrootIrisLibs") {
+                from(Callable { irisJar.map { zipTree(it) } }) {
+                    include(
+                        "META-INF/jars/glsl-transformer*.jar",
+                        "META-INF/jars/glsl-preprocessor*.jar",
+                        "META-INF/jars/jcpp*.jar",
+                        "META-INF/jars/antlr4-runtime*.jar",
+                    )
+                    eachFile { path = name }
                 }
+                includeEmptyDirs = false
+                into(irisLibsDir)
             }
-        }
         dependencies {
-            "runtimeOnly"(files(libs))
+            "runtimeOnly"(files(Callable { fileTree(irisLibsDir) }).builtBy(irisLibs))
         }
     }
     logger.lifecycle("[stormroot] ${stonecutter.current.project}: runClient con ${renderMods.joinToString()}")
