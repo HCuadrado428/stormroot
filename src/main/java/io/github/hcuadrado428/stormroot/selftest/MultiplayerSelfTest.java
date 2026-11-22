@@ -21,8 +21,8 @@ import net.minecraft.server.level.ServerPlayer;
  */
 public final class MultiplayerSelfTest {
     private static final boolean ON = "mp".equals(System.getProperty("stormroot.selfTest", ""));
-    /** Alba en el origen, Berto lejos: ninguna nube de un lado llega al otro. */
-    public static final int ALBA_X = 8;
+    /** Alba lejos del punto de aparición (así "estar en su sitio" = el servidor ya montó la escena), Berto más lejos. */
+    public static final int ALBA_X = -1500;
     public static final int BERTO_X = 3000;
     public static final int Z = 8;
     private static final int TIMEOUT = 20 * 60 * 8;

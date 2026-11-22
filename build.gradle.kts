@@ -183,6 +183,14 @@ tasks.register("stormrootClientCommand") {
         }
         val words = listOf(java) + r.allJvmArgs + listOf("-cp", r.classpath.asPath, r.mainClass.get()) + args
         out.get().asFile.apply { parentFile.mkdirs() }.writeText(words.joinToString("\n") + "\n")
+        // NeoForge/Forge pasan las clases del mod por variables de entorno (MOD_CLASSES...): sin ellas el cliente
+        // arranca pero no encuentra los mixins. Se guardan para que el script las exporte.
+        val env = layout.buildDirectory.file("client-env.txt").get().asFile
+        env.writeText(
+            r.environment.entries
+                .filter { (k, v) -> "\n" !in k && "\n" !in v.toString() }
+                .joinToString("") { (k, v) -> "$k=$v\n" }
+        )
         logger.lifecycle("[stormroot] orden del cliente en ${out.get().asFile}")
     }
 }

@@ -20,6 +20,15 @@ printf 'online-mode=false\nenforce-secure-profile=false\nlevel-name=selftest\nle
 timeout 1200 ./gradlew ":$t:stormrootClientCommand" || { echo "$t: no se pudo preparar el cliente"; exit 1; }
 cmdfile="versions/$t/build/client-command.txt"
 mapfile -t cmd < "$cmdfile"
+# Variables de entorno del run original (NeoForge/Forge pasan así las clases del mod), menos las de la máquina.
+client_env() {
+  while IFS= read -r line; do
+    case "$line" in
+      PATH=*|HOME=*|PWD=*|SHELL=*|DISPLAY=*|XAUTHORITY=*|TMPDIR=*|TEMP=*|TMP=*|JAVA_TOOL_OPTIONS=*|_=*|OLDPWD=*|SHLVL=*) ;;
+      [A-Za-z_]*=*) export "$line" ;;
+    esac
+  done < "versions/$t/build/client-env.txt"
+}
 
 JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:-} -Dstormroot.selfTest=mp" \
   timeout 1500 ./gradlew ":$t:runServer" --args=nogui > "$slog" 2>&1 &
@@ -36,6 +45,7 @@ client() {
   mkdir -p "$dir"
   (
     cd "$dir"
+    client_env
     JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:-} -Dstormroot.selfTest=mp-client" \
       LIBGL_ALWAYS_SOFTWARE=1 MESA_GL_VERSION_OVERRIDE=4.5 MESA_GLSL_VERSION_OVERRIDE=450 \
       timeout 1200 xvfb-run -a -s "-screen 0 854x480x24" \
