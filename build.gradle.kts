@@ -82,11 +82,33 @@ if (mod.isFabric && renderMods.isNotEmpty()) {
             val key = if (m == "sodium" && "iris" in renderMods) "sodium_iris_version" else "${m}_version"
             "modLocalRuntime"("maven.modrinth:$m:${project.mod.prop(key)}")
         }
-        if ("iris" in renderMods) {
-            // Librerías que Iris lleva dentro de su jar pero que en el entorno de desarrollo no se cargan (hacen falta
-            // al encender un pack de shaders): las mismas que declara Iris en su POM.
-            "runtimeOnly"("org.anarres:jcpp:1.4.14")
-            "runtimeOnly"("io.github.douira:glsl-transformer:2.0.1")
+    }
+    if ("iris" in renderMods) {
+        // Iris lleva dentro de su jar (META-INF/jars) librerías que en el entorno de desarrollo no se cargan y hacen
+        // falta al encender un pack de shaders. Se sacan del propio jar, para que sean justo las versiones que usa.
+        val irisJar =
+            configurations
+                .detachedConfiguration(dependencies.create("maven.modrinth:iris:${project.mod.prop("iris_version")}"))
+                .apply { isTransitive = false }
+                .singleFile
+        val libsDir = layout.buildDirectory.dir("iris-libs").get().asFile.apply { mkdirs() }
+        val prefixes = listOf("glsl-transformer", "glsl-preprocessor", "jcpp", "antlr4-runtime")
+        val libs = mutableListOf<File>()
+        java.util.zip.ZipFile(irisJar).use { zip ->
+            for (entry in zip.entries().asSequence()) {
+                val name = entry.name.substringAfterLast('/')
+                if (entry.name.startsWith("META-INF/jars/") && name.endsWith(".jar")) {
+                    logger.lifecycle("[stormroot] Iris lleva dentro: $name")
+                    if (prefixes.any { name.startsWith(it) }) {
+                        val out = File(libsDir, name)
+                        zip.getInputStream(entry).use { input -> out.outputStream().use { input.copyTo(it) } }
+                        libs += out
+                    }
+                }
+            }
+        }
+        dependencies {
+            "runtimeOnly"(files(libs))
         }
     }
     logger.lifecycle("[stormroot] ${stonecutter.current.project}: runClient con ${renderMods.joinToString()}")
