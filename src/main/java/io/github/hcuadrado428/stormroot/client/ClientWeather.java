@@ -142,14 +142,20 @@ public final class ClientWeather {
     /** Arena que vuela con el viento dentro de la tormenta; fuera, calima: polvo fino que cae despacio. */
     private static void spawnSand(ClientLevel level, LocalPlayer player, double sand, double calima) {
         RandomSource random = level.getRandom();
+        // Polvo de arena y de arena roja mezclados: un tono ocre (el de la arena sola sale casi blanco).
         net.minecraft.core.particles.BlockParticleOption dust = new net.minecraft.core.particles.BlockParticleOption(
                 ParticleTypes.FALLING_DUST, net.minecraft.world.level.block.Blocks.SAND.defaultBlockState());
+        net.minecraft.core.particles.BlockParticleOption redDust = new net.minecraft.core.particles.BlockParticleOption(
+                ParticleTypes.FALLING_DUST, net.minecraft.world.level.block.Blocks.RED_SAND.defaultBlockState());
         int count = (int) Math.round(sand * 22);
         for (int i = 0; i < count; i++) {
-            double px = player.getX() + (random.nextDouble() - 0.5) * 20;
+            // Entre 4 y 12 bloques de la cámara: de cerca se verían como manchas enormes.
+            double angle = random.nextDouble() * Math.PI * 2;
+            double dist = 4 + random.nextDouble() * 8;
+            double px = player.getX() + Math.cos(angle) * dist;
             double py = player.getY() + random.nextDouble() * 5 - 1;
-            double pz = player.getZ() + (random.nextDouble() - 0.5) * 20;
-            level.addParticle(dust, px, py, pz, 0, 0, 0);
+            double pz = player.getZ() + Math.sin(angle) * dist;
+            level.addParticle(random.nextInt(3) == 0 ? dust : redDust, px, py, pz, 0, 0, 0);
             sandParticles++;
         }
         if (calima > 0.05 && random.nextDouble() < calima * 0.6) {

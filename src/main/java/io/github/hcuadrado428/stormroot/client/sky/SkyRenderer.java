@@ -258,9 +258,29 @@ public final class SkyRenderer {
                 }
                 if (y1 < 0) {
                     // El techo del polvo, más transparente que los lados: se ve como una bruma, no como una tapa.
-                    int topAlpha = kind == CloudCover.Kind.DUST ? alpha / 2 : alpha;
+                    int topAlpha = kind == CloudCover.Kind.DUST ? alpha / 6 : alpha;
                     quad(vc, pose, x0, y1, z0, x0, y1, z1, x1, y1, z1, x1, y1, z0,
                             shade(topAlpha, r, g, b, day, hr, hg, hb, haze));
+                }
+                if (kind == CloudCover.Kind.DUST) {
+                    // Muro de arena: todas las paredes con el mismo tono (la escalera de celdas no hace rayas) y un
+                    // degradado de abajo (espeso) a arriba (casi transparente), para que se funda con el cielo.
+                    int foot = shade(alpha, r, g, b, day * 0.88f, hr, hg, hb, haze);
+                    int crown = shade(alpha / 6, r, g, b, day * 0.95f, hr, hg, hb, haze);
+                    if (edge(i, j + 1, k, height)) {
+                        wall(vc, pose, x0, z0, x0, z1, y0, y1, foot, crown);
+                    }
+                    if (edge(i + 2, j + 1, k, height)) {
+                        wall(vc, pose, x1, z1, x1, z0, y0, y1, foot, crown);
+                    }
+                    if (edge(i + 1, j, k, height)) {
+                        wall(vc, pose, x1, z0, x0, z0, y0, y1, foot, crown);
+                    }
+                    if (edge(i + 1, j + 2, k, height)) {
+                        wall(vc, pose, x0, z1, x1, z1, y0, y1, foot, crown);
+                    }
+                    drawn++;
+                    continue;
                 }
                 int sideX = shade(alpha, r, g, b, day * 0.9f, hr, hg, hb, haze);
                 int sideZ = shade(alpha, r, g, b, day * 0.82f, hr, hg, hb, haze);
@@ -566,6 +586,15 @@ public final class SkyRenderer {
         vertex(vc, pose, bx, by, bz, argb);
         vertex(vc, pose, cx, cy, cz, argb);
         vertex(vc, pose, dx, dy, dz, argb);
+    }
+
+    /** Pared vertical de (ax, az) a (bx, bz), con un color abajo y otro arriba (degradado). */
+    private static void wall(VertexConsumer vc, PoseStack.Pose pose, float ax, float az, float bx, float bz,
+                             float y0, float y1, int bottom, int top) {
+        vertex(vc, pose, ax, y0, az, bottom);
+        vertex(vc, pose, bx, y0, bz, bottom);
+        vertex(vc, pose, bx, y1, bz, top);
+        vertex(vc, pose, ax, y1, az, top);
     }
 
     private static void vertex(VertexConsumer vc, PoseStack.Pose pose, float x, float y, float z, int argb) {
