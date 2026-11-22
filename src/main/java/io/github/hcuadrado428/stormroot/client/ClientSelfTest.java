@@ -503,7 +503,7 @@ public final class ClientSelfTest {
                     cmd(server, "gamemode creative @a", "clear @a");
                     hotbar(server, ITEMS_A);
                 }
-                shot = "galeria_objetos_1";
+                shot = "galeria_objetos_a";
                 pitch = -10f;
                 gui = true;
                 wait = 80;
@@ -513,7 +513,7 @@ public final class ClientSelfTest {
                     cmd(server, "clear @a");
                     hotbar(server, ITEMS_B);
                 }
-                shot = "galeria_objetos_2";
+                shot = "galeria_objetos_b";
                 pitch = -10f;
                 gui = true;
                 wait = 80;

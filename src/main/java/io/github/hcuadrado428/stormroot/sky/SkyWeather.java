@@ -81,6 +81,15 @@ public final class SkyWeather {
         return kind == CloudCover.Kind.NONE || kind == CloudCover.Kind.DUST;
     }
 
+    /** Nubarrón sobre (x, z) en el hilo actual, o {@code null} si Stormroot no controla el clima aquí. */
+    public static CloudCover.Kind cloudKindAt(double x, double z) {
+        Source source = current();
+        if (source == null || !source.active()) {
+            return null;
+        }
+        return rainCloudAt(source, x, z);
+    }
+
     /** Nubarrón (lluvia o tormenta) sobre (x, z) según una fuente, o {@link CloudCover.Kind#NONE}. */
     public static CloudCover.Kind rainCloudAt(Source source, double x, double z) {
         double seconds = source.seconds();

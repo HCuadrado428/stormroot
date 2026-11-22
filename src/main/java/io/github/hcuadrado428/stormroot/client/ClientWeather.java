@@ -307,11 +307,16 @@ public final class ClientWeather {
             return;
         }
         RandomSource random = level.getRandom();
-        for (int i = 0; i < 8; i++) {
-            double x = player.getX() + (random.nextDouble() - 0.5) * 24;
-            double z = player.getZ() + (random.nextDouble() - 0.5) * 24;
-            double y = player.getY() + 6 + random.nextDouble() * 8;
-            level.addParticle(ParticleTypes.SNOWFLAKE, x, y, z, 0, -0.8, 0);
+        // Trocitos de hielo que caen rápido (los copos de nieve no parecían granizo).
+        net.minecraft.core.particles.BlockParticleOption ice = new net.minecraft.core.particles.BlockParticleOption(
+                ParticleTypes.BLOCK, net.minecraft.world.level.block.Blocks.PACKED_ICE.defaultBlockState());
+        for (int i = 0; i < 10; i++) {
+            double angle = random.nextDouble() * Math.PI * 2;
+            double dist = 3 + random.nextDouble() * 12;
+            double x = player.getX() + Math.cos(angle) * dist;
+            double z = player.getZ() + Math.sin(angle) * dist;
+            double y = player.getY() + 4 + random.nextDouble() * 8;
+            level.addParticle(ice, x, y, z, 0, -1.2, 0);
         }
     }
 

@@ -184,22 +184,25 @@ public final class SkyRenderer {
                 int alpha;
                 switch (kind) {
                     case STORM -> {
-                        // Más gruesa y oscura cuanto más fuerte es la tormenta en ese punto.
-                        bottom = FAIR_Y - 14;
+                        // Más gruesa, baja y oscura cuanto más fuerte es la tormenta en ese punto; en el borde casi
+                        // como una nube de buen tiempo, para que no se vea un disco oscuro pegado a nubes blancas.
+                        float a = (float) Math.pow(amount, 0.8);
+                        bottom = FAIR_Y - 14 * a;
                         height = heightOf(kind, amount);
-                        r = (int) (118 - 30 * amount);
-                        g = (int) (124 - 30 * amount);
-                        b = (int) (140 - 26 * amount);
-                        alpha = 248;
+                        r = (int) (214 - 124 * a);
+                        g = (int) (218 - 124 * a);
+                        b = (int) (228 - 112 * a);
+                        alpha = 220 + (int) (30 * a);
                     }
                     case HAIL -> {
                         // Granizo: el núcleo de la tormenta, con un tono verdoso.
-                        bottom = FAIR_Y - 16;
+                        float a = (float) Math.pow(amount, 0.8);
+                        bottom = FAIR_Y - 16 * a;
                         height = heightOf(kind, amount);
-                        r = (int) (98 - 24 * amount);
-                        g = (int) (124 - 20 * amount);
-                        b = (int) (118 - 22 * amount);
-                        alpha = 250;
+                        r = (int) (190 - 116 * a);
+                        g = (int) (206 - 102 * a);
+                        b = (int) (200 - 104 * a);
+                        alpha = 224 + (int) (28 * a);
                     }
                     case SNOW -> {
                         // Ventisca: nubarrón blanco grisáceo, bajo y espeso.
@@ -220,12 +223,12 @@ public final class SkyRenderer {
                         alpha = 150 + (int) (50 * amount);
                     }
                     case RAIN -> {
-                        bottom = FAIR_Y - 6;
+                        bottom = FAIR_Y - 6 * amount;
                         height = heightOf(kind, amount);
-                        r = (int) (180 - 20 * amount);
-                        g = (int) (184 - 20 * amount);
-                        b = (int) (196 - 18 * amount);
-                        alpha = 236;
+                        r = (int) (232 - 70 * amount);
+                        g = (int) (234 - 68 * amount);
+                        b = (int) (240 - 60 * amount);
+                        alpha = 222 + (int) (16 * amount);
                     }
                     default -> {
                         // Aviso de tormenta: delante de un frente las nubes de buen tiempo se vuelven grises.
@@ -311,40 +314,55 @@ public final class SkyRenderer {
     }
 
     /**
-     * Aurora: dos cortinas de luz verde y morada muy altas, hacia el norte, que ondulan. Solo de noche y dentro de un frente
-     * de aurora (más intensa cuanto más dentro).
+     * Aurora: tres cortinas de luz hacia el norte que ondulan, con rayos que laten, de verde a violeta. Solo de noche y
+     * dentro de un frente de aurora (más intensa cuanto más dentro).
      */
     private static void drawAurora(VertexConsumer vc, PoseStack.Pose pose, ClientLevel level, Vec3 cam, double seconds, float day) {
         double intensity = ClientFronts.intensity(io.github.hcuadrado428.stormroot.weather.FrontType.AURORA, cam.x, cam.z);
         float night = Math.max(0, 1 - day * 1.6f);
-        float strength = (float) (intensity * night);
+        float strength = (float) Math.min(1.0, intensity * 1.4) * night;
         if (strength < 0.02f) {
             return;
         }
-        int segments = 48;
-        for (int curtain = 0; curtain < 2; curtain++) {
-            double distance = 170 + curtain * 60;
-            float bottom = (float) (250 + curtain * 20 - cam.y);
-            float top = bottom + 60;
+        // Tres cortinas hacia el norte, altas, que ondulan; cada una con rayos verticales que laten y un degradado de
+        // verde (abajo) a violeta transparente (arriba).
+        int segments = 64;
+        int[] base = {0x4CF2A0, 0x3FE0C8, 0x7AF27A};
+        for (int curtain = 0; curtain < 3; curtain++) {
+            double distance = 120 + curtain * 45;
+            float bottom = (float) (170 + curtain * 18 - cam.y);
+            float middle = bottom + 45;
+            float top = bottom + 130;
             for (int k = 0; k < segments; k++) {
-                double a0 = (k - segments / 2.0) * 14;
-                double a1 = a0 + 14;
-                double w0 = Math.sin(a0 * 0.025 + seconds * 0.15 + curtain) * 35;
-                double w1 = Math.sin(a1 * 0.025 + seconds * 0.15 + curtain) * 35;
+                double a0 = (k - segments / 2.0) * 12;
+                double a1 = a0 + 12;
+                double w0 = Math.sin(a0 * 0.02 + seconds * 0.12 + curtain * 1.7) * 40 + Math.sin(a0 * 0.07 + seconds * 0.3) * 8;
+                double w1 = Math.sin(a1 * 0.02 + seconds * 0.12 + curtain * 1.7) * 40 + Math.sin(a1 * 0.07 + seconds * 0.3) * 8;
                 float x0 = (float) a0;
                 float x1 = (float) a1;
                 float z0 = (float) (-distance + w0);
                 float z1 = (float) (-distance + w1);
-                double fade = 1 - Math.abs(k - segments / 2.0) / (segments / 2.0);
-                double shimmer = 0.7 + 0.3 * Math.sin(k * 0.7 + seconds * 0.9 + curtain * 2);
-                int alphaBottom = (int) (150 * strength * fade * shimmer);
-                int alphaTop = (int) (40 * strength * fade * shimmer);
-                int green = (alphaBottom << 24) | 0x52F2A0;
-                int violet = (alphaTop << 24) | 0xA67CFF;
-                vertex(vc, pose, x0, bottom, z0, green);
-                vertex(vc, pose, x1, bottom, z1, green);
-                vertex(vc, pose, x1, top, z1, violet);
-                vertex(vc, pose, x0, top, z0, violet);
+                double fade = Math.max(0, 1 - Math.abs(k - segments / 2.0) / (segments / 2.0));
+                fade = Math.sqrt(fade);
+                double ray0 = 0.55 + 0.45 * Math.sin(k * 1.9 + seconds * 0.8 + curtain * 2.3);
+                double ray1 = 0.55 + 0.45 * Math.sin((k + 1) * 1.9 + seconds * 0.8 + curtain * 2.3);
+                float s0 = (float) (strength * fade * ray0);
+                float s1 = (float) (strength * fade * ray1);
+                int c = base[curtain];
+                int lo0 = ((int) (170 * s0) << 24) | c;
+                int lo1 = ((int) (170 * s1) << 24) | c;
+                int mid0 = ((int) (110 * s0) << 24) | c;
+                int mid1 = ((int) (110 * s1) << 24) | c;
+                int hi0 = ((int) (8 * s0) << 24) | 0xA67CFF;
+                int hi1 = ((int) (8 * s1) << 24) | 0xA67CFF;
+                vertex(vc, pose, x0, bottom, z0, lo0);
+                vertex(vc, pose, x1, bottom, z1, lo1);
+                vertex(vc, pose, x1, middle, z1, mid1);
+                vertex(vc, pose, x0, middle, z0, mid0);
+                vertex(vc, pose, x0, middle, z0, mid0);
+                vertex(vc, pose, x1, middle, z1, mid1);
+                vertex(vc, pose, x1, top, z1, hi1);
+                vertex(vc, pose, x0, top, z0, hi0);
             }
         }
         auroraFrames++;

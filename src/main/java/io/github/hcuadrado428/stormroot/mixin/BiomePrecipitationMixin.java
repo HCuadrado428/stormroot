@@ -29,8 +29,20 @@ public abstract class BiomePrecipitationMixin {
     *///?}
 
     private static void stormroot$filter(BlockPos pos, CallbackInfoReturnable<Biome.Precipitation> cir) {
-        if (cir.getReturnValue() != Biome.Precipitation.NONE && SkyWeather.noRainCloudAt(pos.getX() + 0.5, pos.getZ() + 0.5)) {
+        Biome.Precipitation vanilla = cir.getReturnValue();
+        if (vanilla == Biome.Precipitation.NONE) {
+            return;
+        }
+        io.github.hcuadrado428.stormroot.sky.CloudCover.Kind kind = SkyWeather.cloudKindAt(pos.getX() + 0.5, pos.getZ() + 0.5);
+        if (kind == null) {
+            return;
+        }
+        if (kind == io.github.hcuadrado428.stormroot.sky.CloudCover.Kind.NONE
+                || kind == io.github.hcuadrado428.stormroot.sky.CloudCover.Kind.DUST) {
             cir.setReturnValue(Biome.Precipitation.NONE);
+        } else if (kind == io.github.hcuadrado428.stormroot.sky.CloudCover.Kind.SNOW && vanilla == Biome.Precipitation.RAIN) {
+            // Bajo una ventisca nieva aunque el bioma sea templado (no en los secos: ahí vanilla dice NONE).
+            cir.setReturnValue(Biome.Precipitation.SNOW);
         }
     }
 }
