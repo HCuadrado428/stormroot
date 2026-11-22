@@ -34,6 +34,8 @@ Primera versión jugable. Minecraft 1.20.1 (Fabric, Forge; también NeoForge 1.2
 - Guardián de micelio más robusto.
 - **Guardián de micelio**: defensor de las redes grandes; al vencerlo la red se calma y suelta el **corazón de micelio**,
   que domestica redes. **Huevos de generación** de esporín, tejedor y guardián.
+- `/weather` y dormir mueven los frentes: `clear` los deshace y pausa los nuevos, `rain`/`thunder` crean uno encima de
+  cada jugador, dormir deshace los que hay encima, y `doWeatherCycle false` (`advance_weather` en 1.21.11) los congela.
 - Mobs mejorados: el esporín tiene ahora un sombrero con cúpula, motas que brillan y se balancea al andar; la
   **tejedora** (antes tejedor) es una araña del tamaño de la de cueva con setas por el cuerpo y ocho ojos verdes que
   brillan; el guardián es una **seta gigante que anda**, con cara bajo el sombrero, ojos y láminas que brillan, brazos

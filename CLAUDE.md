@@ -71,7 +71,12 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   Todos llaman a `ClientWeather.markFogApplied()` (el self-test lo comprueba).
 - Rayos: `LightningCrystals.onEntityAdded` devuelve `true` para cancelar rayos naturales fuera de los frentes de tormenta
   (Forge/NeoForge cancelan el evento; Fabric hace `discard()`).
-- `/weather`: Stormroot siempre pone duraciones ≤ `STEP_TICKS*2`; si el mundo tiene una mayor, es un `/weather` y se espera
+- `/weather`: Stormroot siempre pone duraciones ≤ `STEP_TICKS*2`. `mixin/ServerLevelWeatherMixin` (común, 3 loaders) mira
+  `ServerLevel#setWeatherParameters`: una duración mayor es un `/weather` → `FrontTicker.onWeatherCommand` (clear: los
+  frentes se deshacen y no nacen nuevos mientras dure; rain/thunder: frente encima de cada jugador con esa duración; se
+  cancela la llamada vanilla). Dormir (`resetWeatherCycle`) deshace los frentes sobre los jugadores. Los frentes que se
+  deshacen (`dissipating`) ya no ponen lluvia. Regla `doWeatherCycle` / `advance_weather` (1.21.11) en false → la
+  simulación no avanza (`FrontTicker.advancesWeather`). Si otro mod cambia los datos del clima a mano, se espera
   (`FrontTicker.weatherOverridden`). Ajustes del mundo en `config/WorldSettings` (guardados en `FrontSavedData`).
 - Mod Menu (solo Fabric, `modCompileOnly`, versión en `versions/dependencies/*.properties`): `client/ModMenuIntegration`,
   excluida al compilar Forge/NeoForge.
@@ -160,10 +165,11 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   su charco al deshacer (`SeepageTicker.undo`). Fósiles: `Sandstorms.uncoverFossil` (huesos sobre arena natural).
   Niebla marrón: `client/mixin/sky/FogColorMixin` (`FogRenderer.setupColor` TAIL hasta 1.21.1, `computeFogColor`
   RETURN en 1.21.11; 3 loaders) + `ClientWeather.sandFogTint`.
+- La CI sube los jars (Stormroot y Bloomberto) en el artefacto `jars` y además en el log (`JAR-B64 <nombre> <base64>`).
 - `research` también saca JSON de datos y recursos vanilla (loot tables, modelos) de los jars del juego.
 - Fuentes decompiladas desde la CI: `gh api -X POST repos/HCuadrado428/stormroot/actions/workflows/research.yml/dispatches`
   con `inputs[classes]` y `inputs[pattern]` (workflow `research`).
-- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 60 comprobaciones; cliente con
+- Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 62 comprobaciones; cliente con
   un jugador en pantalla virtual: 20 más, incluidas las de Bloomberto y las del cielo).
 - En el self-test, el clima se lee de `server.getWorldData().overworldData()`: `level.isRaining()/isThundering()` son la
   intensidad visual, que sube tick a tick. Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.

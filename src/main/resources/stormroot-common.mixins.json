@@ -7,7 +7,8 @@
     "BiomePrecipitationMixin",
     "LightningBoltFireMixin",
     "CropFrostMixin",
-    "ProjectileWindMixin"
+    "ProjectileWindMixin",
+    "ServerLevelWeatherMixin"
   ],
   "injectors": {
     "defaultRequire": 1

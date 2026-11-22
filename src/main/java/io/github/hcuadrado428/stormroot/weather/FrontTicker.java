@@ -7,7 +7,9 @@ import io.github.hcuadrado428.stormroot.network.StormrootNetwork;
 import io.github.hcuadrado428.stormroot.seep.SeepageTicker;
 import io.github.hcuadrado428.stormroot.selftest.SelfTest;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -40,6 +42,12 @@ public final class FrontTicker {
     private static boolean appliedOnce;
     /** Alguien cambió el clima con /weather (u otro mod): Stormroot no lo toca hasta que ese clima termine. */
     private static boolean weatherOverridden;
+    /** Tiempo de juego hasta el que no nacen frentes nuevos (después de un /weather clear). */
+    private static long noSpawnUntil = Long.MIN_VALUE;
+    /** Frentes que se deshacen por /weather clear o por dormir: ya no ponen lluvia vanilla mientras se van. */
+    private static final Set<Long> dissipating = new HashSet<>();
+    /** Stormroot está poniendo el clima vanilla ahora mismo (para no confundirlo con un /weather). */
+    private static boolean applying;
 
     private FrontTicker() {
     }
@@ -66,9 +74,20 @@ public final class FrontTicker {
             return;
         }
         tickCounter = 0;
+        step(server);
+    }
 
+    /** Un paso de la simulación (cada {@link #STEP_TICKS}); público para el self-test. */
+    public static void step(MinecraftServer server) {
         FrontSimulation sim = simulation(server);
         ServerLevel overworld = server.overworld();
+        if (!advancesWeather(overworld)) {
+            // Regla doWeatherCycle / advance_weather en false: los frentes se quedan como están (ni se mueven, ni nacen,
+            // ni mueren), pero siguen poniendo el clima y mojando.
+            applyWeather(overworld, sim);
+            SeepageTicker.step(server, sim, STEP_TICKS / 20.0);
+            return;
+        }
 
         List<double[]> anchors = new ArrayList<>();
         for (ServerPlayer player : overworld.players()) {
@@ -76,7 +95,7 @@ public final class FrontTicker {
         }
 
         sim.setMaxFronts(StormrootConfig.maxFronts.getAsInt());
-        sim.setSpawnChance(StormrootConfig.frontSpawnChance.getAsDouble());
+        sim.setSpawnChance(spawnsPaused(overworld) ? 0.0 : StormrootConfig.frontSpawnChance.getAsDouble());
         List<WeatherFront> rainy = new ArrayList<>();
         for (WeatherFront front : sim.fronts()) {
             if (front.type() == FrontType.RAIN || front.type() == FrontType.THUNDERSTORM || front.type() == FrontType.MONSOON) {
@@ -96,9 +115,119 @@ public final class FrontTicker {
                 Rainbows.onRainEnded(overworld, ended);
             }
         }
+        dissipating.removeIf(id -> sim.fronts().stream().noneMatch(f -> f.id() == id));
         applyWeather(overworld, sim);
         SeepageTicker.step(server, sim, STEP_TICKS / 20.0);
         save(server);
+    }
+
+    /** {@code false} si la regla del mundo congela el clima ({@code doWeatherCycle}, {@code advance_weather} en 1.21.11). */
+    public static boolean advancesWeather(ServerLevel level) {
+        //? if >=1.21.11 {
+        return level.getGameRules().get(net.minecraft.world.level.gamerules.GameRules.ADVANCE_WEATHER);
+        //?} else {
+        /*return level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_WEATHER_CYCLE);
+        *///?}
+    }
+
+    /** Después de un /weather clear no nacen frentes nuevos hasta que se acabe su duración. */
+    public static boolean spawnsPaused(ServerLevel level) {
+        return level.getGameTime() < noSpawnUntil;
+    }
+
+    public static void resumeSpawnsForTest() {
+        noSpawnUntil = Long.MIN_VALUE;
+        dissipating.clear();
+    }
+
+    /**
+     * Lo llama {@code mixin/ServerLevelWeatherMixin} cuando algo pone el clima vanilla ({@code /weather}, otros mods).
+     * Las duraciones de Stormroot nunca pasan de {@code STEP_TICKS * 2}; una más larga es un {@code /weather}.
+     * Devuelve {@code true} si Stormroot se encarga (y la llamada vanilla se cancela).
+     */
+    public static boolean onWeatherCommand(ServerLevel level, int clearTime, int weatherTime, boolean rain, boolean thunder) {
+        MinecraftServer server = level.getServer();
+        if (applying || !controlsWeather || level != server.overworld()
+                || Math.max(clearTime, weatherTime) <= STEP_TICKS * 2) {
+            return false;
+        }
+        FrontSimulation sim = simulation(server);
+        if (!rain) {
+            // /weather clear: los frentes se deshacen poco a poco y no nacen nuevos mientras dure.
+            for (WeatherFront front : sim.fronts()) {
+                dissipate(front);
+            }
+            noSpawnUntil = level.getGameTime() + clearTime;
+            Stormroot.LOGGER.info("[Stormroot] /weather clear: {} frente(s) se deshacen; sin frentes nuevos en {} ticks",
+                    sim.fronts().size(), clearTime);
+        } else {
+            // /weather rain|thunder: un frente encima de cada jugador (o en el origen si no hay nadie) que dura lo que diga el comando.
+            FrontType type = thunder ? FrontType.THUNDERSTORM : FrontType.RAIN;
+            double seconds = weatherTime / 20.0;
+            noSpawnUntil = Long.MIN_VALUE;
+            for (double[] at : weatherAnchors(level)) {
+                WeatherFront base = sim.create(type, at[0], at[1]);
+                // Nace ya crecido (10 % de su vida) para que llueva enseguida, y dura `seconds` a partir de ahora.
+                sim.add(new WeatherFront(base.id(), type, base.x(), base.z(), base.radius(), base.vx(), base.vz(),
+                        seconds * 0.1, seconds * 1.1));
+            }
+            Stormroot.LOGGER.info("[Stormroot] /weather {}: nuevo frente durante {} s", thunder ? "thunder" : "rain", seconds);
+        }
+        weatherOverridden = false;
+        applyNow(server);
+        save(server);
+        return true;
+    }
+
+    /** Lo llama el mixin cuando los jugadores duermen con lluvia: se deshacen los frentes que tienen encima. */
+    public static void onSleptThroughWeather(ServerLevel level) {
+        MinecraftServer server = level.getServer();
+        if (!controlsWeather || level != server.overworld()) {
+            return;
+        }
+        List<double[]> sleepers = new ArrayList<>();
+        for (ServerPlayer player : level.players()) {
+            sleepers.add(new double[] {player.getX(), player.getZ()});
+        }
+        int n = dissipateNear(server, sleepers);
+        Stormroot.LOGGER.info("[Stormroot] Han dormido con mal tiempo: {} frente(s) se deshacen", n);
+        applyNow(server);
+        save(server);
+    }
+
+    /** Deshace los frentes que afectan a alguno de los puntos dados; devuelve cuántos. */
+    public static int dissipateNear(MinecraftServer server, List<double[]> points) {
+        int n = 0;
+        for (WeatherFront front : simulation(server).fronts()) {
+            for (double[] p : points) {
+                if (front.intensityAt(p[0], p[1]) > 0.0) {
+                    dissipate(front);
+                    n++;
+                    break;
+                }
+            }
+        }
+        return n;
+    }
+
+    public static boolean isDissipating(WeatherFront front) {
+        return dissipating.contains(front.id());
+    }
+
+    private static void dissipate(WeatherFront front) {
+        front.fadeOut();
+        dissipating.add(front.id());
+    }
+
+    private static List<double[]> weatherAnchors(ServerLevel level) {
+        List<double[]> out = new ArrayList<>();
+        for (ServerPlayer player : level.players()) {
+            out.add(new double[] {player.getX(), player.getZ()});
+        }
+        if (out.isEmpty()) {
+            out.add(new double[] {0.5, 0.5}); // sin jugadores (servidor vacío, self-test): en el origen
+        }
+        return out;
     }
 
     /** Manda a cada jugador del Overworld los frentes que tiene cerca (para el clima por zonas en el cliente). */
@@ -147,6 +276,8 @@ public final class FrontTicker {
             tickCounter = 0;
             appliedOnce = false;
             weatherOverridden = false;
+            noSpawnUntil = Long.MIN_VALUE;
+            dissipating.clear();
             WorldSettings.reset();
             FrontSavedData data = FrontSavedData.get(server);
             if (data.restoreInto(simulation)) {
@@ -250,7 +381,7 @@ public final class FrontTicker {
         FrontType strongest = null;
         for (ServerPlayer player : level.players()) {
             for (WeatherFront front : sim.fronts()) {
-                if (front.intensityAt(player.getX(), player.getZ()) < WEATHER_THRESHOLD) {
+                if (isDissipating(front) || front.intensityAt(player.getX(), player.getZ()) < WEATHER_THRESHOLD) {
                     continue;
                 }
                 if (front.type() == FrontType.THUNDERSTORM) {
@@ -267,12 +398,17 @@ public final class FrontTicker {
 
         // Duración un poco mayor que un paso: así el ciclo vanilla no cambia el clima por su cuenta,
         // y si Stormroot se desactiva, el clima vanilla vuelve solo en unos segundos.
-        if (strongest == FrontType.THUNDERSTORM) {
-            level.setWeatherParameters(0, duration, true, true);
-        } else if (strongest == FrontType.RAIN) {
-            level.setWeatherParameters(0, duration, true, false);
-        } else {
-            level.setWeatherParameters(duration, 0, false, false);
+        applying = true;
+        try {
+            if (strongest == FrontType.THUNDERSTORM) {
+                level.setWeatherParameters(0, duration, true, true);
+            } else if (strongest == FrontType.RAIN) {
+                level.setWeatherParameters(0, duration, true, false);
+            } else {
+                level.setWeatherParameters(duration, 0, false, false);
+            }
+        } finally {
+            applying = false;
         }
     }
 }

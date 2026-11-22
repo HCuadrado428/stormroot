@@ -140,7 +140,9 @@ public final class SelfTest {
                 run("sync packet round trip", SelfTest::checkPacket);
                 run("commands", () -> checkCommands(server));
                 run("world settings", () -> checkSettings(server));
-                run("/weather is respected", () -> checkWeatherCommand(server));
+                run("/weather moves fronts", () -> checkWeatherCommand(server));
+                run("sleeping clears the storm overhead", () -> checkSleepClearsWeather(server));
+                run("weather cycle rule freezes fronts", () -> checkWeatherCycleRule(server));
                 run("stray storm lightning is removed", () -> checkStrayLightning(server));
                 run("forecast", SelfTest::checkForecast);
                 run("rain falls only under rain clouds", () -> checkRainUnderClouds(server));
@@ -305,18 +307,74 @@ public final class SelfTest {
 
     private static void checkWeatherCommand(MinecraftServer server) {
         CommandSourceStack source = server.createCommandSourceStack().withSuppressedOutput();
-        ServerLevel level = server.overworld();
-        FrontTicker.simulation(server).clear();
+        FrontSimulation sim = FrontTicker.simulation(server);
+        FrontTicker.setControlsWeather(true);
+        FrontTicker.resumeSpawnsForTest();
+        sim.clear();
         FrontTicker.applyNow(server); // Stormroot pone el clima (despejado)
         // level.isRaining() es la intensidad visual (sube tick a tick); el estado del clima está en los datos del mundo.
         net.minecraft.world.level.storage.ServerLevelData data = server.getWorldData().overworldData();
+        // /weather rain 600 (600 ticks = 30 s): nace un frente de lluvia que dura 30 s y Stormroot sigue al mando.
         server.getCommands().performPrefixedCommand(source, "weather rain 600");
+        WeatherFront rain = sim.fronts().stream().filter(f -> f.type() == FrontType.RAIN).findFirst().orElse(null);
+        boolean rainOk = rain != null && Math.abs(rain.maxAgeSeconds() - 33.0) < 0.01 && rain.lifeFactor() > 0.99
+                && !FrontTicker.weatherOverridden();
+        server.getCommands().performPrefixedCommand(source, "weather thunder 600");
+        boolean thunderOk = sim.fronts().stream().anyMatch(f -> f.type() == FrontType.THUNDERSTORM);
+        // /weather clear: todos se deshacen, no nacen nuevos y deja de llover ya.
+        server.getCommands().performPrefixedCommand(source, "weather clear 6000");
+        boolean fading = !sim.fronts().isEmpty()
+                && sim.fronts().stream().allMatch(f -> f.lifeFactor() < 1.0 && FrontTicker.isDissipating(f));
+        boolean clearOk = fading && FrontTicker.spawnsPaused(server.overworld()) && !data.isRaining();
+        FrontTicker.resumeSpawnsForTest();
+        sim.clear();
         FrontTicker.applyNow(server);
-        boolean respected = data.isRaining() && FrontTicker.weatherOverridden() && !FrontTicker.controlsWeatherNow();
-        server.getCommands().performPrefixedCommand(source, "weather clear 1");
+        check("/weather moves fronts", rainOk && thunderOk && clearOk,
+                "rain=" + rainOk + ", thunder=" + thunderOk + ", clear=" + clearOk + " (se deshacen=" + fading + ")");
+    }
+
+    private static void checkSleepClearsWeather(MinecraftServer server) {
+        FrontSimulation sim = FrontTicker.simulation(server);
+        FrontTicker.resumeSpawnsForTest();
+        sim.clear();
+        WeatherFront over = new WeatherFront(911, FrontType.THUNDERSTORM, 0, 0, 100, 0, 0, 500, 1000);
+        WeatherFront far = new WeatherFront(912, FrontType.RAIN, 5000, 0, 100, 0, 0, 500, 1000);
+        sim.add(over);
+        sim.add(far);
+        // Los que duermen están en (10, 10): se deshace la tormenta que tienen encima, la lejana no.
+        int n = FrontTicker.dissipateNear(server, List.of(new double[] {10, 10}));
+        boolean ok = n == 1 && over.lifeFactor() < 1.0 && FrontTicker.isDissipating(over)
+                && far.lifeFactor() == 1.0 && !FrontTicker.isDissipating(far);
+        FrontTicker.resumeSpawnsForTest();
+        sim.clear();
         FrontTicker.applyNow(server);
-        boolean back = !FrontTicker.weatherOverridden() && !data.isRaining();
-        check("/weather is respected", respected && back, "respeta /weather=" + respected + ", retoma el control=" + back);
+        check("sleeping clears the storm overhead", ok, "deshechos=" + n + ", encima=" + over.lifeFactor() + ", lejos=" + far.lifeFactor());
+    }
+
+    private static void checkWeatherCycleRule(MinecraftServer server) {
+        CommandSourceStack source = server.createCommandSourceStack().withSuppressedOutput();
+        FrontSimulation sim = FrontTicker.simulation(server);
+        sim.clear();
+        WeatherFront front = new WeatherFront(921, FrontType.RAIN, 300, 300, 100, 0.5, 0, 500, 1000);
+        sim.add(front);
+        //? if >=1.21.11 {
+        String rule = "advance_weather";
+        //?} else {
+        /*String rule = "doWeatherCycle";
+        *///?}
+        server.getCommands().performPrefixedCommand(source, "gamerule " + rule + " false");
+        boolean frozenRule = !FrontTicker.advancesWeather(server.overworld());
+        double age = front.ageSeconds();
+        double x = front.x();
+        FrontTicker.step(server);
+        boolean frozen = front.ageSeconds() == age && front.x() == x;
+        server.getCommands().performPrefixedCommand(source, "gamerule " + rule + " true");
+        FrontTicker.step(server);
+        boolean moves = FrontTicker.advancesWeather(server.overworld()) && front.ageSeconds() > age;
+        sim.clear();
+        FrontTicker.applyNow(server);
+        check("weather cycle rule freezes fronts", frozenRule && frozen && moves,
+                "regla=" + frozenRule + ", congelado=" + frozen + ", vuelve a moverse=" + moves);
     }
 
     private static void checkStrayLightning(MinecraftServer server) {

@@ -193,6 +193,8 @@ Requieren permisos de operador (nivel 2).
 | `/stormroot settings seepage\|cave_changes\|lightning_roots\|hail_breaks_glass on\|off` | Apaga la filtración, los cambios de bloques en cuevas, las raíces de rayo o que el granizo rompa cristal, sin necesitar Bloomberto |
 | `/stormroot weather on\|off` | Stormroot controla el clima vanilla (`on`, por defecto) o lo deja en paz (`off`) |
 
+**`/weather` y dormir**: `/weather clear` deshace los frentes poco a poco y no nacen nuevos mientras dure; `/weather rain` y `/weather thunder` crean un frente encima de cada jugador que dura lo que diga el comando; dormir con mal tiempo deshace los frentes que hay encima de los jugadores; con `/gamerule doWeatherCycle false` (`advance_weather` en 1.21.11) los frentes se quedan quietos. Con `/stormroot weather off`, `/weather` funciona como en vanilla.
+
 ---
 
 ## 🌩️ 1. Frentes climáticos
