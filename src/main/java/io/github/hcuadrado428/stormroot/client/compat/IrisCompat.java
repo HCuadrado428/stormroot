@@ -23,6 +23,17 @@ public final class IrisCompat {
         return assigned;
     }
 
+    /** ¿Hay un pack de shaders de Iris encendido? (false sin Iris). */
+    public static boolean shadersInUse() {
+        try {
+            Class<?> api = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
+            Object iris = api.getMethod("getInstance").invoke(null);
+            return (Boolean) api.getMethod("isShaderPackInUse").invoke(iris);
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
     /** Se llama al dibujar el cielo; solo hace algo la primera vez. */
     public static void registerSkyPipeline() {
         if (tried) {
@@ -41,7 +52,9 @@ public final class IrisCompat {
             Class<?> programClass = Class.forName("net.irisshaders.iris.api.v0.IrisProgram");
             Object[] programs = programClass.getEnumConstants();
             Object chosen = null;
-            for (String name : PROGRAMS) {
+            // -Dstormroot.irisProgram=NOMBRE para probar otro programa.
+            String forced = System.getProperty("stormroot.irisProgram");
+            for (String name : forced != null ? new String[] {forced} : PROGRAMS) {
                 for (Object p : programs) {
                     if (chosen == null && ((Enum<?>) p).name().equals(name)) {
                         chosen = p;

@@ -237,6 +237,16 @@ jobs:
           chmod +x ./gradlew scripts/selftest.sh scripts/selftest-client-xvfb.sh
           scripts/selftest.sh client ${{ matrix.target }}
 
+      - name: API de Iris (programas y cómo se asignan)
+        if: always() && matrix.shaders != ''
+        run: |
+          jar=$(find ~/.gradle .gradle -name 'iris-*.jar' -path '*modrinth*' 2>/dev/null | head -1)
+          echo "jar: $jar"
+          [ -n "$jar" ] || exit 0
+          javap -cp "$jar" net.irisshaders.iris.api.v0.IrisProgram || true
+          javap -c -p -cp "$jar" net.irisshaders.iris.apiimpl.IrisApiV0Impl | sed -n '/assignPipeline/,/^$/p' | head -80 || true
+          grep -E "Iris: programas|no aceptó|no permite" run/logs/latest.log || true
+
       - name: Logs del self-test
         if: failure()
         uses: actions/upload-artifact@v4
