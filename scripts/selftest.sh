@@ -16,6 +16,8 @@ server_props() {
   printf 'online-mode=false\nlevel-name=selftest\nlevel-type=minecraft\\:flat\ngenerate-structures=false\nspawn-monsters=false\nspawn-protection=0\n' > "$run/server.properties"
 }
 
+# RENDER_MODS=sodium,iris scripts/selftest.sh client 1.21.1-fabric: el cliente con esos mods (solo Fabric).
+tag="${RENDER_MODS:++${RENDER_MODS//,/+}}"
 for t in "$@"; do
   log="$(mktemp)"
   echo "== $t ($side)"
@@ -38,13 +40,13 @@ for t in "$@"; do
       scripts/selftest-client-xvfb.sh "$t" "$log"
     # En la CI, además, cada captura reducida va al log en base64 (para verlas sin descargar artefactos).
     if [ -n "${CI:-}" ] && command -v convert > /dev/null; then
-      for shot in build/selftest-shots/"$t"-*.png; do
+      for shot in build/selftest-shots/"$t$tag"-*.png; do
         [ -f "$shot" ] || continue
         echo "SHOT-B64 $(basename "$shot" .png) $(convert "$shot" -alpha off -resize 640x -quality 70 jpg:- | base64 -w0)"
       done
     fi
   fi
-  grep -E "\[selftest\] (PASS|FAIL|SKIP|SCREENSHOT|.* done|cueva)" "$log" | sed -E "s/^.*\[selftest\]/$t: [selftest]/"
+  grep -E "\[selftest\] (PASS|FAIL|SKIP|PERF|SCREENSHOT|.* done|cueva)" "$log" | sed -E "s/^.*\[selftest\]/$t: [selftest]/"
   ok=1
   grep -q "\[selftest\] server done" "$log" || { ok=0; echo "$t: el self-test del servidor no terminó"; }
   if [ "$side" != server ] && ! grep -q "\[selftest\] client done" "$log"; then ok=0; echo "$t: el self-test del cliente no terminó"; fi
@@ -54,7 +56,7 @@ for t in "$@"; do
   else
     fail=1
     echo "$t: FALLÓ"
-    mkdir -p build/selftest-logs && cp "$log" "build/selftest-logs/$t-$side.log"
+    mkdir -p build/selftest-logs && cp "$log" "build/selftest-logs/$t$tag-$side.log"
     if [ -n "${CI:-}" ]; then grep -E "\[selftest\]|Exception|ERROR|Caused by" "$log" | tail -60; tail -40 "$log"; fi
   fi
 done

@@ -968,6 +968,11 @@ public final class SelfTest {
         serverDone = true;
         stage = 99;
         server.overworld().setChunkForced(CX, CZ, false);
+        for (String line : io.github.hcuadrado428.stormroot.Perf.report("servidor.").split("\n")) {
+            if (!line.isBlank()) {
+                Stormroot.LOGGER.info("[selftest] PERF {}", line);
+            }
+        }
         Stormroot.LOGGER.info("[selftest] server done: {} passed, {} failed", PASSED.get(), FAILED.get());
         if (MODE.equals("server") && exitWhenDone()) {
             server.halt(false);

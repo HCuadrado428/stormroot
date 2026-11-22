@@ -42,6 +42,12 @@ public final class ClientWeather {
     public static void tick() {
         io.github.hcuadrado428.stormroot.client.sky.ClientSkySource.ensureRegistered();
         ClientSelfTest.tick();
+        long perf = io.github.hcuadrado428.stormroot.Perf.start();
+        tickWeather();
+        io.github.hcuadrado428.stormroot.Perf.end("cliente.tick", perf);
+    }
+
+    private static void tickWeather() {
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
         LocalPlayer player = mc.player;

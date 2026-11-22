@@ -61,6 +61,29 @@ if (mod.isFabric) {
     }
 }
 
+// Mods de render para probar la compatibilidad (solo Fabric, solo en runClient; nunca van en el jar):
+//   ./gradlew :1.21.1-fabric:runClient -Pstormroot.renderMods=sodium,iris
+// Las versiones están en versions/dependencies/<versión>.properties (sodium_version, iris_version).
+val renderMods: List<String> =
+    (findProperty("stormroot.renderMods") as String?)
+        ?.split(",")
+        ?.map { it.trim() }
+        ?.filter { it.isNotEmpty() }
+        ?: emptyList()
+if (mod.isFabric && renderMods.isNotEmpty()) {
+    repositories {
+        maven("https://api.modrinth.com/maven") {
+            content { includeGroup("maven.modrinth") }
+        }
+    }
+    dependencies {
+        for (m in renderMods) {
+            "modLocalRuntime"("maven.modrinth:$m:${project.mod.prop("${m}_version")}")
+        }
+    }
+    logger.lifecycle("[stormroot] ${stonecutter.current.project}: runClient con ${renderMods.joinToString()}")
+}
+
 // Bloomberto (opcional). Si existe libs/bloomberto/bloomberto-*+<target>.jar (scripts/fetch-bloomberto.sh),
 // se compila la integración (paquete compat.bloomberto) y Bloomberto se carga en runClient/runServer.
 // Si no existe (p. ej. 1.21.11, que Bloomberto no soporta), esa integración se excluye y el mod compila igual.

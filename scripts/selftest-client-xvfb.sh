@@ -3,9 +3,11 @@
 # escribe "[selftest] SCREENSHOT <nombre>", captura la pantalla virtual en build/selftest-shots/<target>-<nombre>.png.
 # Uso: scripts/selftest-client-xvfb.sh <target> <log>
 t="$1"; log="$2"
+# Con RENDER_MODS=sodium,iris el cliente arranca con esos mods y las capturas llevan "+sodium+iris" en el nombre.
+tag="${RENDER_MODS:++${RENDER_MODS//,/+}}"
 shots="build/selftest-shots"
 mkdir -p "$shots"
-./gradlew ":$t:runClient" --args="--quickPlaySingleplayer testworld" > "$log" 2>&1 &
+./gradlew ":$t:runClient" ${RENDER_MODS:+-Pstormroot.renderMods=$RENDER_MODS} --args="--quickPlaySingleplayer testworld" > "$log" 2>&1 &
 pid=$!
 taken=" "
 used="$(mktemp)"
@@ -23,8 +25,8 @@ while kill -0 "$pid" 2>/dev/null; do
     done
     if [ -n "$newest" ] && ! grep -qx "$newest" "$used"; then
       echo "$newest" >> "$used"
-      convert "$newest" -alpha off "$shots/$t-$name.png"
-      echo "captura: $shots/$t-$name.png brillo=$(convert "$shots/$t-$name.png" -format '%[fx:mean]' info:)"
+      convert "$newest" -alpha off "$shots/$t$tag-$name.png"
+      echo "captura: $shots/$t$tag-$name.png brillo=$(convert "$shots/$t$tag-$name.png" -format '%[fx:mean]' info:)"
     else
       echo "no se pudo capturar $name (el juego no guardó la captura)"
     fi

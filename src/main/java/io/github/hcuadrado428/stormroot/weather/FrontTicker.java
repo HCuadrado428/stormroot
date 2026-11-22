@@ -54,6 +54,7 @@ public final class FrontTicker {
 
     public static void onServerTick(MinecraftServer server) {
         SelfTest.tick(server);
+        long perfTick = io.github.hcuadrado428.stormroot.Perf.start();
         LightningCrystals.tick();
         LightningRoots.tick();
         if (server == currentServer) {
@@ -70,11 +71,14 @@ public final class FrontTicker {
             Sandstorms.tick(server.overworld());
             Rainbows.tick(server.overworld());
         }
+        io.github.hcuadrado428.stormroot.Perf.end("servidor.tick", perfTick);
         if (++tickCounter < STEP_TICKS && server == currentServer) {
             return;
         }
         tickCounter = 0;
+        long perfStep = io.github.hcuadrado428.stormroot.Perf.start();
         step(server);
+        io.github.hcuadrado428.stormroot.Perf.end("servidor.paso", perfStep);
     }
 
     /** Un paso de la simulación (cada {@link #STEP_TICKS}); público para el self-test. */
@@ -85,7 +89,7 @@ public final class FrontTicker {
             // Regla doWeatherCycle / advance_weather en false: los frentes se quedan como están (ni se mueven, ni nacen,
             // ni mueren), pero siguen poniendo el clima y mojando.
             applyWeather(overworld, sim);
-            SeepageTicker.step(server, sim, STEP_TICKS / 20.0);
+            stepSeepage(server, sim);
             return;
         }
 
@@ -117,8 +121,14 @@ public final class FrontTicker {
         }
         dissipating.removeIf(id -> sim.fronts().stream().noneMatch(f -> f.id() == id));
         applyWeather(overworld, sim);
-        SeepageTicker.step(server, sim, STEP_TICKS / 20.0);
+        stepSeepage(server, sim);
         save(server);
+    }
+
+    private static void stepSeepage(MinecraftServer server, FrontSimulation sim) {
+        long perf = io.github.hcuadrado428.stormroot.Perf.start();
+        SeepageTicker.step(server, sim, STEP_TICKS / 20.0);
+        io.github.hcuadrado428.stormroot.Perf.end("servidor.paso.filtracion", perf);
     }
 
     /** {@code false} si la regla del mundo congela el clima ({@code doWeatherCycle}, {@code advance_weather} en 1.21.11). */

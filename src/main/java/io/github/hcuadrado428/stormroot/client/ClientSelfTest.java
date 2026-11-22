@@ -1,5 +1,6 @@
 package io.github.hcuadrado428.stormroot.client;
 
+import io.github.hcuadrado428.stormroot.Perf;
 import io.github.hcuadrado428.stormroot.Stormroot;
 import io.github.hcuadrado428.stormroot.client.sky.SkyRenderer;
 import io.github.hcuadrado428.stormroot.compat.Compat;
@@ -36,6 +37,7 @@ public final class ClientSelfTest {
     private static String pendingShot;
     private static int shotAt;
     private static int holdUntil;
+    private static long perfFrames;
 
     private ClientSelfTest() {
     }
@@ -596,9 +598,57 @@ public final class ClientSelfTest {
                 pitch = -8f;
                 wait = 160;
             }
+            case 11 -> {
+                // Rendimiento en el peor caso: de día (sombras), tormenta encima y cuatro frentes más alrededor.
+                if (waited == 1) {
+                    cmd(server, "tp @a " + GX + " " + (GY + 4) + " " + GZ);
+                    server.execute(() -> {
+                        FrontSimulation sim = FrontTicker.simulation(server);
+                        sim.clear();
+                        sim.add(new WeatherFront(nextFrontId++, FrontType.THUNDERSTORM, GX, GZ, 120, 0, 0, 1000, 2000));
+                        sim.add(new WeatherFront(nextFrontId++, FrontType.SANDSTORM, GX + 260, GZ, 120, 0, 0, 1000, 2000));
+                        sim.add(new WeatherFront(nextFrontId++, FrontType.BLIZZARD, GX - 260, GZ, 120, 0, 0, 1000, 2000));
+                        sim.add(new WeatherFront(nextFrontId++, FrontType.RAIN, GX, GZ + 260, 120, 0, 0, 1000, 2000));
+                        sim.add(new WeatherFront(nextFrontId++, FrontType.HEAT_WAVE, GX, GZ - 260, 120, 0, 0, 1000, 2000));
+                        FrontTicker.applyNow(server);
+                        FrontTicker.save(server);
+                    });
+                }
+                if (waited == 60) {
+                    // Se mide desde aquí: las nubes y las sombras ya están montadas.
+                    Perf.reset("cliente.");
+                    perfFrames = SkyRenderer.framesDrawn();
+                }
+                if (waited == 360) {
+                    long frames = SkyRenderer.framesDrawn() - perfFrames;
+                    Stormroot.LOGGER.info("[selftest] PERF fotogramas por segundo (pantalla virtual por software) ≈ {}", frames / 15);
+                    for (String line : Perf.report("cliente.").split("\n")) {
+                        if (!line.isBlank()) {
+                            Stormroot.LOGGER.info("[selftest] PERF {}", line);
+                        }
+                    }
+                    Perf.Stat sky = Perf.get("cliente.cielo.total");
+                    SelfTest.report("perf sky frame cost", sky != null && sky.meanMicros() < 25_000,
+                            "el cielo tarda " + (sky == null ? "?" : sky) + " por fotograma");
+                    Perf.Stat tick = Perf.get("cliente.tick");
+                    SelfTest.report("perf client tick cost", tick != null && tick.meanMicros() < 10_000,
+                            "el tick del cliente tarda " + (tick == null ? "?" : tick));
+                }
+                shot = "rendimiento";
+                pitch = 10f;
+                wait = 360;
+            }
             default -> {
                 clear(server);
                 mc.options.hideGui = false;
+                Perf.Stat step = Perf.get("servidor.paso");
+                SelfTest.report("perf server step cost", step != null && step.meanMicros() < 50_000,
+                        "el paso del servidor tarda " + (step == null ? "?" : step));
+                for (String line : Perf.report("servidor.").split("\n")) {
+                    if (!line.isBlank()) {
+                        Stormroot.LOGGER.info("[selftest] PERF {}", line);
+                    }
+                }
                 finish(mc);
                 return;
             }

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.hcuadrado428.stormroot.client.ClientFronts;
 import io.github.hcuadrado428.stormroot.config.StormrootConfig;
+import io.github.hcuadrado428.stormroot.Perf;
 import io.github.hcuadrado428.stormroot.sky.CloudCover;
 import io.github.hcuadrado428.stormroot.weather.WeatherFront;
 import java.util.List;
@@ -74,6 +75,9 @@ public final class SkyRenderer {
     private static int stormCells;
     private static int dustCells;
 
+    /** {@code Kind.values()} crea un array nuevo en cada llamada: se guarda una vez (se usa miles de veces por fotograma). */
+    private static final CloudCover.Kind[] KINDS = CloudCover.Kind.values();
+
     /** Celdas con muro de arena en la última rejilla (para el self-test). */
     public static int dustCells() {
         return dustCells;
@@ -121,6 +125,7 @@ public final class SkyRenderer {
         if (status == CloudStatus.OFF) {
             return;
         }
+        long perfAll = Perf.start();
         boolean fancy = status == CloudStatus.FANCY;
         //? if >=1.21.11 {
         Vec3 cam = camera.position();
@@ -138,7 +143,9 @@ public final class SkyRenderer {
         long camCellX = (long) Math.floor((cam.x - driftX) / C);
         long camCellZ = (long) Math.floor((cam.z - driftZ) / C);
         if (tick - gridTick >= 10 || tick < gridTick || camCellX != gridCellX || camCellZ != gridCellZ) {
+            long perfRebuild = Perf.start();
             rebuild(seed, wind, tick / 20.0, camCellX, camCellZ, ClientFronts.snapshot());
+            Perf.end("cliente.nubes.rejilla", perfRebuild);
             gridTick = tick;
             gridCellX = camCellX;
             gridCellZ = camCellZ;
@@ -174,7 +181,7 @@ public final class SkyRenderer {
                 if (k == 0) {
                     continue;
                 }
-                CloudCover.Kind kind = CloudCover.Kind.values()[k];
+                CloudCover.Kind kind = KINDS[k];
                 float amount = SHADE[i + 1][j + 1];
                 double bottom;
                 double height;
@@ -306,9 +313,14 @@ public final class SkyRenderer {
         drawAurora(vc, pose, level, cam, seconds, day);
         drawRainbows(vc, pose, level, cam, day);
         if (StormrootConfig.cloudShadows.getAsBoolean()) {
+            long perfShadows = Perf.start();
             drawShadows(vc, pose, level, cam, camCellX, camCellZ, driftX, driftZ, day);
+            Perf.end("cliente.sombras", perfShadows);
         }
+        long perfBatch = Perf.start();
         buffers.endBatch(renderType);
+        Perf.end("cliente.cielo.envio", perfBatch);
+        Perf.end("cliente.cielo.total", perfAll);
         cellsDrawn += drawn;
         frames++;
     }
@@ -452,7 +464,7 @@ public final class SkyRenderer {
         if (other != kind) {
             return true;
         }
-        return heightOf(CloudCover.Kind.values()[other], SHADE[gi][gj]) < height - 1;
+        return heightOf(KINDS[other], SHADE[gi][gj]) < height - 1;
     }
 
     /**
@@ -465,7 +477,9 @@ public final class SkyRenderer {
         long ox = (long) Math.floor(cam.x) - SHADOW_RANGE;
         long oz = (long) Math.floor(cam.z) - SHADOW_RANGE;
         if (ox != shadowOriginX || oz != shadowOriginZ || ++shadowAge > 40) {
+            long perfHeights = Perf.start();
             refreshShadowHeights(level, ox, oz);
+            Perf.end("cliente.sombras.alturas", perfHeights);
         }
         double gridX0 = (camCellX - RADIUS) * C + driftX;
         double gridZ0 = (camCellZ - RADIUS) * C + driftZ;
@@ -514,7 +528,7 @@ public final class SkyRenderer {
         if (k == 0) {
             return 0;
         }
-        CloudCover.Kind kind = CloudCover.Kind.values()[k];
+        CloudCover.Kind kind = KINDS[k];
         double darkness = switch (kind) {
             case STORM, HAIL -> 0.42;
             case RAIN, SNOW -> 0.32;
