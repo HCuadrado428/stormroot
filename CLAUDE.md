@@ -181,9 +181,13 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   de la CI (+ un pack de shaders en 1.21.11 con `SHADER_PACK_URL`, sin bloquear). En desarrollo hace falta
   `-Dsodium.checks.issue2561=false` (LWJGL de 1.20.1) y las librerías de `META-INF/jars` de Iris en el classpath.
   Si el juego crashea en la CI, el informe de crash sale en el log.
-  Resultado: Sodium y Sodium + Iris sin shaders, todo bien en los 3. Con Complementary (1.21.11) pasa todo menos el
-  esporín (a 3 fps no entra en cámara), pero lo que dibuja `SkyRenderer` (evento END/AFTER_PARTICLES, `debugQuads`)
-  NO se ve: pendiente hacerlo visible con shaders.
+  Resultado: Sodium y Sodium + Iris sin shaders, todo bien en los 3. Con shaders (Complementary) Iris no sabía pintar
+  la pipeline `debugQuads` del cielo: `client/compat/IrisCompat` (reflexión) la asigna con
+  `IrisApi#assignPipeline(RenderPipeline, IrisProgram)` (solo 1.21.11; antes Iris ya la pintaba con su programa básico)
+  al programa `BASIC` (probados TEXTURED, TRANSLUCENT, CLOUDS, PARTICLES_TRANSLUCENT: peor o invisible;
+  `-Dstormroot.irisProgram=X` para probar otro). Ahora se ven nubes, aurora y arena en los 3; en 1.21.11 el muro de
+  arena sale en dientes de sierra (medio triángulo por quad) y el centro de la tormenta muy claro: pendiente.
+  El esporín se salta con shaders (a ~3 fps no entra en cámara).
 - La CI sube los jars (Stormroot y Bloomberto) en el artefacto `jars` y además en el log, en trozos de 60 000 caracteres
   (`JAR-B64 <nombre> <n.º> <base64>`; GitHub descarta las líneas más largas).
 - `research` también saca JSON de datos y recursos vanilla (loot tables, modelos) de los jars del juego.
