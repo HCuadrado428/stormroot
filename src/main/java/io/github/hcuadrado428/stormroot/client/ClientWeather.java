@@ -144,27 +144,29 @@ public final class ClientWeather {
     /** Arena que vuela con el viento dentro de la tormenta; fuera, calima: polvo fino que cae despacio. */
     private static void spawnSand(ClientLevel level, LocalPlayer player, double sand, double calima) {
         RandomSource random = level.getRandom();
-        // Polvo de arena y de arena roja mezclados: un tono ocre (el de la arena sola sale casi blanco).
-        net.minecraft.core.particles.BlockParticleOption dust = new net.minecraft.core.particles.BlockParticleOption(
-                ParticleTypes.FALLING_DUST, net.minecraft.world.level.block.Blocks.SAND.defaultBlockState());
-        net.minecraft.core.particles.BlockParticleOption redDust = new net.minecraft.core.particles.BlockParticleOption(
+        // Polvo ocre: arena roja y tierra. (El polvo de la arena normal sale casi blanco y parece nieve.)
+        net.minecraft.core.particles.BlockParticleOption redSand = new net.minecraft.core.particles.BlockParticleOption(
                 ParticleTypes.FALLING_DUST, net.minecraft.world.level.block.Blocks.RED_SAND.defaultBlockState());
+        net.minecraft.core.particles.BlockParticleOption dirt = new net.minecraft.core.particles.BlockParticleOption(
+                ParticleTypes.FALLING_DUST, net.minecraft.world.level.block.Blocks.DIRT.defaultBlockState());
         int count = (int) Math.round(sand * 22);
         for (int i = 0; i < count; i++) {
-            // Entre 4 y 12 bloques de la cámara: de cerca se verían como manchas enormes.
-            double angle = random.nextDouble() * Math.PI * 2;
-            double dist = 4 + random.nextDouble() * 8;
-            double px = player.getX() + Math.cos(angle) * dist;
-            double py = player.getY() + random.nextDouble() * 5 - 1;
-            double pz = player.getZ() + Math.sin(angle) * dist;
-            level.addParticle(random.nextInt(3) == 0 ? dust : redDust, px, py, pz, 0, 0, 0);
+            double[] at = awayFromCamera(random, player, 4, 12);
+            level.addParticle(random.nextInt(3) == 0 ? dirt : redSand, at[0], player.getY() + random.nextDouble() * 5 - 1, at[1], 0, 0, 0);
             sandParticles++;
         }
         if (calima > 0.05 && random.nextDouble() < calima * 0.6) {
-            level.addParticle(dust, player.getX() + (random.nextDouble() - 0.5) * 24, player.getY() + 6 + random.nextDouble() * 6,
-                    player.getZ() + (random.nextDouble() - 0.5) * 24, 0, 0, 0);
+            double[] at = awayFromCamera(random, player, 6, 16);
+            level.addParticle(dirt, at[0], player.getY() + 6 + random.nextDouble() * 6, at[1], 0, 0, 0);
             sandParticles++;
         }
+    }
+
+    /** Un punto al azar alrededor del jugador, entre {@code min} y {@code max} bloques (de cerca se ven enormes). */
+    private static double[] awayFromCamera(RandomSource random, LocalPlayer player, double min, double max) {
+        double angle = random.nextDouble() * Math.PI * 2;
+        double dist = min + random.nextDouble() * (max - min);
+        return new double[] {player.getX() + Math.cos(angle) * dist, player.getZ() + Math.sin(angle) * dist};
     }
 
     /** ¿Hiela donde está el jugador? (mismas reglas que el servidor: {@code weather/Frost}). */
