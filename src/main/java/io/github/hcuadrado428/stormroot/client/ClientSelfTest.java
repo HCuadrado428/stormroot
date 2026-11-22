@@ -72,6 +72,10 @@ public final class ClientSelfTest {
         double x = mc.player.getX();
         double z = mc.player.getZ();
         int waited = ticks - stageStart;
+        if (stage >= 200) {
+            gallery(mc, server, waited);
+            return;
+        }
         switch (stage) {
             case 0 -> {
                 if (ticks > 100 && SelfTest.serverDone()) {
@@ -387,7 +391,9 @@ public final class ClientSelfTest {
                         "kill @e[type=stormroot:mycelium_guardian]"));
                 server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput(),
                         "difficulty peaceful"));
-                finish(mc);
+                // Galería: capturas de todo lo que se ve (bloques, objetos, cada clima, sombras sobre desniveles).
+                stage = 200;
+                stageStart = ticks;
             }
             case 20 -> {
                 clear(server);
@@ -419,6 +425,194 @@ public final class ClientSelfTest {
     private static void next() {
         stage++;
         stageStart = ticks;
+    }
+
+    // ---------------------------------------------------------------------------------------------------- galería
+    // Lejos de la zona de pruebas, en el suelo del mundo plano (la hierba está en y=-61).
+    private static final int GX = 600;
+    private static final int GY = -60;
+    private static final int GZ = 600;
+
+    private static final String[] ITEMS_A = {"lightning_crystal", "hailstone", "aurora_dust", "rainbow_shard", "spores",
+            "mycelium_thread", "mycelium_heart", "sand_goggles", "weathervane"};
+    private static final String[] ITEMS_B = {"barometer", "lightning_root", "mycelium_node", "ice_crystal", "icicle",
+            "magnetic_rock", "sporeling_spawn_egg", "weaver_spawn_egg", "mycelium_guardian_spawn_egg"};
+
+    private static void cmd(MinecraftServer server, String... commands) {
+        server.execute(() -> {
+            net.minecraft.commands.CommandSourceStack src = server.createCommandSourceStack().withSuppressedOutput();
+            for (String c : commands) {
+                server.getCommands().performPrefixedCommand(src, c);
+            }
+        });
+    }
+
+    private static void hotbar(MinecraftServer server, String[] items) {
+        for (int i = 0; i < items.length; i++) {
+            cmd(server, "item replace entity @a hotbar." + i + " with stormroot:" + items[i]);
+        }
+    }
+
+    /** Escenas de la galería: preparar en el tick 1, captura a los {@code wait} ticks, siguiente 50 ticks después. */
+    private static void gallery(Minecraft mc, MinecraftServer server, int waited) {
+        int scene = stage - 200;
+        int wait = 120;
+        String shot = null;
+        float yaw = 0f;
+        float pitch = 0f;
+        boolean gui = false;
+        switch (scene) {
+            case 0 -> {
+                // Preparar: mediodía, sin frentes, el jugador lejos de la zona de pruebas.
+                if (waited == 1) {
+                    clear(server);
+                    cmd(server, "time set 6000", "gamemode spectator @a",
+                            "tp @a " + GX + " " + (GY + 10) + " " + GZ);
+                }
+                wait = 100;
+            }
+            case 1 -> {
+                // Todos los bloques de Stormroot en fila, delante del jugador (mira al sur).
+                if (waited == 1) {
+                    int z = GZ + 5;
+                    cmd(server,
+                            "fill " + (GX - 5) + " " + GY + " " + (GZ + 2) + " " + (GX + 7) + " " + (GY + 6) + " " + (GZ + 8) + " air",
+                            "setblock " + (GX - 4) + " " + GY + " " + z + " stormroot:weathervane",
+                            "setblock " + (GX - 3) + " " + GY + " " + z + " stormroot:barometer",
+                            "setblock " + (GX - 2) + " " + GY + " " + z + " stormroot:lightning_root",
+                            "setblock " + (GX - 1) + " " + GY + " " + z + " stormroot:ice_crystal",
+                            "setblock " + GX + " " + GY + " " + z + " stormroot:magnetic_rock",
+                            "setblock " + (GX + 1) + " " + GY + " " + z + " stormroot:sand_layer[layers=3]",
+                            "setblock " + (GX + 2) + " " + GY + " " + z + " stormroot:frost_ice",
+                            "setblock " + (GX + 3) + " " + GY + " " + z + " stormroot:mycelium_node",
+                            "setblock " + (GX + 4) + " " + GY + " " + (z + 1) + " minecraft:stone",
+                            "setblock " + (GX + 4) + " " + GY + " " + z + " stormroot:mycelium_vein[south=true]",
+                            "setblock " + (GX + 5) + " " + (GY - 1) + " " + z + " minecraft:oak_leaves[persistent=true]",
+                            "setblock " + (GX + 5) + " " + GY + " " + z + " stormroot:storm_fire",
+                            "fill " + (GX - 4) + " " + (GY + 3) + " " + (z + 2) + " " + (GX + 5) + " " + (GY + 3) + " " + (z + 2) + " minecraft:stone",
+                            "setblock " + (GX - 1) + " " + (GY + 2) + " " + (z + 2) + " stormroot:icicle[tip=true]",
+                            "setblock " + (GX + 1) + " " + (GY + 2) + " " + (z + 2) + " stormroot:icicle[tip=false]",
+                            "setblock " + (GX + 1) + " " + (GY + 1) + " " + (z + 2) + " stormroot:icicle[tip=true]",
+                            "tp @a " + GX + ".5 " + (GY + 1.5) + " " + (GZ + 1) + " 0 20");
+                }
+                shot = "galeria_bloques";
+                pitch = 20f;
+            }
+            case 2 -> {
+                if (waited == 1) {
+                    cmd(server, "gamemode creative @a", "clear @a");
+                    hotbar(server, ITEMS_A);
+                }
+                shot = "galeria_objetos_1";
+                pitch = -10f;
+                gui = true;
+                wait = 80;
+            }
+            case 3 -> {
+                if (waited == 1) {
+                    cmd(server, "clear @a");
+                    hotbar(server, ITEMS_B);
+                }
+                shot = "galeria_objetos_2";
+                pitch = -10f;
+                gui = true;
+                wait = 80;
+            }
+            case 4 -> {
+                if (waited == 1) {
+                    cmd(server, "clear @a", "gamemode spectator @a", "tp @a " + GX + " " + (GY + 8) + " " + GZ);
+                    spawnAt(server, FrontType.BLIZZARD, GX, GZ);
+                }
+                shot = "galeria_ventisca";
+                pitch = 5f;
+                wait = 200;
+            }
+            case 5 -> {
+                if (waited == 1) {
+                    // Tormenta de granizo: id múltiplo de 3 e intensidad plena en el centro.
+                    server.execute(() -> {
+                        FrontSimulation sim = FrontTicker.simulation(server);
+                        sim.clear();
+                        sim.add(new WeatherFront(300, FrontType.THUNDERSTORM, GX, GZ, 120, 0, 0, 1000, 2000));
+                        FrontTicker.applyNow(server);
+                    });
+                }
+                shot = "galeria_granizo";
+                pitch = -20f;
+                wait = 200;
+            }
+            case 6 -> {
+                if (waited == 1) {
+                    cmd(server, "time set 18000");
+                    spawnAt(server, FrontType.AURORA, GX, GZ, 250);
+                }
+                shot = "galeria_aurora";
+                yaw = 180f;
+                pitch = -35f;
+                wait = 200;
+            }
+            case 7 -> {
+                if (waited == 1) {
+                    cmd(server, "time set 6000");
+                    spawnAt(server, FrontType.MAGNETIC_STORM, GX, GZ, 200);
+                }
+                shot = "galeria_tormenta_magnetica";
+                pitch = -5f;
+                wait = 160;
+            }
+            case 8 -> {
+                if (waited == 1) {
+                    spawnAt(server, FrontType.HEAT_WAVE, GX, GZ, 250);
+                }
+                shot = "galeria_ola_de_calor";
+                pitch = -5f;
+                wait = 160;
+            }
+            case 9 -> {
+                // Sombras sobre desniveles: una copa de árbol con huecos, escalones de piedra y losas.
+                if (waited == 1) {
+                    int z0 = GZ + 6;
+                    cmd(server,
+                            "fill " + (GX - 4) + " " + GY + " " + z0 + " " + (GX + 2) + " " + (GY + 3) + " " + (z0 + 5) + " minecraft:oak_leaves[persistent=true]",
+                            "fill " + (GX - 3) + " " + (GY + 3) + " " + (z0 + 1) + " " + (GX - 1) + " " + (GY + 3) + " " + (z0 + 2) + " air",
+                            "fill " + (GX + 4) + " " + GY + " " + z0 + " " + (GX + 5) + " " + GY + " " + (z0 + 5) + " minecraft:stone",
+                            "fill " + (GX + 6) + " " + GY + " " + z0 + " " + (GX + 7) + " " + (GY + 1) + " " + (z0 + 5) + " minecraft:stone",
+                            "fill " + (GX + 8) + " " + GY + " " + z0 + " " + (GX + 9) + " " + GY + " " + (z0 + 5) + " minecraft:stone_slab",
+                            "fill " + (GX - 7) + " " + GY + " " + z0 + " " + (GX - 6) + " " + GY + " " + (z0 + 5) + " minecraft:snow[layers=3]",
+                            "tp @a " + GX + " " + (GY + 14) + " " + (GZ - 4));
+                    spawnAt(server, FrontType.THUNDERSTORM, GX, GZ);
+                }
+                shot = "galeria_sombras";
+                pitch = 50f;
+                wait = 160;
+            }
+            case 10 -> {
+                // Una tormenta que se acerca, vista desde fuera (a 220 bloques al sur).
+                if (waited == 1) {
+                    spawnAt(server, FrontType.THUNDERSTORM, GX, GZ + 260, 110);
+                    cmd(server, "tp @a " + GX + " " + (GY + 6) + " " + GZ);
+                }
+                shot = "galeria_tormenta_que_llega";
+                pitch = -8f;
+                wait = 160;
+            }
+            default -> {
+                clear(server);
+                mc.options.hideGui = false;
+                finish(mc);
+                return;
+            }
+        }
+        if (shot != null && waited == wait) {
+            requestShot(mc, shot, yaw, pitch);
+            if (gui) {
+                mc.options.hideGui = false;
+            }
+        }
+        if (waited >= wait + 50) {
+            stage++;
+            stageStart = ticks;
+        }
     }
 
     private static void spawnAt(MinecraftServer server, FrontType type, double x, double z) {

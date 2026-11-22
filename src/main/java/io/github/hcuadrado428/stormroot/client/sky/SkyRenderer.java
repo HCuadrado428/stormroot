@@ -391,10 +391,12 @@ public final class SkyRenderer {
             for (int band = 0; band < RAINBOW.length; band++) {
                 double outer = radius + 3 - band * 2.2;
                 double inner = outer - 2.2;
-                int argb = ((int) (110 * fade * day) << 24) | RAINBOW[band];
                 for (int k = 0; k < segments; k++) {
                     double t0 = Math.PI * k / segments;
                     double t1 = Math.PI * (k + 1) / segments;
+                    // Los extremos se desvanecen (como uno de verdad), en vez de acabar cortados en el aire.
+                    double ends = Math.min(1.0, Math.min(Math.sin((t0 + t1) / 2) * 3.0, 1.0));
+                    int argb = ((int) (110 * fade * day * ends) << 24) | RAINBOW[band];
                     quad(vc, pose,
                             (float) (cx - dirX * outer * Math.cos(t0) - cam.x), (float) (rainbow.y() + outer * Math.sin(t0) - cam.y), (float) (cz - dirZ * outer * Math.cos(t0) - cam.z),
                             (float) (cx - dirX * outer * Math.cos(t1) - cam.x), (float) (rainbow.y() + outer * Math.sin(t1) - cam.y), (float) (cz - dirZ * outer * Math.cos(t1) - cam.z),
