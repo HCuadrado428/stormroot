@@ -108,7 +108,11 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   sombras (una por bloque sobre la cara de arriba, con su forma; alturas cacheadas en `SkyRenderer.refreshShadowHeights`),
   aviso de tormenta (`CloudCover.approach`), capa alta, niebla que rueda (`ClientWeather.spawnRollingFog`, solo con
   frentes de niebla: `mistFog`). Partículas: nunca pegadas a la cámara; el polvo de arena normal sale blanco (se usa
-  arena roja y tierra); `END_ROD` de la aurora solo de noche; el muro de arena tiene altura fija y degradado (`wall`).
+  arena roja y tierra); `END_ROD` de la aurora solo de noche; el muro de arena tiene altura fija y degradado (`wall`). Nubarrones de lluvia,
+  tormenta y granizo: color, base y opacidad según la intensidad (se funden con las de buen tiempo). Aurora: 3 cortinas
+  con rayos. Granizo: partículas `BLOCK` de hielo compacto. Bajo un nubarrón de ventisca, `RAIN` → `SNOW`
+  (`BiomePrecipitationMixin` + `SkyWeather.cloudKindAt`). El self-test del cliente acaba con una galería de capturas
+  (`galeria_*`: bloques, objetos, cada clima, sombras sobre desniveles) en (600, -60, 600).
 - **Ventisca y cuevas de hielo**: `FrontType.BLIZZARD` (pesos en `ClimateZone`), `weather/BlizzardSnow` (capas hasta 4),
   `SeepageCell.frost` (guardado; `updateFrost`, deshielo lento/masivo) y efectos en `SeepageTicker.freeze` (tipos
   `SNOW_FLOOR`, `ICE_FLOOR`, `FROZEN`, `ICICLE`, `ICE_CRYSTAL`, reversibles), bloques `block/IcicleBlock` (cae con luz
