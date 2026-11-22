@@ -65,7 +65,11 @@ for t in "$@"; do
     fail=1
     echo "$t: FALLÓ"
     mkdir -p build/selftest-logs && cp "$log" "build/selftest-logs/$t$tag-$side.log"
-    if [ -n "${CI:-}" ]; then grep -E "\[selftest\]|Exception|ERROR|Caused by" "$log" | tail -60; tail -40 "$log"; fi
+    if [ -n "${CI:-}" ]; then
+      grep -E "\[selftest\]|Exception|ERROR|Caused by" "$log" | tail -60; tail -40 "$log"
+      # Informe de crash (los artefactos no siempre se pueden descargar): el principio, con la excepción.
+      for crash in run/crash-reports/*.txt; do [ -f "$crash" ] && { echo "== $crash"; head -70 "$crash"; }; done
+    fi
   fi
 done
 exit $fail
