@@ -131,6 +131,7 @@ public final class SkyRenderer {
             return;
         }
         long perfAll = Perf.start();
+        io.github.hcuadrado428.stormroot.client.compat.IrisCompat.registerSkyPipeline();
         boolean fancy = status == CloudStatus.FANCY;
         //? if >=1.21.11 {
         Vec3 cam = camera.position();
