@@ -85,5 +85,6 @@ Primera versión jugable. Minecraft 1.20.1 (Fabric, Forge; también NeoForge 1.2
 - Comandos de depuración `/stormroot front|here|seep`.
 - `art/entity/`: generador de las texturas de los mobs, vista previa 3D y modelos de Blockbench (`.bbmodel`).
 - Self-test dentro del juego (`-Dstormroot.selfTest=server|client|all`) que la CI ejecuta en los 6 targets.
-- Compatibilidad probada en la CI con **Sodium** y **Sodium + Iris** (Fabric, 3 versiones).
+- Compatibilidad probada en la CI con **Sodium** y **Sodium + Iris** (Fabric, 3 versiones). Con un pack de shaders, el cielo propio tambien se ve (`IrisApi#assignPipeline`).
+- Prueba multijugador en la CI: servidor dedicado + 2 clientes, cada uno con su clima; los frentes lejanos no viajan.
 - `-Dstormroot.perf=true`: mide lo que cuesta el cielo, las sombras y la simulación (`Perf`).

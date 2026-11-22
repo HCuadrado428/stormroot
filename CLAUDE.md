@@ -188,6 +188,15 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   `-Dstormroot.irisProgram=X` para probar otro). Ahora se ven nubes, aurora y arena en los 3; en 1.21.11 el muro de
   arena sale en dientes de sierra (medio triángulo por quad) y el centro de la tormenta muy claro: pendiente.
   El esporín se salta con shaders (a ~3 fps no entra en cámara).
+- **Multijugador** (`selftest/MultiplayerSelfTest` servidor con `-Dstormroot.selfTest=mp`,
+  `client/MultiplayerClientSelfTest` con `mp-client`, `scripts/selftest-mp.sh`, job `selftest-mp`): servidor dedicado
+  + 2 clientes a la vez (Alba bajo una tormenta en x=-1500, Berto despejado en x=3000; la sincronización por zonas se
+  comprueba: a Berto NO le llega el frente de Alba; luego `/weather rain` pone un frente a cada uno). Solo Fabric:
+  los clientes de desarrollo de Forge/NeoForge no arrancan fuera de Gradle (el dedicado de los 6 ya lo prueba
+  `selftest`). El 2.o cliente se lanza con la orden de `runClient` (tarea `stormrootClientCommand`: NUNCA
+  `dependsOn(runClient.map{...})`, ejecuta runClient y cuelga la CI) + su entorno (`client-env.txt`) y un
+  `options.txt` con `skipMultiplayerWarning`/`joinedFirstServer` (desde 1.21 ese aviso para el quickPlay).
+  `FrontTicker.pauseSpawnsForTest` da determinismo.
 - La CI sube los jars (Stormroot y Bloomberto) en el artefacto `jars` y además en el log, en trozos de 60 000 caracteres
   (`JAR-B64 <nombre> <n.º> <base64>`; GitHub descarta las líneas más largas).
 - `research` también saca JSON de datos y recursos vanilla (loot tables, modelos) de los jars del juego.

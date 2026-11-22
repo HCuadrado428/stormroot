@@ -59,7 +59,8 @@ public final class MultiplayerClientSelfTest {
                     if (stageStart == 0) {
                         stageStart = ticks;
                     }
-                    if (ticks - stageStart < 160) {
+                    // Rato largo: tras el teletransporte los chunks tardan en dibujarse (la captura salía a medias).
+                    if (ticks - stageStart < 300) {
                         mc.player.setXRot(-50f);
                         return;
                     }
