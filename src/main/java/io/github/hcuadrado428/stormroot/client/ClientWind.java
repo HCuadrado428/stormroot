@@ -97,7 +97,19 @@ public final class ClientWind {
         if (random.nextDouble() > (wind - 0.4)) {
             return;
         }
-        Vec3 at = player.position().add((random.nextDouble() - 0.5) * 16, random.nextDouble() * 3, (random.nextDouble() - 0.5) * 16);
+        // Siempre a más de 6 bloques: de cerca, las nubecitas se ven como manchas blancas enormes.
+        double angle = random.nextDouble() * Math.PI * 2;
+        double dist = 6 + random.nextDouble() * 10;
+        Vec3 at = player.position().add(Math.cos(angle) * dist, random.nextDouble() * 3, Math.sin(angle) * dist);
+        if (ClientWeather.sandHere() > 0.05) {
+            // En la tormenta de arena, las ráfagas son de polvo ocre (las nubecitas blancas parecían nieve).
+            level.addParticle(new net.minecraft.core.particles.BlockParticleOption(ParticleTypes.FALLING_DUST,
+                    net.minecraft.world.level.block.Blocks.RED_SAND.defaultBlockState()), at.x, at.y, at.z, 0, 0, 0);
+            return;
+        }
+        if (random.nextInt(2) == 0) {
+            return;
+        }
         double speed = 0.15 + 0.25 * wind;
         level.addParticle(ParticleTypes.CLOUD, at.x, at.y, at.z, dx * speed, 0, dz * speed);
     }
