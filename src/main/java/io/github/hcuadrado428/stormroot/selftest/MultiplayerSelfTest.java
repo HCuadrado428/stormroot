@@ -49,6 +49,7 @@ public final class MultiplayerSelfTest {
                     cmd(server, "time set 6000");
                     cmd(server, "tp Alba " + ALBA_X + " -60 " + Z);
                     cmd(server, "tp Berto " + BERTO_X + " -60 " + Z);
+                    FrontTicker.pauseSpawnsForTest(server.overworld(), TIMEOUT * 4);
                     FrontSimulation sim = FrontTicker.simulation(server);
                     sim.clear();
                     sim.add(new WeatherFront(901, FrontType.THUNDERSTORM, ALBA_X, Z, 120, 0, 0, 1000, 4000));
@@ -77,6 +78,7 @@ public final class MultiplayerSelfTest {
                 if (waited < 600) {
                     return;
                 }
+                FrontTicker.resumeSpawnsForTest(); // el propio /weather rain tambien quita la pausa; por claridad
                 cmd(server, "weather rain 1200");
                 next();
             }
@@ -87,7 +89,7 @@ public final class MultiplayerSelfTest {
                 CloudCover.Kind berto = SkyWeather.cloudKindAt(BERTO_X, Z);
                 int fronts = FrontTicker.simulation(server).fronts().size();
                 SelfTest.check("server: /weather rain puts a front over each player",
-                        fronts >= 3 && berto != null && berto != CloudCover.Kind.NONE,
+                        fronts >= 2 && berto != null && berto != CloudCover.Kind.NONE,
                         "frentes=" + fronts + " Berto=" + berto);
                 next();
             }

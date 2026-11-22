@@ -151,6 +151,11 @@ public final class FrontTicker {
         dissipating.clear();
     }
 
+    /** Para la prueba multijugador: sin frentes nuevos durante un rato (determinista). */
+    public static void pauseSpawnsForTest(ServerLevel level, int ticks) {
+        noSpawnUntil = level.getGameTime() + ticks;
+    }
+
     /**
      * Lo llama {@code mixin/ServerLevelWeatherMixin} cuando algo pone el clima vanilla ({@code /weather}, otros mods).
      * Las duraciones de Stormroot nunca pasan de {@code STEP_TICKS * 2}; una más larga es un {@code /weather}.

@@ -54,8 +54,9 @@ public final class MultiplayerClientSelfTest {
         CloudCover.Kind kind = SkyWeather.cloudKindAt(x, z);
         switch (stage) {
             case 0 -> {
-                if (inPlace && fronts > 0) {
-                    if (waited == 0 || stageStart == 0) {
+                // Hasta que llegan el teletransporte y la primera sincronización (ClientFronts.active()).
+                if (inPlace && ClientFronts.active()) {
+                    if (stageStart == 0) {
                         stageStart = ticks;
                     }
                     if (ticks - stageStart < 160) {
@@ -63,14 +64,19 @@ public final class MultiplayerClientSelfTest {
                         return;
                     }
                     boolean storm = ClientFronts.snapshot().stream().anyMatch(f -> f.id() == 901);
-                    SelfTest.report("client " + who + ": fronts arrive from the dedicated server", storm, "frentes=" + fronts);
+                    if (alba) {
+                        SelfTest.report("client alba: the storm front arrives from the dedicated server", storm, "frentes=" + fronts);
+                    } else {
+                        // La sincronización es por zonas: a 3000 bloques el frente de Alba NO debe llegarle.
+                        SelfTest.report("client berto: far fronts are not synced", !storm && fronts == 0, "frentes=" + fronts);
+                    }
                     boolean ok = alba ? kind != null && kind != CloudCover.Kind.NONE : kind == CloudCover.Kind.NONE;
                     SelfTest.report("client " + who + ": sees its own sky", ok, "nube encima=" + kind);
                     pendingShot = "mp_" + who + "_cielo";
                     next();
                 } else if (ticks > TIMEOUT) {
                     SelfTest.report("client " + who + ": fronts arrive from the dedicated server", false,
-                            "frentes=" + fronts + " x=" + (int) x);
+                            "frentes=" + fronts + " x=" + (int) x + " sync=" + ClientFronts.active());
                     finish(mc);
                 }
             }
