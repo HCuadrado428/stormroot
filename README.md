@@ -37,7 +37,7 @@ Quilt: el jar de Fabric funciona en Quilt Loader.
 
 NeoForge 1.20.1: usa el jar de **Forge 1.20.1** (NeoForge 1.20.1 es un fork de Forge 47.1). Al publicar, ese jar se marca también como NeoForge. Pendiente de probar en el juego.
 
-**Sodium e Iris** (Fabric): la CI pasa el self-test del cliente con Sodium y con Sodium + Iris en los 3 targets de Fabric (job `selftest-render`), y con Iris y un pack de shaders en 1.21.11. Para probarlo en local: `./gradlew :1.21.1-fabric:runClient -Pstormroot.renderMods=sodium,iris` (las versiones están en `versions/dependencies/<versión>.properties`). Con un pack de shaders, el pack decide cómo se ven el cielo y la niebla: nuestras nubes se dibujan, pero pueden verse distintas.
+**Sodium e Iris** (Fabric): la CI pasa el self-test del cliente con Sodium y con Sodium + Iris en los 3 targets de Fabric (job `selftest-render`), y con Iris y un pack de shaders en 1.21.11. Para probarlo en local: `./gradlew :1.21.1-fabric:runClient -Pstormroot.renderMods=sodium,iris` (las versiones están en `versions/dependencies/<versión>.properties`). Con un pack de shaders (probado con Complementary Reimagined) el juego funciona y el self-test pasa, pero **el cielo propio de Stormroot no se ve** (nubes, sombras de las nubes, aurora y muro de arena): se ven las nubes del pack.
 
 ---
 
@@ -180,6 +180,7 @@ src/versioned/<versión>/  → recetas, loot tables y tags (su formato cambia en
 - Fuera de los rayos, la lluvia "de juego" sigue siendo global en el servidor (fuego que se apaga, calderos que se llenan...) mientras algún jugador esté en un frente.
 - Sin Bloomberto no hay pantalla de config: los ajustes del mundo se cambian con `/stormroot settings` y los del cliente en `config/stormroot-client.properties`.
 - En Fabric, la pantalla de config necesita Bloomberto **y** Mod Menu.
+- Con un **pack de shaders** de Iris no se ve el cielo propio (nubes, sombras, aurora, muro de arena); la lluvia sigue cayendo solo bajo los nubarrones de Stormroot, aunque no se vean.
 
 ## 🧰 Comandos de depuración
 
