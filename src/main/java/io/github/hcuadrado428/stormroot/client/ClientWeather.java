@@ -363,7 +363,11 @@ public final class ClientWeather {
                 vy = 0;
                 break;
             case AURORA:
-                // Destellos muy altos (solo se notan de noche).
+                // Destellos muy altos, solo de noche (de día parecerían copos blancos).
+                long time = Math.floorMod(level.getDayTime(), 24000L);
+                if (time < 13000 || time > 23000) {
+                    return;
+                }
                 particle = ParticleTypes.END_ROD;
                 y = playerY + 8 + random.nextDouble() * 12;
                 vy = 0;
