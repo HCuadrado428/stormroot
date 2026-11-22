@@ -200,6 +200,26 @@ jobs:
           - target: 1.20.1-fabric
             mods: sodium,iris
             shaders: https://cdn.modrinth.com/data/HVnmMxH1/versions/RKfUB9VC/ComplementaryReimagined_r5.10.zip
+          - target: 1.21.11-fabric
+            mods: sodium,iris
+            shaders: https://cdn.modrinth.com/data/HVnmMxH1/versions/RKfUB9VC/ComplementaryReimagined_r5.10.zip
+            irisProgram: TEXTURED
+          - target: 1.21.11-fabric
+            mods: sodium,iris
+            shaders: https://cdn.modrinth.com/data/HVnmMxH1/versions/RKfUB9VC/ComplementaryReimagined_r5.10.zip
+            irisProgram: TRANSLUCENT
+          - target: 1.21.11-fabric
+            mods: sodium,iris
+            shaders: https://cdn.modrinth.com/data/HVnmMxH1/versions/RKfUB9VC/ComplementaryReimagined_r5.10.zip
+            irisProgram: CLOUDS
+          - target: 1.21.11-fabric
+            mods: sodium,iris
+            shaders: https://cdn.modrinth.com/data/HVnmMxH1/versions/RKfUB9VC/ComplementaryReimagined_r5.10.zip
+            irisProgram: PARTICLES_TRANSLUCENT
+          - target: 1.21.11-fabric
+            mods: sodium,iris
+            shaders: https://cdn.modrinth.com/data/HVnmMxH1/versions/RKfUB9VC/ComplementaryReimagined_r5.10.zip
+            irisProgram: BEACON_BEAM
     continue-on-error: ${{ matrix.shaders != '' }}
     steps:
       - uses: actions/checkout@v4
@@ -233,6 +253,8 @@ jobs:
         env:
           RENDER_MODS: ${{ matrix.mods }}
           SHADER_PACK_URL: ${{ matrix.shaders }}
+          JAVA_TOOL_OPTIONS: ${{ matrix.irisProgram && format('-Dstormroot.irisProgram={0}', matrix.irisProgram) || '' }}
+          SELFTEST_EXTRA_TAG: ${{ matrix.irisProgram && format('+{0}', matrix.irisProgram) || '' }}
         run: |
           chmod +x ./gradlew scripts/selftest.sh scripts/selftest-client-xvfb.sh
           scripts/selftest.sh client ${{ matrix.target }}
@@ -240,7 +262,8 @@ jobs:
       - name: API de Iris (programas y cómo se asignan)
         if: always() && matrix.shaders != ''
         run: |
-          jar=$(find ~/.gradle .gradle -name 'iris-*.jar' -path '*modrinth*' 2>/dev/null | head -1)
+          mc="${{ matrix.target }}"; mc="${mc%-fabric}"
+          jar=$(find ~/.gradle .gradle -name "iris-*+${mc}*.jar" -path '*modrinth*' 2>/dev/null | head -1)
           echo "jar: $jar"
           [ -n "$jar" ] || exit 0
           javap -cp "$jar" net.irisshaders.iris.api.v0.IrisProgram || true

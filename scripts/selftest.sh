@@ -18,7 +18,7 @@ server_props() {
 
 # RENDER_MODS=sodium,iris scripts/selftest.sh client 1.21.1-fabric: el cliente con esos mods (solo Fabric).
 # SHADER_PACK_URL=<zip>: además, Iris con ese pack de shaders encendido.
-tag="${RENDER_MODS:++${RENDER_MODS//,/+}}${SHADER_PACK_URL:++shaders}"
+tag="${RENDER_MODS:++${RENDER_MODS//,/+}}${SHADER_PACK_URL:++shaders}${SELFTEST_EXTRA_TAG:-}"
 export SELFTEST_TAG="$tag"
 if [ -n "${SHADER_PACK_URL:-}" ]; then
   mkdir -p "$run/shaderpacks" "$run/config"
