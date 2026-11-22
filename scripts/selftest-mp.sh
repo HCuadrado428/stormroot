@@ -43,6 +43,8 @@ grep -q "Done (" "$slog" || { echo "$t: el servidor no arrancó"; tail -40 "$slo
 client() {
   local name="$1" dir="$2" log="$3"
   mkdir -p "$dir"
+  # Desde 1.21 el aviso de multijugador y la pantalla de accesibilidad de la primera vez pararían el quickPlay.
+  printf 'skipMultiplayerWarning:true\njoinedFirstServer:true\nonboardAccessibility:false\npauseOnLostFocus:false\nnarrator:0\n' > "$dir/options.txt"
   (
     cd "$dir"
     client_env
