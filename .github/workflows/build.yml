@@ -188,6 +188,13 @@ jobs:
         mods:
           - sodium
           - sodium,iris
+        shaders: [""]
+        include:
+          # Iris con un pack de shaders de verdad (en OpenGL por software va muy lento; solo para ver qué se dibuja).
+          - target: 1.21.11-fabric
+            mods: sodium,iris
+            shaders: https://cdn.modrinth.com/data/HVnmMxH1/versions/RKfUB9VC/ComplementaryReimagined_r5.10.zip
+    continue-on-error: ${{ matrix.shaders != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -216,9 +223,10 @@ jobs:
       - name: Pantalla virtual y OpenGL por software
         run: sudo apt-get update && sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0 mesa-utils imagemagick
 
-      - name: Self-test cliente con ${{ matrix.mods }} (${{ matrix.target }})
+      - name: Self-test cliente con ${{ matrix.mods }} ${{ matrix.shaders != '' && '+ shaders' || '' }} (${{ matrix.target }})
         env:
           RENDER_MODS: ${{ matrix.mods }}
+          SHADER_PACK_URL: ${{ matrix.shaders }}
         run: |
           chmod +x ./gradlew scripts/selftest.sh scripts/selftest-client-xvfb.sh
           scripts/selftest.sh client ${{ matrix.target }}

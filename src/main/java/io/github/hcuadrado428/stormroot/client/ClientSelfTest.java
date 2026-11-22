@@ -485,7 +485,7 @@ public final class ClientSelfTest {
                             "setblock " + (GX - 1) + " " + GY + " " + z + " stormroot:ice_crystal",
                             "setblock " + GX + " " + GY + " " + z + " stormroot:magnetic_rock",
                             "setblock " + (GX + 1) + " " + GY + " " + z + " stormroot:sand_layer[layers=3]",
-                            "setblock " + (GX + 2) + " " + GY + " " + z + " stormroot:frost_ice",
+                            "setblock " + (GX + 2) + " " + (GY - 1) + " " + z + " stormroot:frost_ice", // en un hueco: al derretirse queda un charco
                             "setblock " + (GX + 3) + " " + GY + " " + z + " stormroot:mycelium_node",
                             "setblock " + (GX + 4) + " " + GY + " " + (z + 1) + " minecraft:stone",
                             "setblock " + (GX + 4) + " " + GY + " " + z + " stormroot:mycelium_vein[south=true]",

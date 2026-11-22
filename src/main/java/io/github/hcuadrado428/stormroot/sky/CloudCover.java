@@ -76,8 +76,9 @@ public final class CloudCover {
         // (Se mezclan valores de ruido a escalas fijas; cambiar la escala según la posición deformaría el patrón.)
         double zone = ValueNoise.sample(seed ^ 0x51L, u / 1100.0, seconds / 2400.0, v / 1100.0);
         double big = smoothstep(0.35, 0.75, zone);
-        double small = ValueNoise.fbm(seed, u / 80.0, seconds / 500.0, v / 80.0, 2);
-        double large = ValueNoise.fbm(seed ^ 0x33L, u / 210.0, seconds / 900.0, v / 210.0, 4);
+        // Solo se calcula el ruido que pesa (en la mayoría de sitios big es justo 0 o 1): mismo resultado, la mitad de coste.
+        double small = big < 1 ? ValueNoise.fbm(seed, u / 80.0, seconds / 500.0, v / 80.0, 2) : 0;
+        double large = big > 0 ? ValueNoise.fbm(seed ^ 0x33L, u / 210.0, seconds / 900.0, v / 210.0, 4) : 0;
         double n = small * (1 - big) + large * big;
         double cloudiness = ValueNoise.sample(seed ^ 0x77L, u / 1500.0, seconds / 3000.0, v / 1500.0);
         // Pocas y sueltas: umbral alto (más aún para las pequeñas), que baja algo en las zonas más nubladas.

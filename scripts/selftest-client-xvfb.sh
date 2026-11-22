@@ -4,7 +4,7 @@
 # Uso: scripts/selftest-client-xvfb.sh <target> <log>
 t="$1"; log="$2"
 # Con RENDER_MODS=sodium,iris el cliente arranca con esos mods y las capturas llevan "+sodium+iris" en el nombre.
-tag="${RENDER_MODS:++${RENDER_MODS//,/+}}"
+tag="${SELFTEST_TAG:-${RENDER_MODS:++${RENDER_MODS//,/+}}}"
 shots="build/selftest-shots"
 mkdir -p "$shots"
 # Sodium comprueba que LWJGL sea la de Minecraft; el entorno de desarrollo de 1.20.1 trae otra (3.3.2-snapshot) y

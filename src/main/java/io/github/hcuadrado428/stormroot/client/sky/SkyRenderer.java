@@ -56,9 +56,14 @@ public final class SkyRenderer {
     private static final int SHADOW_SIZE = SHADOW_RANGE * 2 + 1;
     /** Altura de la cara de arriba de cada columna (cacheada unos fotogramas), relativa a nada: y del mundo. */
     private static final float[] SHADOW_TOP = new float[SHADOW_SIZE * SHADOW_SIZE];
+    private static final float[] SHADOW_TMP = new float[SHADOW_SIZE * SHADOW_SIZE];
     private static long shadowOriginX = Long.MIN_VALUE;
     private static long shadowOriginZ;
-    private static int shadowAge;
+    /** Mundo de la caché de alturas (por identidad; no se guarda el mundo para no retenerlo al salir). */
+    private static int shadowLevel;
+    /** Siguiente fila que se vuelve a leer (unas pocas por fotograma: los bloques que cambian se ven en ~1 s). */
+    private static int shadowRow;
+    private static final int SHADOW_ROWS_PER_FRAME = 4;
 
     private static final byte[][] GRID = new byte[SIZE + 2][SIZE + 2];
     /** Por celda: intensidad del frente (nubarrones) o aviso de tormenta (buen tiempo), 0–1. */
@@ -476,11 +481,9 @@ public final class SkyRenderer {
                                     long camCellX, long camCellZ, double driftX, double driftZ, float day) {
         long ox = (long) Math.floor(cam.x) - SHADOW_RANGE;
         long oz = (long) Math.floor(cam.z) - SHADOW_RANGE;
-        if (ox != shadowOriginX || oz != shadowOriginZ || ++shadowAge > 40) {
-            long perfHeights = Perf.start();
-            refreshShadowHeights(level, ox, oz);
-            Perf.end("cliente.sombras.alturas", perfHeights);
-        }
+        long perfHeights = Perf.start();
+        updateShadowHeights(level, ox, oz);
+        Perf.end("cliente.sombras.alturas", perfHeights);
         double gridX0 = (camCellX - RADIUS) * C + driftX;
         double gridZ0 = (camCellZ - RADIUS) * C + driftZ;
         for (int c = 0; c < SHADOW_SIZE; c++) {
@@ -543,23 +546,61 @@ public final class SkyRenderer {
         return ((int) (255 * darkness * day * Math.min(1, fade * 2)) >> 3) << 3;
     }
 
-    /** Altura exacta de la cara de arriba de cada columna (bloque más alto que para el paso, con su forma). */
-    private static void refreshShadowHeights(ClientLevel level, long ox, long oz) {
-        shadowOriginX = ox;
-        shadowOriginZ = oz;
-        shadowAge = 0;
+    /**
+     * Mantiene la caché de alturas (cara de arriba de cada columna) alrededor de la cámara sin leer las 16 000 columnas
+     * de golpe: al moverse se desplaza y solo se leen las filas o columnas nuevas; además se releen
+     * {@link #SHADOW_ROWS_PER_FRAME} filas por fotograma para ver los bloques que cambian.
+     */
+    private static void updateShadowHeights(ClientLevel level, long ox, long oz) {
+        int id = System.identityHashCode(level);
+        long dx = ox - shadowOriginX;
+        long dz = oz - shadowOriginZ;
         net.minecraft.core.BlockPos.MutableBlockPos pos = new net.minecraft.core.BlockPos.MutableBlockPos();
-        for (int c = 0; c < SHADOW_SIZE; c++) {
-            for (int a = 0; a < SHADOW_SIZE; a++) {
-                int x = (int) (ox + a);
-                int z = (int) (oz + c);
-                int top = level.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z);
-                pos.set(x, top - 1, z);
-                net.minecraft.world.phys.shapes.VoxelShape shape = level.getBlockState(pos).getShape(level, pos);
-                float height = shape.isEmpty() ? 1.0f : (float) shape.max(net.minecraft.core.Direction.Axis.Y);
-                SHADOW_TOP[c * SHADOW_SIZE + a] = top - 1 + height;
+        if (id != shadowLevel || shadowOriginX == Long.MIN_VALUE || Math.abs(dx) >= SHADOW_SIZE || Math.abs(dz) >= SHADOW_SIZE) {
+            shadowLevel = id;
+            shadowOriginX = ox;
+            shadowOriginZ = oz;
+            for (int c = 0; c < SHADOW_SIZE; c++) {
+                readShadowRow(level, pos, c);
+            }
+            return;
+        }
+        if (dx != 0 || dz != 0) {
+            // Desplazar lo que ya se sabe; lo que entra nuevo se lee.
+            System.arraycopy(SHADOW_TOP, 0, SHADOW_TMP, 0, SHADOW_TOP.length);
+            shadowOriginX = ox;
+            shadowOriginZ = oz;
+            for (int c = 0; c < SHADOW_SIZE; c++) {
+                long oc = c + dz;
+                for (int a = 0; a < SHADOW_SIZE; a++) {
+                    long oa = a + dx;
+                    if (oc >= 0 && oc < SHADOW_SIZE && oa >= 0 && oa < SHADOW_SIZE) {
+                        SHADOW_TOP[c * SHADOW_SIZE + a] = SHADOW_TMP[(int) oc * SHADOW_SIZE + (int) oa];
+                    } else {
+                        SHADOW_TOP[c * SHADOW_SIZE + a] = topAt(level, pos, (int) (ox + a), (int) (oz + c));
+                    }
+                }
             }
         }
+        for (int k = 0; k < SHADOW_ROWS_PER_FRAME; k++) {
+            readShadowRow(level, pos, shadowRow);
+            shadowRow = (shadowRow + 1) % SHADOW_SIZE;
+        }
+    }
+
+    private static void readShadowRow(ClientLevel level, net.minecraft.core.BlockPos.MutableBlockPos pos, int c) {
+        for (int a = 0; a < SHADOW_SIZE; a++) {
+            SHADOW_TOP[c * SHADOW_SIZE + a] = topAt(level, pos, (int) (shadowOriginX + a), (int) (shadowOriginZ + c));
+        }
+    }
+
+    /** Altura exacta de la cara de arriba de una columna (bloque más alto que para el paso, con su forma). */
+    private static float topAt(ClientLevel level, net.minecraft.core.BlockPos.MutableBlockPos pos, int x, int z) {
+        int top = level.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z);
+        pos.set(x, top - 1, z);
+        net.minecraft.world.phys.shapes.VoxelShape shape = level.getBlockState(pos).getShape(level, pos);
+        float height = shape.isEmpty() ? 1.0f : (float) shape.max(net.minecraft.core.Direction.Axis.Y);
+        return top - 1 + height;
     }
 
     /** Qué nube hay en cada celda alrededor de la cámara (se calcula en el centro de la celda, en coordenadas del mundo). */
