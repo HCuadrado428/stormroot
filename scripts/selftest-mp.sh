@@ -17,7 +17,7 @@ mkdir -p run
 echo "eula=true" > run/eula.txt
 printf 'online-mode=false\nenforce-secure-profile=false\nlevel-name=selftest\nlevel-type=minecraft\\:flat\ngenerate-structures=false\nspawn-monsters=false\nspawn-protection=0\nview-distance=6\n' > run/server.properties
 
-./gradlew ":$t:stormrootClientCommand" -q || { echo "$t: no se pudo preparar el cliente"; exit 1; }
+timeout 1200 ./gradlew ":$t:stormrootClientCommand" || { echo "$t: no se pudo preparar el cliente"; exit 1; }
 cmdfile="versions/$t/build/client-command.txt"
 mapfile -t cmd < "$cmdfile"
 

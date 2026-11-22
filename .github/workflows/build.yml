@@ -262,6 +262,7 @@ jobs:
   # Multijugador: servidor dedicado + dos clientes a la vez (Alba bajo una tormenta, Berto lejos y despejado).
   selftest-mp:
     runs-on: ubuntu-latest
+    timeout-minutes: 75
     needs: build
     if: github.event_name != 'release'
     strategy:

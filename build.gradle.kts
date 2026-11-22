@@ -163,13 +163,25 @@ publishMods {
 // arrancar un segundo cliente a la vez sin otro Gradle (dos Gradle en el mismo proyecto se bloquean).
 tasks.register("stormrootClientCommand") {
     val runClient = tasks.named<JavaExec>("runClient")
-    dependsOn(runClient.map { it.taskDependencies.getDependencies(it) })
+    // OJO: nada de dependsOn(runClient.map { ... }): un provider derivado de una tarea arrastra esa tarea como
+    // dependencia y Gradle EJECUTA runClient (cliente colgado en el menú para siempre; pasó en la CI).
+    dependsOn(tasks.matching { it.name == "downloadAssets" || it.name == "classes" || it.name == "processResources" })
     val out = layout.buildDirectory.file("client-command.txt")
     outputs.upToDateWhen { false }
     doLast {
         val r = runClient.get()
         val java = r.javaLauncher.get().executablePath.asFile.absolutePath
-        val words = listOf(java) + r.allJvmArgs + listOf("-cp", r.classpath.asPath, r.mainClass.get()) + r.args.orEmpty()
+        // Sin --username ni --quickPlay*: cada cliente de la prueba pone los suyos.
+        val args = mutableListOf<String>()
+        var skip = false
+        for (arg in r.args.orEmpty()) {
+            when {
+                skip -> skip = false
+                arg == "--username" || arg.startsWith("--quickPlay") -> skip = true
+                else -> args += arg
+            }
+        }
+        val words = listOf(java) + r.allJvmArgs + listOf("-cp", r.classpath.asPath, r.mainClass.get()) + args
         out.get().asFile.apply { parentFile.mkdirs() }.writeText(words.joinToString("\n") + "\n")
         logger.lifecycle("[stormroot] orden del cliente en ${out.get().asFile}")
     }
