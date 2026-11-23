@@ -197,6 +197,11 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   `dependsOn(runClient.map{...})`, ejecuta runClient y cuelga la CI) + su entorno (`client-env.txt`) y un
   `options.txt` con `skipMultiplayerWarning`/`joinedFirstServer` (desde 1.21 ese aviso para el quickPlay).
   `FrontTicker.pauseSpawnsForTest` da determinismo.
+- **Quilt** (`scripts/selftest-quilt.sh`, job `selftest-quilt`): instala un servidor Quilt REAL (instalador de
+  quiltmc.org, `install server <mc> --download-server`), mete el jar remapeado de `:<t>:build` + Fabric API de
+  Modrinth (+ Bloomberto) en `mods/` y pasa el self-test de servidor completo. Sin QSL. Java por versión
+  (`JAVA_HOME_17_X64`/`21`). Materiales de publicación: `docs/publicacion/` (descripción es/en, galería; capturas
+  grandes en el artefacto `selftest-shots`).
 - **Mundos antiguos** (`selftest/OldWorldSelfTest` con `-Dstormroot.selfTest=oldworld`, `scripts/selftest-oldworld.sh`,
   job `selftest-oldworld`, commit viejo en `compat.ref`): el self-test del commit de `compat.ref` genera y guarda el
   mundo (worktree en `build/oldworld-src`) y el código actual lo abre: deben cargar las redes de micelio, la

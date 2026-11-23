@@ -87,6 +87,8 @@ Primera versión jugable. Minecraft 1.20.1 (Fabric, Forge; también NeoForge 1.2
 - Self-test dentro del juego (`-Dstormroot.selfTest=server|client|all`) que la CI ejecuta en los 6 targets.
 - Compatibilidad probada en la CI con **Sodium** y **Sodium + Iris** (Fabric, 3 versiones). Con un pack de shaders, el cielo propio tambien se ve (`IrisApi#assignPipeline`).
 - Prueba multijugador en la CI: servidor dedicado + 2 clientes, cada uno con su clima; los frentes lejanos no viajan.
+- Materiales de publicación en `docs/publicacion/` (descripción es/en, galería) y jar de Fabric probado en Quilt
+  en la CI (job `selftest-quilt`: servidor Quilt real con Fabric API).
 - Sonido ambiente del clima: viento, tormenta, ventisca, tormenta de arena, granizo y aurora (bucles que suben y
   bajan con el frente; bajo techo se amortiguan).
 - Prueba de mundos antiguos en la CI: un mundo guardado por una versión anterior se abre con la actual sin perder nada.
