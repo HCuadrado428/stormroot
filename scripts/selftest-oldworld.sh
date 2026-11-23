@@ -30,7 +30,8 @@ rm -rf run/selftest
 cp -r build/oldworld-src/run/selftest run/selftest
 rm -f run/selftest/session.lock
 echo "eula=true" > run/eula.txt
-printf 'online-mode=false\nlevel-name=selftest\nlevel-type=minecraft\\:flat\ngenerate-structures=false\nspawn-monsters=false\nspawn-protection=0\n' > run/server.properties
+# pause-when-empty-seconds: desde 1.21.5 el servidor vacío se pausa a los 60 s y la prueba se quedaba congelada.
+printf 'online-mode=false\nlevel-name=selftest\nlevel-type=minecraft\\:flat\ngenerate-structures=false\nspawn-monsters=false\nspawn-protection=0\npause-when-empty-seconds=-1\n' > run/server.properties
 
 log="$(mktemp)"
 JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:-} -Dstormroot.selfTest=oldworld" \

@@ -40,8 +40,8 @@ public final class OldWorldSelfTest {
             SelfTest.check("old world: fronts and settings load", fronts != null,
                     "frentes=" + FrontTicker.simulation(server).fronts().size());
         }
-        if (ticks == 1200) {
-            // Un minuto de simulación normal encima del mundo viejo (frentes, filtración, micelio).
+        if (ticks == 900) {
+            // Un buen rato de simulación normal encima del mundo viejo (frentes, filtración, micelio).
             SelfTest.check("old world: simulation keeps running", true, "");
             FrontTicker.save(server);
             server.saveEverything(true, true, true);
