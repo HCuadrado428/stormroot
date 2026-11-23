@@ -83,7 +83,10 @@ public final class MultiplayerClientSelfTest {
             }
             case 1 -> {
                 // El servidor lanza /weather rain: un frente nuevo encima de cada uno.
-                boolean rainHere = ClientFronts.snapshot().stream().anyMatch(f -> f.type() == io.github.hcuadrado428.stormroot.weather.FrontType.RAIN
+                // Alba ya tiene la tormenta encima y el frente nuevo del /weather puede fundirse con ella
+                // (choque de frentes): vale cualquier frente que moje a menos de 60 bloques.
+                boolean rainHere = ClientFronts.snapshot().stream().anyMatch(f -> (f.type() == io.github.hcuadrado428.stormroot.weather.FrontType.RAIN
+                        || f.type() == io.github.hcuadrado428.stormroot.weather.FrontType.THUNDERSTORM)
                         && Math.hypot(f.x() - x, f.z() - z) < 60);
                 if (rainHere && kind != null && kind != CloudCover.Kind.NONE && waited > 100) {
                     SelfTest.report("client " + who + ": /weather rain reaches every player", true, "");
