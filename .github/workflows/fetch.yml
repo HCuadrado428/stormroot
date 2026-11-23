@@ -1,0 +1,30 @@
+name: fetch
+
+# Baja archivos (p. ej. sonidos CC0/CC-BY de OpenGameArt) y los vuelca al log en base64, en trozos de 60 000
+# caracteres (como los jars: FILE-B64 <nombre> <n.º> <base64>), porque el entorno de trabajo no puede bajarlos.
+# Uso: gh workflow run fetch.yml -f urls="https://... https://..."
+on:
+  workflow_dispatch:
+    inputs:
+      urls:
+        description: URLs separadas por espacios
+        required: true
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Bajar y volcar
+        env:
+          URLS: ${{ inputs.urls }}
+        run: |
+          set -u
+          for u in $URLS; do
+            n="$(basename "${u%%\?*}" | tr ' %' '__')"
+            echo "== $u -> $n"
+            curl -sSfL --retry 3 -o "$n" "$u" || { echo "FALLO $u"; continue; }
+            ls -la "$n"
+            base64 -w0 "$n" | fold -w 60000 | nl -ba -w1 -s' ' | while read -r i chunk; do
+              echo "FILE-B64 $n $i $chunk"
+            done
+          done
