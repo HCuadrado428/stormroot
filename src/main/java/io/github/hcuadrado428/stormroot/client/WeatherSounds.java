@@ -78,7 +78,7 @@ public final class WeatherSounds {
 
     /** Bucles sonando ahora mismo (para el self-test). */
     public static int playing() {
-        return (int) LOOPS.values().stream().filter(l -> l.volume > 0.01f).count();
+        return (int) LOOPS.values().stream().filter(Loop::audible).count();
     }
 
     static void reset() {
@@ -97,6 +97,10 @@ public final class WeatherSounds {
             relative = true;
             attenuation = SoundInstance.Attenuation.NONE;
             volume = 0.001f;
+        }
+
+        boolean audible() {
+            return volume > 0.01f;
         }
 
         @Override
