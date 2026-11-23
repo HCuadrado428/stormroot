@@ -197,6 +197,13 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   `dependsOn(runClient.map{...})`, ejecuta runClient y cuelga la CI) + su entorno (`client-env.txt`) y un
   `options.txt` con `skipMultiplayerWarning`/`joinedFirstServer` (desde 1.21 ese aviso para el quickPlay).
   `FrontTicker.pauseSpawnsForTest` da determinismo.
+- **Mundos antiguos** (`selftest/OldWorldSelfTest` con `-Dstormroot.selfTest=oldworld`, `scripts/selftest-oldworld.sh`,
+  job `selftest-oldworld`, commit viejo en `compat.ref`): el self-test del commit de `compat.ref` genera y guarda el
+  mundo (worktree en `build/oldworld-src`) y el código actual lo abre: deben cargar las redes de micelio, la
+  filtración y los frentes con sus ajustes (un codec que no entiende el formato viejo entrega datos VACÍOS, por eso
+  se mira el contenido), 45 s de simulación y volver a guardar. OJO: desde 1.21.5 el servidor vacío se pausa a los
+  60 s (`pause-when-empty-seconds=-1` en server.properties). Si cambias el formato de guardado, mantén la carga del
+  viejo y actualiza `compat.ref` solo cuando el formato nuevo ya esté publicado.
 - La CI sube los jars (Stormroot y Bloomberto) en el artefacto `jars` y además en el log, en trozos de 60 000 caracteres
   (`JAR-B64 <nombre> <n.º> <base64>`; GitHub descarta las líneas más largas).
 - `research` también saca JSON de datos y recursos vanilla (loot tables, modelos) de los jars del juego.

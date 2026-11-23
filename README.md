@@ -39,6 +39,8 @@ NeoForge 1.20.1: usa el jar de **Forge 1.20.1** (NeoForge 1.20.1 es un fork de F
 
 **Multijugador**: la CI levanta un servidor dedicado con dos jugadores a la vez (job `selftest-mp`, solo Fabric): cada uno ve su propio cielo (tormenta sobre uno, despejado sobre el otro a 3000 bloques), los frentes lejanos no se sincronizan y `/weather rain` pone lluvia a los dos. En local: `scripts/selftest-mp.sh 1.21.11-fabric` (necesita xvfb).
 
+**Mundos antiguos**: la CI guarda un mundo con una versión anterior del mod (commit en `compat.ref`) y lo abre con la actual (job `selftest-oldworld`): los datos guardados (frentes, ajustes, filtración, redes de micelio) tienen que cargar y la simulación seguir. En local: `scripts/selftest-oldworld.sh 1.21.11-fabric`.
+
 **Sodium e Iris** (Fabric): la CI pasa el self-test del cliente con Sodium y con Sodium + Iris en los 3 targets de Fabric (job `selftest-render`), y con Iris y un pack de shaders en 1.21.11. Para probarlo en local: `./gradlew :1.21.1-fabric:runClient -Pstormroot.renderMods=sodium,iris` (las versiones están en `versions/dependencies/<versión>.properties`). Con un pack de shaders (probado con Complementary Reimagined en las 3 versiones) el self-test pasa y el cielo de Stormroot se ve junto al del pack; en 1.21.11 el muro de arena aún sale con dientes de sierra.
 
 ---
