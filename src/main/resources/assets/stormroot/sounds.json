@@ -1,0 +1,26 @@
+{
+  "weather.wind": {
+    "subtitle": "subtitles.stormroot.weather.wind",
+    "sounds": [{"name": "stormroot:weather/wind", "stream": true}]
+  },
+  "weather.wind_strong": {
+    "subtitle": "subtitles.stormroot.weather.wind",
+    "sounds": [{"name": "stormroot:weather/wind_strong", "stream": true}]
+  },
+  "weather.blizzard": {
+    "subtitle": "subtitles.stormroot.weather.blizzard",
+    "sounds": [{"name": "stormroot:weather/blizzard", "stream": true}]
+  },
+  "weather.sandstorm": {
+    "subtitle": "subtitles.stormroot.weather.sandstorm",
+    "sounds": [{"name": "stormroot:weather/sandstorm", "stream": true}]
+  },
+  "weather.hail": {
+    "subtitle": "subtitles.stormroot.weather.hail",
+    "sounds": [{"name": "stormroot:weather/hail", "stream": true}]
+  },
+  "weather.aurora": {
+    "subtitle": "subtitles.stormroot.weather.aurora",
+    "sounds": [{"name": "stormroot:weather/aurora", "stream": true}]
+  }
+}

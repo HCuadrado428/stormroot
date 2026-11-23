@@ -43,5 +43,10 @@
   "item.stormroot.mycelium_heart": "Mycelium Heart",
   "item.stormroot.sporeling_spawn_egg": "Sporeling Spawn Egg",
   "item.stormroot.weaver_spawn_egg": "Weaver Spawn Egg",
-  "item.stormroot.mycelium_guardian_spawn_egg": "Mycelium Guardian Spawn Egg"
+  "item.stormroot.mycelium_guardian_spawn_egg": "Mycelium Guardian Spawn Egg",
+  "subtitles.stormroot.weather.wind": "Wind blows",
+  "subtitles.stormroot.weather.blizzard": "Blizzard howls",
+  "subtitles.stormroot.weather.sandstorm": "Sandstorm hisses",
+  "subtitles.stormroot.weather.hail": "Hail rattles",
+  "subtitles.stormroot.weather.aurora": "Aurora hums"
 }

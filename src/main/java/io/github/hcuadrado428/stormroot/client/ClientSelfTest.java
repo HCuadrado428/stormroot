@@ -109,6 +109,10 @@ public final class ClientSelfTest {
                 if (visible || waited > TIMEOUT) {
                     SelfTest.report("storm is visible on the client", visible,
                             "trueno=" + ClientWeather.thunder() + ", lluvia=" + ClientWeather.rain());
+                    // El sonido ambiente del clima: bajo la tormenta debe haber al menos un bucle sonando
+                    // (aunque la CI no tenga tarjeta de sonido, el volumen objetivo y el fundido son nuestros).
+                    SelfTest.report("weather sound loops follow the storm", WeatherSounds.playing() >= 1,
+                            "bucles=" + WeatherSounds.playing());
                     checkBloomberto(mc);
                     stage = 20; // captura bajo la tormenta y luego sigue en el 3
                     stageStart = ticks;

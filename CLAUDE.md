@@ -204,13 +204,20 @@ Frentes climáticos que avanzan por el mundo y cambian lo que hay bajo tierra. E
   se mira el contenido), 45 s de simulación y volver a guardar. OJO: desde 1.21.5 el servidor vacío se pausa a los
   60 s (`pause-when-empty-seconds=-1` en server.properties). Si cambias el formato de guardado, mantén la carga del
   viejo y actualiza `compat.ref` solo cuando el formato nuevo ya esté publicado.
+- **Sonido** (`registry/ModSounds` común, registro por loader en `Stormroot.java` como los items;
+  `client/WeatherSounds` llamado por `ClientWeather`): 6 bucles de ambiente (`weather.wind`, `wind_strong`,
+  `blizzard`, `sandstorm`, `hail`, `aurora`) en `sounds/weather/*.ogg` (stream), volumen según la intensidad del
+  frente encima (bajo techo ×0,35; granizo con `SkyWeather.cloudKindAt`; aurora solo de noche). Archivos CC0
+  reprocesados con `art/sounds/make_sounds.py` (fuentes en `docs/creditos-sonidos.md`; se bajan con el workflow
+  `fetch`, que vuelca binarios al log como `FILE-B64`). API igual en las 3 versiones
+  (`AbstractTickableSoundInstance`, `SoundEvent.createVariableRangeEvent`).
 - La CI sube los jars (Stormroot y Bloomberto) en el artefacto `jars` y además en el log, en trozos de 60 000 caracteres
   (`JAR-B64 <nombre> <n.º> <base64>`; GitHub descarta las líneas más largas).
 - `research` también saca JSON de datos y recursos vanilla (loot tables, modelos) de los jars del juego.
 - Fuentes decompiladas desde la CI: `gh api -X POST repos/HCuadrado428/stormroot/actions/workflows/research.yml/dispatches`
   con `inputs[classes]` y `inputs[pattern]` (workflow `research`).
 - Compila en los 6 targets y **el self-test pasa dentro del juego en los 6** (servidor: 62 comprobaciones; cliente con
-  un jugador en pantalla virtual: 23 más, incluidas las de Bloomberto y las del cielo).
+  un jugador en pantalla virtual: 24 más, incluidas las de Bloomberto y las del cielo).
 - En el self-test, el clima se lee de `server.getWorldData().overworldData()`: `level.isRaining()/isThundering()` son la
   intensidad visual, que sube tick a tick. Lo visual (niebla, partículas, texturas) aún no se ha mirado a ojo.
 - **Self-test** (`selftest/SelfTest`, `client/ClientSelfTest`, `scripts/selftest.sh`, job `selftest` de la CI): cuando

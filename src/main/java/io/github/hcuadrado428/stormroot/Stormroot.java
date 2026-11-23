@@ -96,6 +96,9 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
         event.register(Registries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING_ID), io.github.hcuadrado428.stormroot.entity.ModEntities::sporeling);
         event.register(Registries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.WEAVER_ID), io.github.hcuadrado428.stormroot.entity.ModEntities::weaver);
         event.register(Registries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.GUARDIAN_ID), io.github.hcuadrado428.stormroot.entity.ModEntities::guardian);
+        for (String soundId : io.github.hcuadrado428.stormroot.registry.ModSounds.IDS) {
+            event.register(Registries.SOUND_EVENT, ModIds.id(soundId), () -> io.github.hcuadrado428.stormroot.registry.ModSounds.get(soundId));
+        }
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.WEATHERVANE_ID),
                 () -> ModBlocks.WEATHERVANE = ModBlocks.createWeathervane());
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.BAROMETER_ID),
@@ -217,6 +220,9 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
         event.register(Registries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING_ID), io.github.hcuadrado428.stormroot.entity.ModEntities::sporeling);
         event.register(Registries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.WEAVER_ID), io.github.hcuadrado428.stormroot.entity.ModEntities::weaver);
         event.register(Registries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.GUARDIAN_ID), io.github.hcuadrado428.stormroot.entity.ModEntities::guardian);
+        for (String soundId : io.github.hcuadrado428.stormroot.registry.ModSounds.IDS) {
+            event.register(Registries.SOUND_EVENT, ModIds.id(soundId), () -> io.github.hcuadrado428.stormroot.registry.ModSounds.get(soundId));
+        }
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.WEATHERVANE_ID),
                 () -> ModBlocks.WEATHERVANE = ModBlocks.createWeathervane());
         event.register(Registries.BLOCK, ModIds.id(ModBlocks.BAROMETER_ID),
@@ -337,6 +343,9 @@ public class Stormroot /*? if fabric {*/ implements ModInitializer /*?}*/ {
                 ModIds.id(ModBlocks.FROST_ICE_ID), ModBlocks.createFrostIce());
         ModBlocks.SAND_LAYER = Registry.register(BuiltInRegistries.BLOCK,
                 ModIds.id(ModBlocks.SAND_LAYER_ID), ModBlocks.createSandLayer());
+        for (String soundId : io.github.hcuadrado428.stormroot.registry.ModSounds.IDS) {
+            Registry.register(BuiltInRegistries.SOUND_EVENT, ModIds.id(soundId), io.github.hcuadrado428.stormroot.registry.ModSounds.get(soundId));
+        }
         ModItems.LIGHTNING_CRYSTAL = Registry.register(BuiltInRegistries.ITEM,
                 ModIds.id("lightning_crystal"), ModItems.create("lightning_crystal"));
         Registry.register(BuiltInRegistries.ENTITY_TYPE, ModIds.id(io.github.hcuadrado428.stormroot.entity.ModEntities.SPORELING_ID), io.github.hcuadrado428.stormroot.entity.ModEntities.sporeling());

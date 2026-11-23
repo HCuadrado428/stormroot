@@ -54,6 +54,7 @@ public final class ClientWeather {
         LocalPlayer player = mc.player;
         if (level == null || player == null) {
             ClientFronts.reset();
+            WeatherSounds.reset();
             rain = thunder = fog = 0;
             return;
         }
@@ -62,8 +63,10 @@ public final class ClientWeather {
         }
         if (!ClientFronts.active() || level.dimension() != Level.OVERWORLD) {
             fog = approach(fog, 0);
+            WeatherSounds.reset();
             return;
         }
+        WeatherSounds.tick(mc, level, player);
 
         ClientFronts.advance(1.0 / 20.0);
         double x = player.getX();
