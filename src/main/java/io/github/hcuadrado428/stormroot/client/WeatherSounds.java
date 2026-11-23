@@ -76,9 +76,14 @@ public final class WeatherSounds {
         loop.target = target;
     }
 
-    /** Bucles sonando ahora mismo (para el self-test). */
+    /** Bucles sonando ahora mismo. */
     public static int playing() {
         return (int) LOOPS.values().stream().filter(Loop::audible).count();
+    }
+
+    /** Bucles que QUEREMOS que suenen (para el self-test: en la CI no hay tarjeta de sonido y el motor no los tica). */
+    public static int wanted() {
+        return (int) LOOPS.values().stream().filter(l -> l.target > 0.01f).count();
     }
 
     static void reset() {
