@@ -306,3 +306,47 @@ jobs:
         run: |
           chmod +x ./gradlew scripts/selftest-mp.sh
           scripts/selftest-mp.sh ${{ matrix.target }}
+
+  # Mundos guardados por versiones anteriores: el self-test del commit de compat.ref genera el mundo y el código
+  # actual lo abre (una versión de Minecraft por job, alternando loaders).
+  selftest-oldworld:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    needs: build
+    if: github.event_name != 'release'
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - 1.20.1-forge
+          - 1.21.1-neoforge
+          - 1.21.11-fabric
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: |
+            17
+            21
+            25
+          cache: gradle
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Caché de Bloomberto
+        uses: actions/cache@v4
+        with:
+          path: libs/bloomberto
+          key: bloomberto-${{ hashFiles('bloomberto.ref') }}
+
+      - name: Compilar Bloomberto
+        run: |
+          chmod +x scripts/fetch-bloomberto.sh
+          scripts/fetch-bloomberto.sh
+
+      - name: Mundo antiguo (${{ matrix.target }})
+        run: |
+          chmod +x ./gradlew scripts/selftest-oldworld.sh
+          scripts/selftest-oldworld.sh ${{ matrix.target }}

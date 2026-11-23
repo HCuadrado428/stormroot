@@ -55,6 +55,7 @@ public final class FrontTicker {
     public static void onServerTick(MinecraftServer server) {
         SelfTest.tick(server);
         io.github.hcuadrado428.stormroot.selftest.MultiplayerSelfTest.tick(server);
+        io.github.hcuadrado428.stormroot.selftest.OldWorldSelfTest.tick(server);
         long perfTick = io.github.hcuadrado428.stormroot.Perf.start();
         LightningCrystals.tick();
         LightningRoots.tick();
